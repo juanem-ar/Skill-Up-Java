@@ -1,14 +1,17 @@
 package com.alkemy.wallet.model;
 
+import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
-import java.security.Timestamp;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Data
@@ -24,17 +27,27 @@ public class Account {
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
 
-    private enum currency { ARS, USD} ;
+    private enum Currency { ARS, USD} ;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
+
+    @NotNull
     private Double transactionLimit;
 
+    @NotNull
     private Double balance;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "account_id", referencedColumnName = "id")
     private long userId;
 
-    private Timestamp creationDate;
+    @CreationTimestamp
+    private LocalDateTime creationDate;
 
-    private Timestamp updateData;
+    @UpdateTimestamp
+    private LocalDateTime updateData;
 
     private Boolean softDelete;
 }

@@ -39,7 +39,7 @@ public class Account {
     @NotNull
     private Double balance;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     private long userId;
 

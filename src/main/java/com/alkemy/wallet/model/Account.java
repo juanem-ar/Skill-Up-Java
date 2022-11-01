@@ -4,17 +4,19 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.security.Timestamp;
 
 @Entity
 @Data
 @Getter
 @Setter
+@Table(name= "accounts")
+@SQLDelete(sql = "UPDATE accounts SET deleted=true WHERE id = ?")
+@Where(clause = "deleted = false")
 public class Account {
 
     @Id
@@ -34,5 +36,5 @@ public class Account {
 
     private Timestamp updateData;
 
-
+    private Boolean softDelete;
 }

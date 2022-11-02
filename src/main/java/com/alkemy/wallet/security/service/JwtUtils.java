@@ -1,6 +1,8 @@
 package com.alkemy.wallet.security.service;
 
+import com.alkemy.wallet.repository.IUserRepository;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.internal.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import io.jsonwebtoken.Jwts;
 @Service
 public class JwtUtils {
     private String SECRET_KEY = "secret";
+    @Autowired
+    private IUserRepository userRepository;
 
     public String extractUsername (String token){ return extractClaim(token, Claims::getSubject);}
     public Date extractExpiration(String token){ return extractClaim(token, Claims::getExpiration);}
@@ -30,6 +34,8 @@ public class JwtUtils {
 
     public String generateToken(UserDetails userDetails){
         Map<String, Object> claims = new HashMap<>();
+        //username and userID are integrated in claims
+        claims.put("userId",userRepository.findByEmail(userDetails.getUsername()).getId());
         return createToken(claims, userDetails.getUsername());
     }
     private String createToken(Map<String, Object> claims, String subject){

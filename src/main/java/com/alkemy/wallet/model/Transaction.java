@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.lang.Nullable;
@@ -12,15 +13,15 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
+@Table(name = "transactions")
 @Data
 @Getter
 @Setter
-@Table(name= "transactions")
-@SQLDelete(sql = "UPDATE transaction SET deleted=true WHERE id = ?")
+@SQLDelete(sql = "UPDATE transactions SET deleted=true WHERE id = ?")
 @Where(clause = "deleted = false")
 public class Transaction {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     private Long id;
     @NotNull
     private Double amount;
@@ -28,14 +29,17 @@ public class Transaction {
     private EType type;
     @Nullable
     private String description;
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "USER_ID", insertable = false, updatable = false)
-    private User userId;
+    private Boolean softDelete;
+
+    @Column(name="ACCOUNT_ID", nullable = false)
+    private Long accountId;
+
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name = "ACCOUNT_ID", insertable = false, updatable = false)
-    private Account accountId;
+    private Account account;
+
+    @CreationTimestamp
     private Timestamp transactionDate;
-
-
-
 }
+
+

@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("api/v1/users")
 @RestController
-public class UserContreoller {
+public class UserController {
+    private UserServiceImpl userService;
 
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> deleteUsers(@PathVariable Long id){
+        return new ResponseEntity<>(userService.deleteUser(id), HttpStatus.OK);
+    }
 }

@@ -1,28 +1,34 @@
 package com.alkemy.wallet.controller;
 
-import com.alkemy.wallet.dto.TransactionDTO;
 import com.alkemy.wallet.model.EType;
+import com.alkemy.wallet.repository.AccountRepository;
+import com.alkemy.wallet.security.dto.AuthenticationResponseDto;
+import com.alkemy.wallet.dto.TransactionDto;
+import com.alkemy.wallet.security.service.JwtUtils;
+import com.alkemy.wallet.service.impl.TransactionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("TRANSACTIONS")
+@RequestMapping("transactions")
 public class TransactionController {
 
-    @Lazy
     @Autowired
+    private TransactionServiceImpl transactionService;
 
-    // Especificar id de cuenta destinataria, monto y todos los campos NOT NULL de la tabla Transactions
-    @PostMapping("/transactions/")
-    public ResponseEntity<TransactionDTO> sendArs(@PathVariable Long accountId, Long amount, EType type) {
-        //try - catch
-    }
+    @Autowired
+    private JwtUtils jwtUtils;
+    private AuthenticationResponseDto dto;
 
-    // Especificar el id de la cuenta destinataria, el monto, y todos los campos NOT NULL de la tabla Transactions
-    public ResponseEntity<TransactionDTO> sendUsd(@PathVariable Long accountId, Long amount, EType type) {
-        //try - catch
-    }
+    @Autowired
+    private AccountRepository accountRepository;
+
+    /*@PostMapping("/sendArs")
+    public ResponseEntity<TransactionDto> sendArs(@PathVariable Long accountId, Long amount, EType type) {
+        // Usuario emisor deberá extraerse del token
+        String username = jwtUtils.extractUsername(dto.getJwt());
+        return ResponseEntity.ok().body(transactionService.sendArs(accountId,amount,type));
+    }*/
 }
 

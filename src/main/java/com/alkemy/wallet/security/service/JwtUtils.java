@@ -11,7 +11,7 @@ import java.util.Map;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
-/*
+
 @Service
 public class JwtUtils {
     private String SECRET_KEY = "secret";
@@ -42,4 +42,3 @@ public class JwtUtils {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }
-*/

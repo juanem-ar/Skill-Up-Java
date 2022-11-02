@@ -34,7 +34,7 @@ public class Transaction {
     @Column(name="ACCOUNT_ID", nullable = false)
     private Long accountId;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "ACCOUNT_ID", insertable = false, updatable = false)
     private Account account;
 

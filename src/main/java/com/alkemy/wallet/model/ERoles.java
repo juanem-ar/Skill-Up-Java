@@ -1,5 +1,5 @@
 package com.alkemy.wallet.model;
 
-public enum Roles {
+public enum ERoles {
     ADMIN,USER
 }

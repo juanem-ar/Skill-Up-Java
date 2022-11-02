@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
+/*
 @Service
 public class UserDetailsCustomService implements UserDetailsService {
     @Autowired
@@ -23,3 +24,6 @@ public class UserDetailsCustomService implements UserDetailsService {
         return new User(userEntity.getEmail(), userEntity.getPassword(), Collections.emptyList());
     }
 }
+*/
+
+

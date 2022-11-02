@@ -2,6 +2,8 @@ package com.alkemy.wallet.repository;
 
 import com.alkemy.wallet.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface ITransactionRepository extends JpaRepository<Long, Transaction> {
+@Repository
+public interface ITransactionRepository extends JpaRepository<Transaction, Long> {
 }

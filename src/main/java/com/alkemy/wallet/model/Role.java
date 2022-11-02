@@ -30,7 +30,7 @@ public class Role implements Serializable {
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "NAME")
-    private Roles name;
+    private ERoles name;
 
     @Column(name = "DESCRIPTION")
     private String description;

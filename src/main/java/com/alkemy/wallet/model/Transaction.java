@@ -1,13 +1,23 @@
 package com.alkemy.wallet.model;
 
 import com.sun.istack.NotNull;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "transactions")
+@Data
+@Getter
+@Setter
+@Table(name= "transactions")
+@SQLDelete(sql = "UPDATE transaction SET deleted=true WHERE id = ?")
+@Where(clause = "deleted = false")
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,78 +28,14 @@ public class Transaction {
     private EType type;
     @Nullable
     private String description;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "USER_ID", insertable = false, updatable = false)
     private User userId;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "ACCOUNT_ID", insertable = false, updatable = false)
     private Account accountId;
     private Timestamp transactionDate;
 
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public EType getType() {
-        return type;
-    }
-
-    public void setType(EType type) {
-        this.type = type;
-    }
-
-    @Nullable
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(@Nullable String description) {
-        this.description = description;
-    }
-
-    public User getUserId() {
-        return userId;
-    }
-
-    public void setUserId(User userId) {
-        this.userId = userId;
-    }
-
-    public Account getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(Account accountId) {
-        this.accountId = accountId;
-    }
-
-    public Timestamp getTransactionDate() {
-        return transactionDate;
-    }
-
-    public void setTransactionDate(Timestamp transactionDate) {
-        this.transactionDate = transactionDate;
-    }
-
-    @Override
-    public String toString() {
-        return "Transaction{" +
-                "id=" + id +
-                ", amount=" + amount +
-                ", type=" + type +
-                ", description='" + description + '\'' +
-                ", userId=" + userId +
-                ", accountId=" + accountId +
-                ", transactionDate=" + transactionDate +
-                '}';
-    }
 }

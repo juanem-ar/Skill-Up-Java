@@ -39,9 +39,12 @@ public class Account {
     @NotNull
     private Double balance;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "account_id", referencedColumnName = "id")
-    private long userId;
+    @Column(name="USER_ID", nullable = false)
+    private Long userId;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "USER_ID", insertable = false, updatable = false)
+    private User user;
 
     @CreationTimestamp
     private LocalDateTime creationDate;

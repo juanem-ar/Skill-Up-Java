@@ -1,5 +1,5 @@
 package com.alkemy.wallet.security.filter;
-/*
+
 import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.security.service.UserDetailsCustomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,4 +52,3 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
-*/

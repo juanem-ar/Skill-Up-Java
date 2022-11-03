@@ -45,6 +45,6 @@ public class AccountController {
 
         account.get().setTransactionLimit(transactionLimit);
 
-        return new ResponseEntity<>(iAccountMapper.accountToAccountDto(account), HttpStatus.OK);
+        return new ResponseEntity<>(iAccountMapper.accountToAccountDto(account.get()), HttpStatus.OK);
     }
 }

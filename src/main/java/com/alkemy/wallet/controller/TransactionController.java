@@ -7,6 +7,7 @@ import com.alkemy.wallet.dto.TransactionDto;
 import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.impl.TransactionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,16 +20,12 @@ public class TransactionController {
 
     @Autowired
     private JwtUtils jwtUtils;
-    private AuthenticationResponseDto authenticationResponseDto;
 
-    @Autowired
-    private AccountRepository accountRepository;
 
-    /*
     @PostMapping("/sendArs")
-    public ResponseEntity<TransactionDto> sendArs(@PathVariable Long accountId, Long amount, EType type) {
-        Long senderId = jwtUtils.extractUserId(authenticationResponseDto.getJwt());
-        return ResponseEntity.ok().body(transactionService.sendArs(senderId,accountId,amount,type));
-    }*/
+    public ResponseEntity<TransactionDto> sendArs(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Long amount, EType type) {
+        return ResponseEntity.ok().body(transactionService.sendArs(token,accountId,amount,type));
+    }
+
 }
 

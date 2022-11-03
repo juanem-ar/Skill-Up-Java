@@ -3,6 +3,7 @@ package com.alkemy.wallet.model;
 import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
@@ -17,8 +18,9 @@ import java.sql.Timestamp;
 @Data
 @Getter
 @Setter
-@SQLDelete(sql = "UPDATE transactions SET deleted=true WHERE id = ?")
-@Where(clause = "deleted = false")
+@NoArgsConstructor
+@SQLDelete(sql = "UPDATE transactions SET soft_delete=true WHERE id = ?")
+@Where(clause = "soft_delete = false")
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
@@ -29,7 +31,7 @@ public class Transaction {
     private EType type;
     @Nullable
     private String description;
-    private Boolean softDelete;
+    private Boolean softDelete = Boolean.FALSE;
 
     @Column(name="ACCOUNT_ID", nullable = false)
     private Long accountId;

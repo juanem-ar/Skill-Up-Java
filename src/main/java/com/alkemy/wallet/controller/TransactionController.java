@@ -19,16 +19,16 @@ public class TransactionController {
 
     @Autowired
     private JwtUtils jwtUtils;
-    private AuthenticationResponseDto dto;
+    private AuthenticationResponseDto authenticationResponseDto;
 
     @Autowired
     private AccountRepository accountRepository;
 
-    /*@PostMapping("/sendArs")
+    /*
+    @PostMapping("/sendArs")
     public ResponseEntity<TransactionDto> sendArs(@PathVariable Long accountId, Long amount, EType type) {
-        // Usuario emisor deberá extraerse del token
-        String username = jwtUtils.extractUsername(dto.getJwt());
-        return ResponseEntity.ok().body(transactionService.sendArs(accountId,amount,type));
+        Long senderId = jwtUtils.extractUserId(authenticationResponseDto.getJwt());
+        return ResponseEntity.ok().body(transactionService.sendArs(senderId,accountId,amount,type));
     }*/
 }
 

@@ -1,9 +1,10 @@
 package com.alkemy.wallet.service.impl;
 
 import com.alkemy.wallet.mapper.TransactionMapper;
+import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
-import com.alkemy.wallet.model.User;
+import com.alkemy.wallet.repository.AccountRepository;
 import com.alkemy.wallet.repository.ITransactionRepository;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.dto.TransactionDto;
@@ -14,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,23 +23,20 @@ public class TransactionServiceImpl extends GenericServiceImpl<Transaction, Long
 
     private final ITransactionRepository transactionRepository;
     private final IUserRepository userRepository;
-    //private final IAccountRepository accountRepository;
+    private final AccountRepository accountRepository;
     private final TransactionMapper transactionMapper;
 
-/*
-    public TransactionDto sendArs(Long accountId, Long amount, EType type) {
+    /*
+    public TransactionDto sendArs(Long senderId, Long accountId, Long amount, EType type) {
 
-        Long userId = 1L;
-        Long accountUserId = userRepository.findAccountByUserId(userId);
+        Account senderAccount = accountRepository.findArsAccountByUserId(userId);
         Long receiverId = userRepository.findAccountByUserId(accountId);
 
-        Optional<User> user = userRepository.findById(userId);
-        Account account = accountRepository.findAccountArsByUserId(userId);
-
-        if (account.getBalance() >= amount && account.getTransactionLimit() >= amount) {
-            TransactionDto transaction = transactionMapper.toDto(payment(userId, accountUserId, amount, type));
-            income(accountId, amount, EType.INCOME, receiverId);
+        if (amount <= senderAccount.getBalance() && amount <= senderAccount.getTransactionLimit()) {
+            TransactionDto transaction = transactionMapper.toDto(payment(senderId, receiverId, amount, type));
+            income(accountId, receiverId, amount, EType.INCOME);
             log.info("Transaccion exitosa");
+
         } else {
             log.error("Fallo en la transaccion ARS");
         }

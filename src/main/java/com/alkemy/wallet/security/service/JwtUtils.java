@@ -21,6 +21,13 @@ public class JwtUtils {
     private IUserRepository userRepository;
 
     public String extractUsername (String token){ return extractClaim(token, Claims::getSubject);}
+    public Long extractUserId (String token){
+        String subject = extractClaim(token, Object::toString);
+        String[] list = subject.split(",");
+        String[] listSplit = list[2].split("=");
+        Long userId = Long.parseLong(listSplit[1]);
+        return userId;
+    }
     public Date extractExpiration(String token){ return extractClaim(token, Claims::getExpiration);}
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         final Claims claims = extractAllClaims(token);

@@ -7,5 +7,6 @@ public interface ITransactionService {
 
     String getJwt(String token);
     //ResponseTransactionDto sendArs(String token, Long accountId, Long amount, EType type); // faltan métodos llamados adentro
+    //ResponseTransactionDto sendUsd(String token, Long accountId, Long amount, EType type); // faltan métodos llamados adentro
     ResponseTransactionDto save(ResponseTransactionDto transactionDto);
 }

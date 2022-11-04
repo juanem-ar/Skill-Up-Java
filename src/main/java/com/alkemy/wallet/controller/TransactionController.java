@@ -26,6 +26,12 @@ public class TransactionController {
         return ResponseEntity.ok().body(transactionService.sendArs(token,accountId,amount,type));
     }*/
 
+    /*
+    @PostMapping("/sendUsd")
+    public ResponseEntity<ResponseTransactionDto> sendUsd(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Long amount, EType type) {
+        return ResponseEntity.ok().body(transactionService.sendUsd(token,accountId,amount,type));
+    }*/
+
     @PostMapping("/deposit")
     public ResponseEntity<ResponseTransactionDto> saveDeposit(
             @RequestBody ResponseTransactionDto deposit){

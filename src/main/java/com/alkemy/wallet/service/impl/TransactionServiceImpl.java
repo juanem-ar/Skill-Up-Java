@@ -36,7 +36,7 @@ public class TransactionServiceImpl implements ITransactionService {
         return jwt;
     }
 
-    // Faltan findArsAccountByUserId
+    // Falta findArsAccountByUserId, payment e income
     /*
     public ResponseTransactionDto sendArs(String token, Long accountId, Long amount, EType type) {
 
@@ -54,6 +54,28 @@ public class TransactionServiceImpl implements ITransactionService {
             save(transaction);
         } else {
             log.error("ARS transaction failed");
+        }
+        return transaction;
+    }*/
+
+    // Falta findUsdAccountByUserId, payment e income
+    /*
+    public ResponseTransactionDto sendUsd(String token, Long accountId, Long amount, EType type) {
+
+        Long senderId = jwtUtils.extractUserId(getJwt(token));
+        ResponseTransactionDto transaction = null;
+        //Account senderAccount = accountRepository.findUsdAccountByUserId(senderId);
+        Long receiverId = accountRepository.findUsdAccountByUserId(accountId);
+
+        if (amount <= senderAccount.getBalance() && amount <= senderAccount.getTransactionLimit()) {
+
+            transaction = transactionMapper.modelToResponseTransactionDto(payment(senderId, receiverId, amount, type));
+            income(accountId, receiverId, amount, EType.INCOME);
+            log.info("Successful USD transaction");
+
+            save(transaction);
+        } else {
+            log.error("USD transaction failed");
         }
         return transaction;
     }*/

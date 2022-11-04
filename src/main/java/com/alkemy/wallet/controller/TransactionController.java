@@ -13,37 +13,31 @@ import java.util.List;
 @RequestMapping("transactions")
 @RestController
 public class TransactionController {
-
     @Autowired
     private TransactionServiceImpl transactionService;
-
     @Autowired
     private JwtUtils jwtUtils;
-
     /*
     @PostMapping("/sendArs")
     public ResponseEntity<ResponseTransactionDto> sendArs(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Long amount, EType type) {
         return ResponseEntity.ok().body(transactionService.sendArs(token,accountId,amount,type));
     }*/
-
     @PostMapping("/deposit")
     public ResponseEntity<ResponseTransactionDto> saveDeposit(
             @RequestBody ResponseTransactionDto deposit){
         ResponseTransactionDto depositCreated = transactionService.save(deposit);
         return ResponseEntity.status(HttpStatus.CREATED).body(depositCreated);
     }
-
-
-    /*
     @GetMapping("/{userId}")
-    public ResponseEntity<ResponseTransactionDto> getListTransactionByAdminUser(@PathVariable("userId") Long userId){
+    public ResponseEntity<?> getListTransactionByAdminUser(@PathVariable("userId") Long userId) {
         //IF PARA VALIDAR USUARIO ADMINISTRADOR
         List<ResponseTransactionDto> listTransactionsByUser = transactionService.findByUserId(userId);
-        if(listTransactionsByUser.isEmpty()){
-            return new ResponseEntity<ResponseTransactionDto>("User doesn't exist or has not transactions", HttpStatus.NOT_FOUND);
-        }else {
-            return new ResponseEntity<ResponseTransactionDto>(listTransactionsByUser, HttpStatus.OK);
+        if (listTransactionsByUser.isEmpty()) {
+            return new ResponseEntity<>("User doesn't exist or has not transactions", HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(listTransactionsByUser, HttpStatus.OK);
         }
-    }*/
+    }
+
 
 }

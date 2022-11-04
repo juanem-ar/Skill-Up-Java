@@ -17,6 +17,8 @@ import com.alkemy.wallet.dto.ResponseTransactionDto;
 import com.alkemy.wallet.exceptions.ErrorEnum;
 import com.alkemy.wallet.exceptions.TransactionError;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -66,6 +68,11 @@ public class TransactionServiceImpl implements ITransactionService {
         Transaction entity = transactionMapper.responseTransactionDtoToModel(transactionDto);
         Transaction entitySaved = transactionRepository.save(entity);
         return transactionMapper.modelToResponseTransactionDto(entitySaved);
+    }
+
+    @Override
+    public List<ResponseTransactionDto> findByUserId(Long userId) {
+        return transactionMapper.listModelToResponseTransactionDto(transactionRepository.findByAccount_UserId(userId));
     }
 }
 

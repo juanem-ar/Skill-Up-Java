@@ -19,13 +19,7 @@ import org.springframework.stereotype.Service;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 import com.alkemy.wallet.exceptions.ErrorEnum;
 import com.alkemy.wallet.exceptions.TransactionError;
-import com.alkemy.wallet.mapper.ITransactionMapper;
-import com.alkemy.wallet.model.EType;
-import com.alkemy.wallet.model.Transaction;
-import com.alkemy.wallet.repository.ITransactionRepository;
-import com.alkemy.wallet.service.ITransactionService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +39,6 @@ public class TransactionServiceImpl extends GenericServiceImpl<Transaction, Long
         return jwt;
     }
 
-    /*
     public TransactionDto sendArs(String token, Long accountId, Long amount, EType type) {
 
         Long senderId = jwtUtils.extractUserId(getJwt(token));
@@ -64,7 +57,12 @@ public class TransactionServiceImpl extends GenericServiceImpl<Transaction, Long
             log.error("ARS transaction failed");
         }
         return transaction;
-    }*/
+    }
+
+    @Override
+    public Transaction save(Transaction entity) {
+        return transactionRepository.save(entity);
+    }
 
     // Si queda el extends GenericService, el método del conflicto sería asi
     public ResponseTransactionDto save(ResponseTransactionDto transactionDto){
@@ -75,11 +73,6 @@ public class TransactionServiceImpl extends GenericServiceImpl<Transaction, Long
         Transaction entity = transactionMapper.toEntity(transactionDto); // Pero toEntity recibe TransactionDto, y transactionDto es un ResponseTransactionDto
         Transaction entitySaved = transactionRepository.save(entity);
         return transactionMapper.toDto(entitySaved);
-    }
-
-    @Override
-    public Transaction save(Transaction entity) {
-        return transactionRepository.save(entity);
     }
 
     @Override

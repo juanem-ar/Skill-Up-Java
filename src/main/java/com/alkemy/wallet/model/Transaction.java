@@ -14,9 +14,8 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "transactions")
-@Data
-//@Getter
-//@Setter
+@Getter
+@Setter
 @SQLDelete(sql = "UPDATE transactions SET deleted=true WHERE id = ?")
 @Where(clause = "deleted = false")
 public class Transaction {
@@ -25,7 +24,7 @@ public class Transaction {
     private Long id;
     @NotNull
     private Double amount;
-    @NotNull
+   // @NotNull
     private EType type;
     @Nullable
     private String description;

@@ -22,7 +22,7 @@ public class TransactionController {
         ResponseTransactionDto depositCreated = transactionService.save(deposit);
         return ResponseEntity.status(HttpStatus.CREATED).body(depositCreated);
     }
-    @GetMapping("transactions/{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<?> getListTransactionByAdminUser(@PathVariable("userId") Long userId){
 
         //IF PARA VALIDAR USUARIO ADMINISTRADOR

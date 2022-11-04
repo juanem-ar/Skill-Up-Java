@@ -11,6 +11,9 @@ import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.ITransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
@@ -67,6 +70,12 @@ public class TransactionServiceImpl implements ITransactionService {
         Transaction entitySaved = transactionRepository.save(entity);
         return transactionMapper.modelToResponseTransactionDto(entitySaved);
     }
+
+	@Override
+	public List<Transaction> findAllTransactionsWith(
+		Account account) {
+		return transactionRepository.findByAccount(account);
+	}
 }
 
     

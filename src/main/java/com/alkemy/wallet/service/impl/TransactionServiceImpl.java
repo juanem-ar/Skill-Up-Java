@@ -84,6 +84,8 @@ public class TransactionServiceImpl extends GenericServiceImpl<Transaction, Long
 /*
 // Conflicto
 
+import java.util.List;
+
 @Service
 public class TransactionServiceImpl implements ITransactionService {
 
@@ -103,4 +105,13 @@ public class TransactionServiceImpl implements ITransactionService {
         Transaction entitySaved = transactionRepository.save(entity);
         return transactionMapper.modelToResponseTransactionDto(entitySaved);
     }
+
+@Override
+    public List<ResponseTransactionDto> findByUserId(Long userId) {
+        return transactionMapper.listModelToResponseTransactionDto(transactionRepository.findByAccount_UserId(userId));
+    }
 }*/
+
+    
+}
+

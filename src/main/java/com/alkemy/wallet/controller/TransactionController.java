@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequestMapping("transactions")
 @RestController
 public class TransactionController {
@@ -33,4 +35,17 @@ public class TransactionController {
         ResponseTransactionDto depositCreated = transactionService.save(deposit);
         return ResponseEntity.status(HttpStatus.CREATED).body(depositCreated);
     }
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getListTransactionByAdminUser(@PathVariable("userId") Long userId){
+
+        //IF PARA VALIDAR USUARIO ADMINISTRADOR
+
+        List<ResponseTransactionDto> listTransactionsByUser = transactionService.findByUserId(userId);
+        if(listTransactionsByUser.isEmpty()){
+            return new ResponseEntity<>("User doesn't exist or has not transactions", HttpStatus.NOT_FOUND);
+        }else {
+            return new ResponseEntity<>(listTransactionsByUser, HttpStatus.OK);
+        }
+    }
+
 }

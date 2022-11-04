@@ -1,8 +1,6 @@
 package com.alkemy.wallet.controller;
 
 import com.alkemy.wallet.model.EType;
-import com.alkemy.wallet.repository.AccountRepository;
-import com.alkemy.wallet.security.dto.AuthenticationResponseDto;
 import com.alkemy.wallet.dto.TransactionDto;
 import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.dto.ResponseTransactionDto;

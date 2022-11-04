@@ -4,7 +4,7 @@ import com.alkemy.wallet.mapper.TransactionMapper;
 import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
-import com.alkemy.wallet.repository.AccountRepository;
+import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.repository.ITransactionRepository;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.dto.TransactionDto;
@@ -14,13 +14,18 @@ import com.alkemy.wallet.service.generic.GenericServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-
-import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.ignoreCase;
-
+import com.alkemy.wallet.dto.ResponseTransactionDto;
+import com.alkemy.wallet.exceptions.ErrorEnum;
+import com.alkemy.wallet.exceptions.TransactionError;
+import com.alkemy.wallet.mapper.ITransactionMapper;
+import com.alkemy.wallet.model.EType;
+import com.alkemy.wallet.model.Transaction;
+import com.alkemy.wallet.repository.ITransactionRepository;
+import com.alkemy.wallet.service.ITransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +34,7 @@ public class TransactionServiceImpl extends GenericServiceImpl<Transaction, Long
 
     private final ITransactionRepository transactionRepository;
     private final IUserRepository userRepository;
-    private final AccountRepository accountRepository;
+    private final IAccountRepository accountRepository;
     private final TransactionMapper transactionMapper;
 
     @Autowired
@@ -61,6 +66,17 @@ public class TransactionServiceImpl extends GenericServiceImpl<Transaction, Long
         return transaction;
     }*/
 
+    // Si queda el extends GenericService, el método del conflicto sería asi
+    public ResponseTransactionDto save(ResponseTransactionDto transactionDto){
+        if (transactionDto.getAmount() <= 0) {
+            throw new TransactionError(ErrorEnum.DEPOSITNOTVALID.getMessage());
+        }
+        transactionDto.setType(EType.DEPOSIT);
+        Transaction entity = transactionMapper.toEntity(transactionDto); // Pero toEntity recibe TransactionDto, y transactionDto es un ResponseTransactionDto
+        Transaction entitySaved = transactionRepository.save(entity);
+        return transactionMapper.toDto(entitySaved);
+    }
+
     @Override
     public Transaction save(Transaction entity) {
         return transactionRepository.save(entity);
@@ -72,17 +88,8 @@ public class TransactionServiceImpl extends GenericServiceImpl<Transaction, Long
     }
 
 }
-
-import com.alkemy.wallet.dto.ResponseTransactionDto;
-import com.alkemy.wallet.exceptions.ErrorEnum;
-import com.alkemy.wallet.exceptions.TransactionError;
-import com.alkemy.wallet.mapper.ITransactionMapper;
-import com.alkemy.wallet.model.EType;
-import com.alkemy.wallet.model.Transaction;
-import com.alkemy.wallet.repository.ITransactionRepository;
-import com.alkemy.wallet.service.ITransactionService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+/*
+// Conflicto
 
 @Service
 public class TransactionServiceImpl implements ITransactionService {
@@ -103,4 +110,4 @@ public class TransactionServiceImpl implements ITransactionService {
         Transaction entitySaved = transactionRepository.save(entity);
         return transactionMapper.modelToResponseTransactionDto(entitySaved);
     }
-}
+}*/

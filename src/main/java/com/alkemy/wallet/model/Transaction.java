@@ -15,8 +15,8 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "transactions")
 @Data
-@Getter
-@Setter
+//@Getter
+//@Setter
 @SQLDelete(sql = "UPDATE transactions SET deleted=true WHERE id = ?")
 @Where(clause = "deleted = false")
 public class Transaction {
@@ -40,6 +40,8 @@ public class Transaction {
 
     @CreationTimestamp
     private Timestamp transactionDate;
+
+
 }
 
 

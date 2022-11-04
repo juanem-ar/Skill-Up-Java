@@ -20,4 +20,5 @@ public class TransactionController {
         ResponseTransactionDto depositCreated = transactionService.save(deposit);
         return ResponseEntity.status(HttpStatus.CREATED).body(depositCreated);
     }
+
 }

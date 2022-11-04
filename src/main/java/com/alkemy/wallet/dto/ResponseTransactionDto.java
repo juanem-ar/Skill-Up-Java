@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 public class ResponseTransactionDto {
-
+    private Long id;
     @NotNull
     private Double amount;
     private EType type;

@@ -11,6 +11,8 @@ import com.alkemy.wallet.service.ITransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TransactionServiceImpl implements ITransactionService {
 
@@ -29,5 +31,9 @@ public class TransactionServiceImpl implements ITransactionService {
         Transaction entity = transactionMapper.responseTransactionDtoToModel(transactionDto);
         Transaction entitySaved = transactionRepository.save(entity);
         return transactionMapper.modelToResponseTransactionDto(entitySaved);
+    }
+    @Override
+    public List<ResponseTransactionDto> findByUserId(Long userId) {
+        return transactionMapper.listModelToResponseTransactionDto(iTransactionRepository.findByAccount_UserId(userId));
     }
 }

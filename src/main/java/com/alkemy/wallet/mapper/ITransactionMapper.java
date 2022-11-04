@@ -10,4 +10,5 @@ public interface ITransactionMapper {
     ResponseTransactionDto modelToResponseTransactionDto(Transaction transaction);
 
     Transaction responseTransactionDtoToModel(ResponseTransactionDto dto);
+    
 }

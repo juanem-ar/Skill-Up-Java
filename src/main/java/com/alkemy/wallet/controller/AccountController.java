@@ -23,28 +23,23 @@ public class AccountController {
     private IUserService userService;
     @Autowired
     private IAccountService accountService;
-    @Autowired
-    private IAccountMapper iAccountMapper;
 
     @Secured(value = { "ROLE_ADMIN" })
     @GetMapping("{id}")
     public ResponseEntity<List<ResponseAccountDto>> listAccountsByUser(@PathVariable Long id){
-        Optional<User> user = userService.findById(id);
-    //    if(user.isEmpty())
-    //        return new ResponseEntity<>( "User Not Found", HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(iAccountMapper.accountsToAccountsDto(accountService.findAllByUser(user.get())), HttpStatus.OK);
+        return new ResponseEntity<>(accountService.findAllByUser(userService.findById(id)), HttpStatus.OK);
     }
-    @Secured(value = { "ROLE_" })
+    @Secured(value = { "ROLE_USER" })
     @PatchMapping("{:id}")
     public ResponseEntity<Object> updateAccount(@PathVariable Long id, Authentication authentication, @RequestParam Double transactionLimit){
         Optional<Account> account = accountService.findById(id);
 
-        if (account.isEmpty())
+        //if (account.isEmpty())
             return new ResponseEntity<>( "Account Not Found", HttpStatus.NOT_FOUND);
         //if (authentication.)
 
-        account.get().setTransactionLimit(transactionLimit);
+        //account.get().setTransactionLimit(transactionLimit);
 
-        return new ResponseEntity<>(iAccountMapper.accountToAccountDto(account.get()), HttpStatus.OK);
+        //return new ResponseEntity<>(accountService.updateAccount(account,transactionLimit), HttpStatus.OK);
     }
 }

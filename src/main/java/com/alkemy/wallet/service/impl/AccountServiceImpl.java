@@ -1,6 +1,10 @@
 package com.alkemy.wallet.service.impl;
 
 
+import com.alkemy.wallet.dto.ResponseAccountDto;
+import com.alkemy.wallet.exceptions.ErrorEnum;
+import com.alkemy.wallet.exceptions.ResourceNotFoundException;
+import com.alkemy.wallet.mapper.IAccountMapper;
 import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IAccountRepository;
@@ -13,7 +17,10 @@ import java.util.Optional;
 
 @Service
 public class AccountServiceImpl implements IAccountService {
+    @Autowired
     private IAccountRepository iAccountRepository;
+    @Autowired
+    private IAccountMapper iAccountMapper;
 
     @Autowired
     public AccountServiceImpl(IAccountRepository iAccountRepository) {
@@ -21,8 +28,11 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
-    public List<Account> findAllByUser(User user) {
-        return user.getAccounts();
+    public List<ResponseAccountDto> findAllByUser(Optional<User> user)  {
+ //           if(user.isEmpty())
+        //              throw new ResourceNotFoundException("User Not Found");
+        //        return new ResponseEntity<>( , HttpStatus.NOT_FOUND);
+        return iAccountMapper.accountsToAccountsDto(user.get().getAccounts());
     }
 
     @Override

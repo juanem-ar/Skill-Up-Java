@@ -1,17 +1,16 @@
 package com.alkemy.wallet.service.impl;
 
-import com.alkemy.wallet.dto.ResponseUserDto;
-import com.alkemy.wallet.mapper.IuserMapper;
-import com.alkemy.wallet.model.User;
-import com.alkemy.wallet.repository.IUserRepository;
-import com.alkemy.wallet.service.IUserService;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.alkemy.wallet.dto.ResponseUserDto;
+import com.alkemy.wallet.mapper.IuserMapper;
+import com.alkemy.wallet.model.User;
+import com.alkemy.wallet.repository.IUserRepository;
+import com.alkemy.wallet.service.IUserService;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -33,15 +32,7 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public List<ResponseUserDto> findAllUsers() {
-		List<User> users = iUserRepository.findAll();
-		
-		List<ResponseUserDto> dtos = new ArrayList<>();
-		
-		users.forEach(user -> {
-			dtos.add(userMapper.modelToResponseUserDto(user));
-			});
-		
-		return dtos;
+		return userMapper.usersToResponseUserDtos(iUserRepository.findAll());
 	}
 
     @Override

@@ -26,13 +26,13 @@ public class TransactionServiceImpl implements ITransactionService {
 
     @Override
     public TransactionDtoPay payment( TransactionDtoPay transitionDtoPay) {
-       /* Transaction transaction = iTransactionMapper.transactionDtoToTransaction(transitionDtoPay);
+       Transaction transaction = iTransactionMapper.transactionDtoToTransaction(transitionDtoPay);
         transaction.setType(EType.PAYMENT);
-        transaction.setAccountId(1L);
+        //transaction.setAccountId(1L);
         iTransactionRepository.save(transaction);
         //date files handle default value in model
         TransactionDtoPay  transactionDtoPay = iTransactionMapper.transactionToTransactionDto(transaction);
-        return transactionDtoPay;*/
-        return null;
+        return transactionDtoPay;
+
     };
 }

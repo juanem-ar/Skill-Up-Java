@@ -30,8 +30,8 @@ public class Transaction {
     private String description;
     private Boolean softDelete;
 
-    @Column(name="ACCOUNT_ID", nullable = false)
-    private Long accountId;
+   // @Column(name="ACCOUNT_ID", nullable = false)
+    //private Long accountId;
 
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "ACCOUNT_ID", insertable = false, updatable = false)

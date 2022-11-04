@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -32,7 +33,7 @@ public class AccountServiceImpl implements IAccountService {
     @Override
     public List<ResponseAccountDto> findAllByUser(Long id)  {
         Optional<User> user = iUserService.findById(id);
- //           if(user.isEmpty())
+        //           if(user.isEmpty())
         //              throw new ResourceNotFoundException("User Not Found");
         //        return new ResponseEntity<>( , HttpStatus.NOT_FOUND);
         return iAccountMapper.accountsToAccountsDto(user.get().getAccounts());
@@ -44,7 +45,7 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
-    public ResponseAccountDto updateAccount(Long id, Double transactionLimit, Authentication authentication){
+    public ResponseAccountDto updateAccount(Long id, Map<String,Double> requestAccount, Authentication authentication){
         Optional<Account> account = this.findById(id);
 
         //if (account.isEmpty())
@@ -53,7 +54,7 @@ public class AccountServiceImpl implements IAccountService {
         //Unauthorized
 
         //if (account.get().getId().equals(authentig))
-        account.get().setTransactionLimit(transactionLimit);
+        account.get().setTransactionLimit(requestAccount.get("transactionLimit"));
         return iAccountMapper.accountToAccountDto(iAccountRepository.save(account.get()));
     }
 }

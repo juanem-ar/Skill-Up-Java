@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("api/v1/accounts")
 @RestController
@@ -26,8 +27,8 @@ public class AccountController {
         return new ResponseEntity<>(iAccountService.findAllByUser(id), HttpStatus.OK);
     }
     @Secured(value = { "ROLE_USER" })
-    @PatchMapping("{:id}")
-    public ResponseEntity<ResponseAccountDto> updateAccount(@PathVariable Long id, Authentication authentication, @RequestParam Double transactionLimit){
-        return new ResponseEntity<>(iAccountService.updateAccount(id,transactionLimit,authentication), HttpStatus.OK);
+    @PatchMapping("{id}")
+    public ResponseEntity<ResponseAccountDto> updateAccount(@PathVariable Long id, Authentication authentication, @RequestBody Map<String,Double> requestAccountDto){
+        return new ResponseEntity<>(iAccountService.updateAccount(id,requestAccountDto,authentication), HttpStatus.OK);
     }
 }

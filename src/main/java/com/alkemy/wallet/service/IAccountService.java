@@ -5,6 +5,7 @@ import com.alkemy.wallet.model.Account;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface IAccountService {
@@ -12,5 +13,5 @@ public interface IAccountService {
 
     Optional<Account> findById(Long id);
 
-    ResponseAccountDto updateAccount(Long id, Double transactionLimit, Authentication authentication);
+    ResponseAccountDto updateAccount(Long id, Map<String,Double> transactionLimit, Authentication authentication);
 }

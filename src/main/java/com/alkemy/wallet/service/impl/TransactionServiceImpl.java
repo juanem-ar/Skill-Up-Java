@@ -34,6 +34,6 @@ public class TransactionServiceImpl implements ITransactionService {
     }
     @Override
     public List<ResponseTransactionDto> findByUserId(Long userId) {
-        return transactionMapper.listModelToResponseTransactionDto(iTransactionRepository.findByAccount_UserId(userId));
+        return transactionMapper.listModelToResponseTransactionDto(transactionRepository.findByAccount_UserId(userId));
     }
 }

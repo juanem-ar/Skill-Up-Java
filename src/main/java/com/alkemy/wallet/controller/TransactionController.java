@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Optional;
 import javax.validation.Valid;
 
 @RequestMapping("api/v1/transactions")
@@ -54,7 +55,16 @@ public class TransactionController {
             return new ResponseEntity<>(listTransactionsByUser, HttpStatus.OK);
         }
     }
-
+    @GetMapping("transaction/{id}")
+    public ResponseEntity<?> getTransactionByAuthUser(@PathVariable("id") Long id){
+        //IF PARA VALIDAR USUARIO AUTENTICADO
+        Optional<ResponseTransactionDto> responseTransactionDto = transactionService.findTransactionById(id);
+        if(!responseTransactionDto.isPresent()){
+            return new ResponseEntity<>("The transaction ID does not exist", HttpStatus.NOT_FOUND);
+        }else {
+            return new ResponseEntity<>(responseTransactionDto, HttpStatus.OK);
+        }
+    }
 
 
 }

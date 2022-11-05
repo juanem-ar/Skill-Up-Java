@@ -1,6 +1,6 @@
 package com.alkemy.wallet.service.impl;
 
-import com.alkemy.wallet.exceptions.custumer.UserNotFoundUserException;
+import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.service.IUserService;

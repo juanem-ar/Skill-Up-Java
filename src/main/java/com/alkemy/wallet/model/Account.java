@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 
 @Entity
-@Data
+//@Data
 @Getter
 @Setter
 @Table(name= "accounts")
@@ -25,12 +25,12 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
-    private long id;
+    private Long id;
 
     private enum Currency { ARS, USD} ;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
+    //@Enumerated(EnumType.STRING)
     private Currency currency;
 
     @NotNull

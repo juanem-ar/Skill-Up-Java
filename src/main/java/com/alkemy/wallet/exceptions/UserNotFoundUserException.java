@@ -1,4 +1,4 @@
-package com.alkemy.wallet.exceptions.custumer;
+package com.alkemy.wallet.exceptions;
 
 public class UserNotFoundUserException extends RuntimeException{
     public UserNotFoundUserException(String message){

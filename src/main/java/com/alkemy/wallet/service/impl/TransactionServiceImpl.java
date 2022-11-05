@@ -30,7 +30,6 @@ public class TransactionServiceImpl implements ITransactionService {
         transaction.setType(EType.PAYMENT);
         //transaction.setAccountId(1L);
         iTransactionRepository.save(transaction);
-        //date files handle default value in model
         TransactionDtoPay  transactionDtoPay = iTransactionMapper.transactionToTransactionDto(transaction);
         return transactionDtoPay;
 

@@ -34,7 +34,7 @@ public class Transaction {
     //private Long accountId;
 
     @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "ACCOUNT_ID", insertable = false, updatable = false)
+    @JoinColumn(name = "ACCOUNT_ID",  updatable = false)
     private Account account;
 
     @CreationTimestamp

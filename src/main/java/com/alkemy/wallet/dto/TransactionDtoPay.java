@@ -16,4 +16,5 @@ public class TransactionDtoPay {
     private Double amount;
 
     private String description;
+    private Long idAccount;
 }

@@ -14,5 +14,5 @@ public interface ITransactionService {
     public TransactionDtoPay payment(TransactionDtoPay transitionDtoPay);
     List<ResponseTransactionDto> findByUserId(Long userId);
     Optional<ResponseTransactionDto> findTransactionById(Long id);
-
+    ResponseTransactionDto updateDescriptionFromTransaction(ResponseTransactionDto responseTransactionDto, String description);
 }

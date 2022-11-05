@@ -94,7 +94,13 @@ public class TransactionServiceImpl implements ITransactionService {
             return Optional.empty();
         }
     }
-
+    @Override
+    public ResponseTransactionDto updateDescriptionFromTransaction(ResponseTransactionDto responseTransactionDto, String description) {
+        responseTransactionDto.setDescription(description);
+        Transaction saveTransaction = transactionMapper.responseTransactionDtoToModel(responseTransactionDto);
+        iTransactionRepository.save(saveTransaction);
+        return responseTransactionDto;
+    }
 }
 
     

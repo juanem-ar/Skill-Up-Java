@@ -1,6 +1,8 @@
 package com.alkemy.wallet.security.service;
 
+import com.alkemy.wallet.repository.IUserRepository;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.internal.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -11,12 +13,21 @@ import java.util.Map;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
-/*
+
 @Service
 public class JwtUtils {
     private String SECRET_KEY = "secret";
+    @Autowired
+    private IUserRepository userRepository;
 
     public String extractUsername (String token){ return extractClaim(token, Claims::getSubject);}
+    public Long extractUserId (String token){
+        String subject = extractClaim(token, Object::toString);
+        String[] list = subject.split(",");
+        String[] listSplit = list[2].split("=");
+        Long userId = Long.parseLong(listSplit[1]);
+        return userId;
+    }
     public Date extractExpiration(String token){ return extractClaim(token, Claims::getExpiration);}
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         final Claims claims = extractAllClaims(token);
@@ -30,6 +41,8 @@ public class JwtUtils {
 
     public String generateToken(UserDetails userDetails){
         Map<String, Object> claims = new HashMap<>();
+        //username and userID are integrated in claims
+        claims.put("userId",userRepository.findByEmail(userDetails.getUsername()).getId());
         return createToken(claims, userDetails.getUsername());
     }
     private String createToken(Map<String, Object> claims, String subject){
@@ -42,4 +55,3 @@ public class JwtUtils {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }
-*/

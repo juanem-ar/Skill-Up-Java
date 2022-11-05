@@ -1,9 +1,9 @@
 package com.alkemy.wallet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sun.istack.NotNull;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.*;
 
 import javax.persistence.*;
@@ -17,6 +17,9 @@ import java.time.LocalDateTime;
 //@Data
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@RequiredArgsConstructor
 @Table(name= "accounts")
 @SQLDelete(sql = "UPDATE accounts SET deleted=true WHERE id = ?")
 @Where(clause = "deleted = false")
@@ -27,7 +30,7 @@ public class Account {
     @GenericGenerator(name = "native", strategy = "native")
     private Long id;
 
-    private enum Currency { ARS, USD} ;
+    public enum Currency { ARS, USD} ;
 
     @NotNull
     //@Enumerated(EnumType.STRING)
@@ -44,13 +47,14 @@ public class Account {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name = "USER_ID", insertable = false, updatable = false)
+    @ToString.Exclude
     private User user;
 
     @CreationTimestamp
     private LocalDateTime creationDate;
 
     @UpdateTimestamp
-    private LocalDateTime updateData;
+    private LocalDateTime updateDate;
 
-    private Boolean softDelete;
+    private Boolean deleted = Boolean.FALSE;
 }

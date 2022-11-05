@@ -2,6 +2,8 @@ package com.alkemy.wallet.service.impl;
 
 
 import com.alkemy.wallet.dto.ResponseAccountDto;
+import com.alkemy.wallet.exceptions.ResourceNotFoundException;
+import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.mapper.IAccountMapper;
 import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.User;
@@ -32,11 +34,8 @@ public class AccountServiceImpl implements IAccountService {
 
     @Override
     public List<ResponseAccountDto> findAllByUser(Long id)  {
-        Optional<User> user = iUserService.findById(id);
-        //           if(user.isEmpty())
-        //              throw new ResourceNotFoundException("User Not Found");
-        //        return new ResponseEntity<>( , HttpStatus.NOT_FOUND);
-        return iAccountMapper.accountsToAccountsDto(user.get().getAccounts());
+        User user = iUserService.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found User with number id: "+ id));
+        return iAccountMapper.accountsToAccountsDto(user.getAccounts());
     }
 
     @Override
@@ -46,15 +45,11 @@ public class AccountServiceImpl implements IAccountService {
 
     @Override
     public ResponseAccountDto updateAccount(Long id, Map<String,Double> requestAccount, Authentication authentication){
-        Optional<Account> account = this.findById(id);
-
-        //if (account.isEmpty())
-        //return new ResponseEntity<>( "Account Not Found", HttpStatus.NOT_FOUND);
+        Account account = this.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
         //if logged user is not the same as who is updating the account
         //Unauthorized
-
         //if (account.get().getId().equals(authentig))
-        account.get().setTransactionLimit(requestAccount.get("transactionLimit"));
-        return iAccountMapper.accountToAccountDto(iAccountRepository.save(account.get()));
+        account.setTransactionLimit(requestAccount.get("transactionLimit"));
+        return iAccountMapper.accountToAccountDto(iAccountRepository.save(account));
     }
 }

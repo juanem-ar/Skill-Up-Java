@@ -59,7 +59,7 @@ class TransactionServiceImplIntegrationTest {
 		transaction1.setType(EType.DEPOSIT);
 		transaction1.setAccount(account);
 		// problema con los models
-		transaction1.setAccountId(account.getId());
+		//transaction1.setAccountId(account.getId());
 		//
 		transaction1 = transactionRepository.save(transaction1);
 
@@ -68,7 +68,7 @@ class TransactionServiceImplIntegrationTest {
 		transaction2.setType(EType.DEPOSIT);
 		transaction2.setAccount(account);
 		// problema con los models
-		transaction2.setAccountId(account.getId());
+		//transaction2.setAccountId(account.getId());
 		//
 		transaction2 = transactionRepository.save(transaction2);
 

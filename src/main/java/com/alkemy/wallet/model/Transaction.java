@@ -15,7 +15,6 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "transactions")
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,21 +26,23 @@ public class Transaction {
     private Long id;
     @NotNull
     private Double amount;
-    @NotNull
+   // @NotNull
     private EType type;
     @Nullable
     private String description;
     private Boolean softDelete = Boolean.FALSE;
 
-    @Column(name="ACCOUNT_ID", nullable = false)
-    private Long accountId;
+   // @Column(name="ACCOUNT_ID", nullable = false)
+    //private Long accountId;
 
     @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "ACCOUNT_ID", insertable = false, updatable = false)
+    @JoinColumn(name = "ACCOUNT_ID",  updatable = false)
     private Account account;
 
     @CreationTimestamp
     private Timestamp transactionDate;
+
+
 }
 
 

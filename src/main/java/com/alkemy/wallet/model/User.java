@@ -15,16 +15,15 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "users")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @SQLDelete(sql = "UPDATE users SET deleted = true WHERE id=?")
@@ -32,7 +31,7 @@ import lombok.EqualsAndHashCode;
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@EqualsAndHashCode.Include
+
 	private Long id;
 	
 	@NotNull

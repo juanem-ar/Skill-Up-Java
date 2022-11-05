@@ -1,6 +1,5 @@
 package com.alkemy.wallet.service.impl;
 
-
 import java.util.List;
 import java.util.Optional;
 
@@ -9,10 +8,14 @@ import org.springframework.stereotype.Service;
 
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.exceptions.UserNotFoundException;
+import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.mapper.IuserMapper;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.service.IUserService;
+
+
+
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -28,8 +31,10 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public String deleteUser(Long id) {
-        iUserRepository.deleteById(id);
-        return "delete user with number" + id ;
+       User userSelected = iUserRepository.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found User with number id: "+ id));
+       userSelected.setDeleted(true);
+       iUserRepository.save(userSelected);
+       return "delete user with number" + id ;
     }
 
 	@Override

@@ -1,7 +1,7 @@
 package com.alkemy.wallet.controller;
 
-import java.util.List;
 
+import com.alkemy.wallet.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +13,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alkemy.wallet.dto.ResponseUserDto;
-import com.alkemy.wallet.service.impl.UserServiceImpl;
 
+import java.util.List;
 @RequestMapping("api/v1/users")
 @RestController
 public class UserController {
-	@Autowired
     private UserServiceImpl userService;
+
+    @Autowired
+    public UserController(UserServiceImpl userService) {
+        this.userService = userService;
+    }
 
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteUsers(@PathVariable Long id){

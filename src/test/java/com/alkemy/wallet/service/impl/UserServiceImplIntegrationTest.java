@@ -27,6 +27,8 @@ class UserServiceImplIntegrationTest {
 	@Test
 	@Transactional
 	void findAllUsers_DataBaseWithOneUser_ReturnAListWithOneDto() {
+		userRepository.deleteAll();
+		
 		User user1 = new User();
 		
 		String firstName = "first";

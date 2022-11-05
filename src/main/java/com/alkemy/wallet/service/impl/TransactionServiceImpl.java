@@ -20,7 +20,7 @@ import com.alkemy.wallet.exceptions.ErrorEnum;
 import com.alkemy.wallet.exceptions.TransactionError;
 
 import java.util.List;
-
+import java.util.Optional;
 
 
 @Service
@@ -86,6 +86,15 @@ public class TransactionServiceImpl implements ITransactionService {
     public List<ResponseTransactionDto> findByUserId(Long userId) {
         return transactionMapper.listModelToResponseTransactionDto(transactionRepository.findByAccount_UserId(userId));
     }
+    @Override
+    public Optional<ResponseTransactionDto> findTransactionById(Long id) {
+        if (iTransactionRepository.findById(id).isPresent()){
+            return Optional.of(transactionMapper.modelToResponseTransactionDto(iTransactionRepository.findById(id).get()));
+        }else {
+            return Optional.empty();
+        }
+    }
+
 }
 
     

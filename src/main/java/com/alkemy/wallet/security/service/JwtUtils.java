@@ -21,19 +21,15 @@ public class JwtUtils {
     private IUserRepository userRepository;
 
     public String extractUsername (String token){ return extractClaim(token, Claims::getSubject);}
-    public Long extractUserId (String token){
-        String subject = extractClaim(token, Object::toString);
-        String[] list = subject.split(",");
-        String[] listSplit = list[2].split("=");
-        Long userId = Long.parseLong(listSplit[1]);
-        return userId;
-    }
     public Date extractExpiration(String token){ return extractClaim(token, Claims::getExpiration);}
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-
+    public String getJwt(String token){
+        String jwt = token.substring(7);
+        return jwt;
+    }
     private Claims extractAllClaims(String token){
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
     }
@@ -41,7 +37,6 @@ public class JwtUtils {
 
     public String generateToken(UserDetails userDetails){
         Map<String, Object> claims = new HashMap<>();
-        //username and userID are integrated in claims
         claims.put("userId",userRepository.findByEmail(userDetails.getUsername()).getId());
         return createToken(claims, userDetails.getUsername());
     }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.validation.Valid;
 
@@ -31,12 +32,10 @@ public class TransactionController {
         this.jwtUtils = jwtUtils;
     }
 
-
     @PostMapping("payment")
     public ResponseEntity<TransactionDtoPay>  transactionPayment(@RequestBody @Valid TransactionDtoPay transactionDtoPay){
         return new ResponseEntity<>(transactionService.payment(transactionDtoPay), HttpStatus.CREATED);
     }
-
 
     @PostMapping("/deposit")
     public ResponseEntity<ResponseTransactionDto> saveDeposit(
@@ -65,6 +64,15 @@ public class TransactionController {
             return new ResponseEntity<>(responseTransactionDto, HttpStatus.OK);
         }
     }
-
-
+    @PatchMapping("{id}")
+    public ResponseEntity<?> editTransactionByAuthUser(@RequestBody Map<Object, String> description,
+                                                       @PathVariable("id") Long id){
+        //IF PARA VALIDAR USUARIO AUTENTICADO
+        Optional<ResponseTransactionDto> responseTransactionDto = transactionService.findTransactionById(id);
+        if(responseTransactionDto.isEmpty()){
+            return new ResponseEntity<>("The transaction ID does not exist", HttpStatus.NOT_FOUND);
+        }else {
+            return new ResponseEntity<>(transactionService.updateDescriptionFromTransaction(responseTransactionDto.get(),description.get("description")), HttpStatus.OK);
+        }
+    }
 }

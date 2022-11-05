@@ -36,48 +36,53 @@ public class TransactionServiceImpl implements ITransactionService {
         return jwt;
     }
 
-    // Falta findArsAccountByUserId, payment e income
+    // Comentadas porque faltan funcionalidades llamadas dentro (de Account e income)
     /*
-    public ResponseTransactionDto sendArs(String token, Long accountId, Long amount, EType type) {
+    public ResponseTransactionDto sendArs(String token, Long accountId, Double amount) {
 
         Long senderId = jwtUtils.extractUserId(getJwt(token));
-        ResponseTransactionDto transaction = null;
-        //Account senderAccount = accountRepository.findArsAccountByUserId(senderId);
-        Long receiverId = accountRepository.findArsAccountByUserId(accountId);
+
+        String description = "Money transfer in ARS";
+        //Account senderAccount = accountRepository.findUsdAccountByUserId(senderId);
+        //Long receiverAccount = accountRepository.findArsAccountByUserId(accountId);
+        TransactionDtoPay transactionDtoPay = new TransactionDtoPay(amount, description, receiverId);
+        TransactionDtoPay arsTransaction = null;
 
         if (amount <= senderAccount.getBalance() && amount <= senderAccount.getTransactionLimit()) {
 
-            transaction = transactionMapper.modelToResponseTransactionDto(payment(senderId, receiverId, amount, type));
-            income(accountId, receiverId, amount, EType.INCOME);
+            arsTransaction = payment(transactionDtoPay);
+            //income(accountId, receiverId, amount, EType.INCOME);
             log.info("Successful ARS transaction");
+            save(arsTransaction);
 
-            save(transaction);
         } else {
             log.error("ARS transaction failed");
         }
-        return transaction;
-    }*/
+        return arsTransaction;
+    }
 
-    // Falta findUsdAccountByUserId, payment e income
-    /*
-    public ResponseTransactionDto sendUsd(String token, Long accountId, Long amount, EType type) {
+    public ResponseTransactionDto sendUsd(String token, Long accountId, Double amount) {
 
         Long senderId = jwtUtils.extractUserId(getJwt(token));
-        ResponseTransactionDto transaction = null;
-        //Account senderAccount = accountRepository.findUsdAccountByUserId(senderId);
-        Long receiverId = accountRepository.findUsdAccountByUserId(accountId);
+
+        String description = "Money transfer in USD";
+        // Account senderAccount = accountRepository.findUsdAccountByUserId(senderId);
+        //Long receiverAccount = accountRepository.findUsdAccountByUserId(accountId);
+
+        TransactionDtoPay transactionDtoPay = new TransactionDtoPay(amount, description, receiverId);
+        TransactionDtoPay usdTransaction = null;
 
         if (amount <= senderAccount.getBalance() && amount <= senderAccount.getTransactionLimit()) {
 
-            transaction = transactionMapper.modelToResponseTransactionDto(payment(senderId, receiverId, amount, type));
-            income(accountId, receiverId, amount, EType.INCOME);
+            usdTransaction = payment(transactionDtoPay);
+            //income(accountId, receiverId, amount, EType.INCOME);
             log.info("Successful USD transaction");
+            save(usdTransaction);
 
-            save(transaction);
         } else {
             log.error("USD transaction failed");
         }
-        return transaction;
+        return usdTransaction;
     }*/
 
     public ResponseTransactionDto save(ResponseTransactionDto transactionDto){

@@ -20,16 +20,15 @@ public class TransactionController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    /*
-    @PostMapping("/sendArs")
-    public ResponseEntity<ResponseTransactionDto> sendArs(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Long amount, EType type) {
-        return ResponseEntity.ok().body(transactionService.sendArs(token,accountId,amount,type));
-    }*/
 
     /*
+    @PostMapping("/sendArs")
+    public ResponseEntity<ResponseTransactionDto> sendArs(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Double amount) {
+        return ResponseEntity.ok().body(transactionService.sendUsd(token,accountId,amount));
+    }
     @PostMapping("/sendUsd")
-    public ResponseEntity<ResponseTransactionDto> sendUsd(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Long amount, EType type) {
-        return ResponseEntity.ok().body(transactionService.sendUsd(token,accountId,amount,type));
+    public ResponseEntity<ResponseTransactionDto> sendUsd(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Double amount) {
+        return ResponseEntity.ok().body(transactionService.sendUsd(token,accountId,amount));
     }*/
 
     @PostMapping("/deposit")

@@ -9,4 +9,5 @@ import com.alkemy.wallet.model.User;
 @Repository
 public interface IUserRepository extends JpaRepository<User, Long> {
     User findByEmail(String email);
+    Boolean existsByEmail(String username);
 }

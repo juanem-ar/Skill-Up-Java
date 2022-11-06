@@ -32,7 +32,7 @@ public class AccountController {
     @PatchMapping("{id}")
     public ResponseEntity<Object> updateAccount(@PathVariable Long id, Authentication authentication, @RequestBody Map<String,Double> requestAccountDto){
         Account account = iAccountService.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
-        if (account.getUser().getEmail().equals(authentication.getName()))
+        if (authentication == null || !authentication.isAuthenticated() || !account.getUser().getEmail().equals(authentication.getName()))
             return new ResponseEntity<>("You don't have permission to access this resource", HttpStatus.UNAUTHORIZED);
         return new ResponseEntity<>(iAccountService.updateAccount(account,requestAccountDto,authentication), HttpStatus.OK);
     }

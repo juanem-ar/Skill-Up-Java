@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.alkemy.wallet.dto.UpdateAccountDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,18 @@ import com.alkemy.wallet.dto.ResponseUserBalanceDto;
 import com.alkemy.wallet.mapper.IAccountMapper;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.security.service.JwtUtils;
+import com.alkemy.wallet.exceptions.UserNotFoundUserException;
+import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IUserService;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/accounts")
 @RestController
@@ -35,32 +45,35 @@ public class AccountController {
     @Autowired
     private JwtUtils jwtUtils;
     @Autowired
-    private IUserService userService;
+    private IUserService iUserService;
     @Autowired
-    private IAccountService accountService;
-    @Autowired
-    private IAccountMapper iAccountMapper;
+    private IAccountService iAccountService;
 
     @Secured(value = { "ROLE_ADMIN" })
     @GetMapping("{id}")
     public ResponseEntity<List<ResponseAccountDto>> listAccountsByUser(@PathVariable Long id){
-        Optional<User> user = userService.findById(id);
-    //    if(user.isEmpty())
-    //        return new ResponseEntity<>( "User Not Found", HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(iAccountMapper.accountsToAccountsDto(accountService.findAllByUser(user.get())), HttpStatus.OK);
+        return new ResponseEntity<>(iAccountService.findAllByUser(id), HttpStatus.OK);
+    }
+    @Secured(value = { "ROLE_USER" })
+    @PatchMapping("{id}")
+    public ResponseEntity<Object> updateAccount(@PathVariable Long id, Authentication authentication, @RequestBody UpdateAccountDto requestAccountDto){
+        Account account = iAccountService.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
+    //    if (authentication == null || !authentication.isAuthenticated() || !account.getUser().getEmail().equals(authentication.getName()))
+    //        return new ResponseEntity<>("You don't have permission to access this resource", HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(iAccountService.updateAccount(account,requestAccountDto,authentication), HttpStatus.OK);
     }
 
-    
+
     @GetMapping("/balance")
 	public ResponseEntity<
 		ResponseUserBalanceDto> getAccountsBalance(
 			@RequestHeader(name = "Authorization") String token) {
-		return ResponseEntity.ok(accountService.getBalance(token));
+		return ResponseEntity.ok(iAccountService.getBalance(token));
 	}
 
     @PostMapping
     public ResponseEntity<String> createAccount(@RequestHeader("Authorization") String token, @Valid @RequestBody CurrencyDto currency) throws Exception {
-        accountService.addAccount(jwtUtils.extractUsername(jwtUtils.getJwt(token)), currency);
+        iAccountService.addAccount(jwtUtils.extractUsername(jwtUtils.getJwt(token)), currency);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

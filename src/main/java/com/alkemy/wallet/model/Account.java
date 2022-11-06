@@ -42,7 +42,7 @@ public class Account {
     private LocalDateTime creationDate;
 
     @UpdateTimestamp
-    private LocalDateTime updateData;
+    private LocalDateTime updateDate;
 
     private Boolean deleted;
 }

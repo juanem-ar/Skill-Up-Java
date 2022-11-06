@@ -48,7 +48,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         "/auth/**",
                         "/api/v1/transactions/**",
-                        "/api/v1/users/**"
+                        "/api/v1/users/**",
+                        "/api/v1/accounts/**"
                 )
                 .permitAll()
                 .anyRequest().authenticated()

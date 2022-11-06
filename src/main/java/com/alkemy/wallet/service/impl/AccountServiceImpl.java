@@ -1,8 +1,11 @@
 package com.alkemy.wallet.service.impl;
 
 
-import com.alkemy.wallet.dto.CurrencyDto;
+import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.exceptions.BadRequestException;
+import com.alkemy.wallet.exceptions.ResourceNotFoundException;
+import com.alkemy.wallet.exceptions.UserNotFoundUserException;
+import com.alkemy.wallet.mapper.IAccountMapper;
 import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.ECurrency;
 import com.alkemy.wallet.model.User;
@@ -12,14 +15,16 @@ import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import com.alkemy.wallet.dto.AccountBalanceDto;
-import com.alkemy.wallet.dto.ResponseUserBalanceDto;
 import com.alkemy.wallet.mapper.IAccountMapper;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.service.ITransactionService;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import static com.alkemy.wallet.model.ECurrency.ARS;
 import static com.alkemy.wallet.model.ECurrency.USD;
 
@@ -31,13 +36,13 @@ public class AccountServiceImpl implements IAccountService {
     private IJwtUtils jwtUtils;
     private IUserRepository userRepository;
     private IUserService iUserService;
-    
+
     @Autowired
     private ITransactionService transactionService;
-    
+
     @Autowired
     private IAccountMapper accountMapper;
-    
+
     @Autowired
     public AccountServiceImpl( IAccountRepository iAccountRepository, IUserService iUserService , IJwtUtils jwtUtils, IUserRepository userRepository) {
         this.iAccountRepository = iAccountRepository;
@@ -46,22 +51,34 @@ public class AccountServiceImpl implements IAccountService {
         this.userRepository = userRepository;
     }
     @Override
-    public List<Account> findAllByUser(User user) {
-        return user.getAccounts();
+    public List<ResponseAccountDto> findAllByUser(Long id)  {
+        User user = iUserService.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found User with number id: "+ id));
+        return accountMapper.accountsToAccountsDto(user.getAccounts());
+    }
+
+    @Override
+    public Optional<Account> findById(Long id) {
+        return iAccountRepository.findById(id);
+    }
+
+    @Override
+    public ResponseAccountDto updateAccount(Account account, UpdateAccountDto requestAccount, Authentication authentication){
+        account.setTransactionLimit(requestAccount.getTransactionLimit());
+        return accountMapper.accountToAccountDto(iAccountRepository.save(account));
     }
 
 	@Override
 	public ResponseUserBalanceDto getBalance(String token) {
 		Long userId = jwtUtils.extractUserId(token);
-		
+
 		User user = iUserService.getUserById(userId);
-		
+
 		ResponseUserBalanceDto responseUserBalanceDto = new ResponseUserBalanceDto();
 		responseUserBalanceDto.setId(userId);
-		
+
 		for(Account account : user.getAccounts()) {
 			AccountBalanceDto accountBalanceDto = accountMapper.accountToBalanceDto(account);
-			
+
 			accountBalanceDto.setBalance(
 				calcularBalance(
 					account.getBalance(),
@@ -69,15 +86,15 @@ public class AccountServiceImpl implements IAccountService {
 
 			responseUserBalanceDto.getAccountBalanceDtos().add(accountBalanceDto);
 		}
-		
+
 		return responseUserBalanceDto;
 	}
 
-	
+
 	private Double calcularBalance(
 		Double balanceBase, List<Transaction> transactions) {
 		Double b = balanceBase;
-		
+
 		for(Transaction transaction : transactions) {
 			if(transaction.getType() == EType.DEPOSIT
 				|| transaction.getType() == EType.INCOME)
@@ -85,7 +102,7 @@ public class AccountServiceImpl implements IAccountService {
 			else if(transaction.getType() == EType.PAYMENT)
 				b -= transaction.getAmount();
 		}
-		
+
 		return b;
 	}
 

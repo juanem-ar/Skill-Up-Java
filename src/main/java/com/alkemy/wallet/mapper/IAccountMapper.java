@@ -11,6 +11,8 @@ import java.util.List;
 public interface IAccountMapper {
 
     List<ResponseAccountDto> accountsToAccountsDto(List<Account> account);
-    
+
     AccountBalanceDto accountToBalanceDto(Account account);
+
+    ResponseAccountDto accountToAccountDto(Account account);
 }

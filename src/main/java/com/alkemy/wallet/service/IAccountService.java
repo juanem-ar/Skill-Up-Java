@@ -3,6 +3,7 @@ package com.alkemy.wallet.service;
 import com.alkemy.wallet.dto.ResponseUserBalanceDto;
 import com.alkemy.wallet.dto.CurrencyDto;
 import com.alkemy.wallet.dto.ResponseAccountDto;
+import com.alkemy.wallet.dto.UpdateAccountDto;
 import com.alkemy.wallet.model.Account;
 import org.springframework.security.core.Authentication;
 
@@ -21,5 +22,5 @@ public interface IAccountService {
 
     Optional<Account> findById(Long id);
 
-    ResponseAccountDto updateAccount(Account account, Map<String,Double> transactionLimit, Authentication authentication);
+    ResponseAccountDto updateAccount(Account account, UpdateAccountDto transactionLimit, Authentication authentication);
 }

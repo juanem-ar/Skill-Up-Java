@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.alkemy.wallet.dto.UpdateAccountDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,10 +56,10 @@ public class AccountController {
     }
     @Secured(value = { "ROLE_USER" })
     @PatchMapping("{id}")
-    public ResponseEntity<Object> updateAccount(@PathVariable Long id, Authentication authentication, @RequestBody Map<String,Double> requestAccountDto){
+    public ResponseEntity<Object> updateAccount(@PathVariable Long id, Authentication authentication, @RequestBody UpdateAccountDto requestAccountDto){
         Account account = iAccountService.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
-        if (authentication == null || !authentication.isAuthenticated() || !account.getUser().getEmail().equals(authentication.getName()))
-            return new ResponseEntity<>("You don't have permission to access this resource", HttpStatus.UNAUTHORIZED);
+    //    if (authentication == null || !authentication.isAuthenticated() || !account.getUser().getEmail().equals(authentication.getName()))
+    //        return new ResponseEntity<>("You don't have permission to access this resource", HttpStatus.UNAUTHORIZED);
         return new ResponseEntity<>(iAccountService.updateAccount(account,requestAccountDto,authentication), HttpStatus.OK);
     }
 

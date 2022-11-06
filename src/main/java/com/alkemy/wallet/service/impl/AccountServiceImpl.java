@@ -1,9 +1,8 @@
 package com.alkemy.wallet.service.impl;
 
 
-import com.alkemy.wallet.dto.CurrencyDto;
+import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.exceptions.BadRequestException;
-import com.alkemy.wallet.dto.ResponseAccountDto;
 import com.alkemy.wallet.exceptions.ResourceNotFoundException;
 import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.mapper.IAccountMapper;
@@ -18,8 +17,6 @@ import com.alkemy.wallet.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import com.alkemy.wallet.dto.AccountBalanceDto;
-import com.alkemy.wallet.dto.ResponseUserBalanceDto;
 import com.alkemy.wallet.mapper.IAccountMapper;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
@@ -65,9 +62,8 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
-    //todo change requestAccount for Dto
-    public ResponseAccountDto updateAccount(Account account, Map<String,Double> requestAccount, Authentication authentication){
-        account.setTransactionLimit(requestAccount.get("transactionLimit"));
+    public ResponseAccountDto updateAccount(Account account, UpdateAccountDto requestAccount, Authentication authentication){
+        account.setTransactionLimit(requestAccount.getTransactionLimit());
         return accountMapper.accountToAccountDto(iAccountRepository.save(account));
     }
 

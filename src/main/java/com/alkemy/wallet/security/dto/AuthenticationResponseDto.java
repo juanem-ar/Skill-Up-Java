@@ -6,5 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AuthenticationResponseDto {
+    private String user;
     private String jwt;
 }

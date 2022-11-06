@@ -15,33 +15,33 @@ import io.jsonwebtoken.Jwts;
 
 
 @Service
-public class JwtUtils {
+public class JwtUtils implements IJwtUtils {
     private String SECRET_KEY = "secret";
     @Autowired
     private IUserRepository userRepository;
 
-    public String extractUsername (String token){ return extractClaim(token, Claims::getSubject);}
-    public Long extractUserId (String token){
-        String subject = extractClaim(token, Object::toString);
-        String[] list = subject.split(",");
-        String[] listSplit = list[2].split("=");
-        Long userId = Long.parseLong(listSplit[1]);
-        return userId;
-    }
-    public Date extractExpiration(String token){ return extractClaim(token, Claims::getExpiration);}
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
+    @Override
+	public String extractUsername (String token){ return extractClaim(token, Claims::getSubject);}
+    @Override
+	public Date extractExpiration(String token){ return extractClaim(token, Claims::getExpiration);}
+    @Override
+	public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-
+    @Override
+	public String getJwt(String token){
+        String jwt = token.substring(7);
+        return jwt;
+    }
     private Claims extractAllClaims(String token){
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
     }
     private Boolean isTokenExpired(String token){ return extractExpiration(token).before(new Date());}
 
-    public String generateToken(UserDetails userDetails){
+    @Override
+	public String generateToken(UserDetails userDetails){
         Map<String, Object> claims = new HashMap<>();
-        //username and userID are integrated in claims
         claims.put("userId",userRepository.findByEmail(userDetails.getUsername()).getId());
         return createToken(claims, userDetails.getUsername());
     }
@@ -50,8 +50,14 @@ public class JwtUtils {
                 .setExpiration(new Date(System.currentTimeMillis()+ 100 * 60 * 60 * 10))//el ultimo numero tenia 10, le puse 100; calculo para q el token dure 10 horas.
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
     }
-    public Boolean validateToken(String token, UserDetails userDetails){
+    @Override
+	public Boolean validateToken(String token, UserDetails userDetails){
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+	@Override
+	public Long extractUserId(String token) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

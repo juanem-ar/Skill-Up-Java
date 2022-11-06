@@ -10,10 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.alkemy.wallet.model.Account;
+import com.alkemy.wallet.model.ECurrency;
+import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.model.User;
-import com.alkemy.wallet.model.Account.Currency;
-import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.repository.ITransactionRepository;
 import com.alkemy.wallet.repository.IUserRepository;
@@ -45,12 +45,12 @@ class TransactionServiceImplIntegrationTest {
 		user = userRepository.save(user);
 
 		Account account = new Account();
-		account.setCurrency(Currency.ARS);
+		account.setCurrency(ECurrency.ARS);
 		account.setTransactionLimit(100000.0);
 		account.setBalance(0.0);
 		account.setUser(user);
 		// problema con los models
-		account.setUserId(user.getId());
+		//account.setUserId(user.getId());
 		//
 		account = accountRepository.save(account);
 
@@ -73,7 +73,7 @@ class TransactionServiceImplIntegrationTest {
 		transaction2 = transactionRepository.save(transaction2);
 
 		List<Transaction> result =
-			transactionService.findAllTransactionsWith(account);
+			transactionService.findAllTransactionsWith(account.getId());
 
 		assertEquals(2, result.size());
 	}

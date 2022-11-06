@@ -7,6 +7,8 @@ import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.model.User;
 
 public interface IUserService {
+    Boolean existsByEmail(String email);
+    ResponseUserDto saveUser(ResponseUserDto dto) throws Exception;
     public String deleteUser(Long id);
 
     public List<ResponseUserDto> findAllUsers();

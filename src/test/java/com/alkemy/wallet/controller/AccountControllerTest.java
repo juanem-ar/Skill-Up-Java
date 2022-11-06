@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.alkemy.wallet.dto.ResponseUserBalanceDto;
 import com.alkemy.wallet.mapper.IAccountMapper;
+import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IUserService;
 
@@ -32,8 +33,11 @@ class AccountControllerTest {
 
 	@MockBean
 	private IAccountMapper iAccountMapper;
+	
+	@MockBean
+	private JwtUtils jwtUtils;
 
-	private String uri = "/api/v1/accounts";
+	private String uri = "/accounts";
 
 
 	@Test

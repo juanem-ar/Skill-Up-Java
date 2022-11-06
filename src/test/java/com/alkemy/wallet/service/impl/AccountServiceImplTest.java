@@ -22,7 +22,7 @@ import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IAccountRepository;
-import com.alkemy.wallet.security.service.JwtUtils;
+import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.ITransactionService;
 import com.alkemy.wallet.service.IUserService;
 
@@ -36,7 +36,7 @@ class AccountServiceImplTest {
 	private IUserService userService;
 
 	@Mock
-	private JwtUtils jwtUtils;
+	private IJwtUtils jwtUtils;
 
 	@Mock
 	private ITransactionService transactionService;
@@ -78,7 +78,9 @@ class AccountServiceImplTest {
 		//
 
 		Double balanceBase = 1.0;
+		Long accountId = 1L;
 		Account account = new Account();
+		account.setId(accountId);
 		account.setBalance(balanceBase);
 
 		User user = new User();
@@ -86,12 +88,14 @@ class AccountServiceImplTest {
 
 		when(userService.getUserById(userId)).thenReturn(user);
 
-		when(transactionService.findAllTransactionsWith(account))
+		when(transactionService.findAllTransactionsWith(accountId))
 			.thenReturn(transactions);
 
 		Double balanceFinal =
-			incomeAmount + depositAmount + balanceBase
-				- paymentAmount;
+			balanceBase
+			+ incomeAmount
+			+ depositAmount 
+			- paymentAmount;
 
 		ResponseUserBalanceDto result =
 			accountService.getBalance(token);

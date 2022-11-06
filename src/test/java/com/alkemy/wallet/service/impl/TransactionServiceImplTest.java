@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.alkemy.wallet.mapper.ITransactionMapper;
-import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.repository.ITransactionRepository;
@@ -39,17 +38,17 @@ class TransactionServiceImplTest {
 
 	@Test
 	void findAllTransactionsWith_AccountWithTwoTranstransaction_ReturnTwoTranstransaction() {
-		Account account = new Account();
+		Long accountId = 1L;
 
 		List<Transaction> transactions = new ArrayList<>();
 		transactions.add(new Transaction());
 		transactions.add(new Transaction());
 
-		when(transactionService.findAllTransactionsWith(account))
+		when(transactionService.findAllTransactionsWith(accountId))
 			.thenReturn(transactions);
 
 		List<Transaction> result =
-			transactionService.findAllTransactionsWith(account);
+			transactionService.findAllTransactionsWith(accountId);
 		
 		assertEquals(2, result.size());
 	}

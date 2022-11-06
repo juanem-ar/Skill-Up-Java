@@ -4,25 +4,23 @@ package com.alkemy.wallet.service.impl;
 
 import com.alkemy.wallet.dto.TransactionDtoPay;
 import com.alkemy.wallet.mapper.ITransactionMapper;
-import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.repository.ITransactionRepository;
 import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.repository.IUserRepository;
-import com.alkemy.wallet.security.service.JwtUtils;
+import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.ITransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 import com.alkemy.wallet.exceptions.ErrorEnum;
 import com.alkemy.wallet.exceptions.TransactionError;
 
+import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -37,7 +35,7 @@ public class TransactionServiceImpl implements ITransactionService {
     private final ITransactionMapper transactionMapper;
 
     @Autowired
-    private JwtUtils jwtUtils;
+    private IJwtUtils jwtUtils;
 
     public String getJwt(String token){
         String jwt = token.substring(7);
@@ -87,13 +85,28 @@ public class TransactionServiceImpl implements ITransactionService {
 
 	@Override
 	public List<Transaction> findAllTransactionsWith(
-		Account account) {
-		return transactionRepository.findByAccount(account);
+		Long accountId) {
+		return transactionRepository.findAllByAccountId(accountId);
 	}
 
     @Override
     public List<ResponseTransactionDto> findByUserId(Long userId) {
         return transactionMapper.listModelToResponseTransactionDto(transactionRepository.findByAccount_UserId(userId));
+    }
+    @Override
+    public Optional<ResponseTransactionDto> findTransactionById(Long id) {
+        if (iTransactionRepository.findById(id).isPresent()){
+            return Optional.of(transactionMapper.modelToResponseTransactionDto(iTransactionRepository.findById(id).get()));
+        }else {
+            return Optional.empty();
+        }
+    }
+    @Override
+    public ResponseTransactionDto updateDescriptionFromTransaction(ResponseTransactionDto responseTransactionDto, String description) {
+        responseTransactionDto.setDescription(description);
+        Transaction saveTransaction = transactionMapper.responseTransactionDtoToModel(responseTransactionDto);
+        iTransactionRepository.save(saveTransaction);
+        return responseTransactionDto;
     }
 }
 

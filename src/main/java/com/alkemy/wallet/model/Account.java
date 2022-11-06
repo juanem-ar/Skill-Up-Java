@@ -33,7 +33,7 @@ public class Account {
     public enum Currency { ARS, USD} ;
 
     @NotNull
-    //@Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private Currency currency;
 
     @NotNull

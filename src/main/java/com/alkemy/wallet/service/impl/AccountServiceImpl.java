@@ -44,11 +44,8 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
-    public ResponseAccountDto updateAccount(Long id, Map<String,Double> requestAccount, Authentication authentication){
-        Account account = this.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
-        //if logged user is not the same as who is updating the account
-        //Unauthorized
-        //if (account.get().getId().equals(authentig))
+    //todo change requestAccount for Dto
+    public ResponseAccountDto updateAccount(Account account, Map<String,Double> requestAccount, Authentication authentication){
         account.setTransactionLimit(requestAccount.get("transactionLimit"));
         return iAccountMapper.accountToAccountDto(iAccountRepository.save(account));
     }

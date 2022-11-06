@@ -1,6 +1,8 @@
 package com.alkemy.wallet.controller;
 
 import com.alkemy.wallet.dto.ResponseAccountDto;
+import com.alkemy.wallet.exceptions.UserNotFoundUserException;
+import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,10 @@ public class AccountController {
     }
     @Secured(value = { "ROLE_USER" })
     @PatchMapping("{id}")
-    public ResponseEntity<ResponseAccountDto> updateAccount(@PathVariable Long id, Authentication authentication, @RequestBody Map<String,Double> requestAccountDto){
-        return new ResponseEntity<>(iAccountService.updateAccount(id,requestAccountDto,authentication), HttpStatus.OK);
+    public ResponseEntity<Object> updateAccount(@PathVariable Long id, Authentication authentication, @RequestBody Map<String,Double> requestAccountDto){
+        Account account = iAccountService.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
+        if (account.getUser().getEmail().equals(authentication.getName()))
+            return new ResponseEntity<>("You don't have permission to access this resource", HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(iAccountService.updateAccount(account,requestAccountDto,authentication), HttpStatus.OK);
     }
 }

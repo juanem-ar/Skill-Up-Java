@@ -9,7 +9,7 @@ import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.repository.ITransactionRepository;
 import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.repository.IUserRepository;
-import com.alkemy.wallet.security.service.JwtUtils;
+import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.ITransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class TransactionServiceImpl implements ITransactionService {
     private final ITransactionMapper transactionMapper;
 
     @Autowired
-    private JwtUtils jwtUtils;
+    private IJwtUtils jwtUtils;
 
     public String getJwt(String token){
         String jwt = token.substring(7);
@@ -81,6 +81,13 @@ public class TransactionServiceImpl implements ITransactionService {
         Transaction entitySaved = transactionRepository.save(entity);
         return transactionMapper.modelToResponseTransactionDto(entitySaved);
     }
+
+
+	@Override
+	public List<Transaction> findAllTransactionsWith(
+		Long accountId) {
+		return transactionRepository.findAllByAccountId(accountId);
+	}
 
     @Override
     public List<ResponseTransactionDto> findByUserId(Long userId) {

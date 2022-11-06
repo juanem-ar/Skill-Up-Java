@@ -1,15 +1,17 @@
 package com.alkemy.wallet.service.impl;
 
-
+import com.alkemy.wallet.exceptions.UserNotFoundException;
 import com.alkemy.wallet.dto.CurrencyDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.exceptions.UserNotFoundUserException;
+
 import com.alkemy.wallet.mapper.UserMapper;
 import com.alkemy.wallet.model.ECurrency;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IUserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -19,8 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Optional;
-
-
 
 
 @Service
@@ -70,6 +70,17 @@ public class UserServiceImpl implements IUserService {
         return iUserRepository.findById(id);
     }
 
+
+	@Override
+	public User getUserById(Long userId) {
+		Optional<User> userOptional = iUserRepository.findById(userId);
+		
+		if(userOptional.isEmpty())
+			throw new UserNotFoundException();
+		
+		return userOptional.get();
+	}
+
     @Override
     public Boolean existsByEmail(@PathVariable String email){
         if(iUserRepository.existsByEmail(email)) {
@@ -77,4 +88,5 @@ public class UserServiceImpl implements IUserService {
         }
         return false;
     }
+
 }

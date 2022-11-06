@@ -14,4 +14,6 @@ public interface IUserService {
     public List<ResponseUserDto> findAllUsers();
 
     Optional<User> findById(Long id);
+
+	public User getUserById(Long userId);
 }

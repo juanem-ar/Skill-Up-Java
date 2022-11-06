@@ -1,9 +1,9 @@
 package com.alkemy.wallet.controller;
 
 
-import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 import com.alkemy.wallet.dto.TransactionDtoPay;
+import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.impl.TransactionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,10 +24,10 @@ import javax.validation.Valid;
 public class TransactionController {
 
     private final TransactionServiceImpl transactionService;
-    private final JwtUtils jwtUtils;
+    private final IJwtUtils jwtUtils;
 
     @Autowired
-    public TransactionController(TransactionServiceImpl transactionService, JwtUtils jwtUtils) {
+    public TransactionController(TransactionServiceImpl transactionService, IJwtUtils jwtUtils) {
         this.transactionService = transactionService;
         this.jwtUtils = jwtUtils;
     }

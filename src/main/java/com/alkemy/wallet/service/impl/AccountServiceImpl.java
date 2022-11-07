@@ -14,6 +14,7 @@ import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.model.EType;
@@ -49,19 +50,21 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
-    public List<ResponseAccountDto> findAllByUser(Long id)  {
-        User user = iUserService.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found User with number id: "+ id));
-        //return accountMapper.accountsToAccountsDto(user.getAccounts()); TODO if findAll function is correct, delete this line
+    public List<ResponseAccountDto> findAllByUser(Long id) throws ResourceNotFoundException {
+        User user = iUserService.findById(id).orElseThrow(()-> new ResourceNotFoundException("Not found User with number id: "+ id));
         return accountMapper.accountsToAccountsDto(iAccountRepository.findAllByUserId(user.getId()));
     }
 
     @Override
-    public Optional<Account> findById(Long id) {
-        return iAccountRepository.findById(id);
+    public Account findById(Long id) throws ResourceNotFoundException {
+        return iAccountRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Not found Account with number id: "+ id));
     }
 
     @Override
-    public ResponseAccountDto updateAccount(Account account, UpdateAccountDto requestAccount, Authentication authentication){
+    public ResponseAccountDto updateAccount(Account account, UpdateAccountDto requestAccount, String token){
+        //Long userId = jwtUtils.extractUserId(token);
+        //    if (!account.getUser().getId().equals(userId))
+        //        throw new AccessDeniedException("You don't have permission to access this resource");
         account.setTransactionLimit(requestAccount.getTransactionLimit());
         return accountMapper.accountToAccountDto(iAccountRepository.save(account));
     }

@@ -4,6 +4,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import com.alkemy.wallet.dto.UpdateAccountDto;
+import com.alkemy.wallet.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,16 +39,14 @@ public class AccountController {
 
     @Secured(value = { "ROLE_ADMIN" })
     @GetMapping("{id}")
-    public ResponseEntity<List<ResponseAccountDto>> listAccountsByUser(@PathVariable Long id){
+    public ResponseEntity<List<ResponseAccountDto>> listAccountsByUser(@PathVariable Long id) throws ResourceNotFoundException {
         return new ResponseEntity<>(iAccountService.findAllByUser(id), HttpStatus.OK);
     }
     @Secured(value = { "ROLE_USER" })
     @PatchMapping("{id}")
-    public ResponseEntity<Object> updateAccount(@PathVariable Long id, Authentication authentication, @RequestBody UpdateAccountDto requestAccountDto){
-        Account account = iAccountService.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
-    //    if (authentication == null || !authentication.isAuthenticated() || !account.getUser().getEmail().equals(authentication.getName()))
-    //        return new ResponseEntity<>("You don't have permission to access this resource", HttpStatus.UNAUTHORIZED);
-        return new ResponseEntity<>(iAccountService.updateAccount(account,requestAccountDto,authentication), HttpStatus.OK);
+    public ResponseEntity<Object> updateAccount(@PathVariable Long id, @RequestHeader(name = "Authorization") String token, @RequestBody UpdateAccountDto requestAccountDto) throws ResourceNotFoundException {
+        Account account = iAccountService.findById(id);
+        return new ResponseEntity<>(iAccountService.updateAccount(account,requestAccountDto,token), HttpStatus.OK);
     }
     @GetMapping("/balance")
 	public ResponseEntity<

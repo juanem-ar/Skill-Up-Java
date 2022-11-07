@@ -14,7 +14,8 @@ import java.util.Optional;
 public interface ITransactionService {
 
     String getJwt(String token);
-    //ResponseTransactionDto sendArs(String token, Long accountId, Long amount, EType type); // faltan métodos llamados adentro
+    //ResponseTransactionDto sendArs(String token, Long accountId, Double amount) // faltan métodos llamados dentro
+    //ResponseTransactionDto sendUsd(String token, Long accountId, Double amount) // faltan métodos llamados dentro
     ResponseTransactionDto save(ResponseTransactionDto transactionDto);
 
     List<Transaction> findAllTransactionsWith(Long accountId);

@@ -32,6 +32,18 @@ public class TransactionController {
         this.jwtUtils = jwtUtils;
     }
 
+
+
+    /*
+    @PostMapping("/sendArs")
+    public ResponseEntity<ResponseTransactionDto> sendArs(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Double amount) {
+        return ResponseEntity.ok().body(transactionService.sendUsd(token,accountId,amount));
+    }
+    @PostMapping("/sendUsd")
+    public ResponseEntity<ResponseTransactionDto> sendUsd(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Double amount) {
+        return ResponseEntity.ok().body(transactionService.sendUsd(token,accountId,amount));
+    }*/
+
     @PostMapping("payment")
     public ResponseEntity<TransactionDtoPay>  transactionPayment(@RequestBody @Valid TransactionDtoPay transactionDtoPay){
         return new ResponseEntity<>(transactionService.payment(transactionDtoPay), HttpStatus.CREATED);

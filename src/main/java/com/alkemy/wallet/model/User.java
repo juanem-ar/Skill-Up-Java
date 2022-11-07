@@ -28,11 +28,11 @@ public class User {
 
 	private Long id;
 
-	@Size(min = 5, max = 50)
+	@Size(min = 3, max = 50)
 	@NotNull
 	private String firstName;
 
-	@Size(min = 5, max = 50)
+	@Size(min = 3, max = 50)
 	@NotNull
 	private String lastName;
 

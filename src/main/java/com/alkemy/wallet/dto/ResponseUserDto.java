@@ -24,4 +24,5 @@ public class ResponseUserDto {
 	private Timestamp creationDate;
 	private Timestamp updateDate;
 	private Boolean deleted = Boolean.FALSE;
+	private String jwt;
 }

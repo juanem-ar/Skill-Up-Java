@@ -1,6 +1,6 @@
 package com.alkemy.wallet.security.filter;
 
-import com.alkemy.wallet.security.service.IJwtUtils;
+import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.security.service.UserDetailsCustomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,14 +18,12 @@ import java.io.IOException;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-
     @Autowired
     private UserDetailsCustomService userDetailsCustomService;
     @Autowired
-    private IJwtUtils jwtUtil;
+    private JwtUtils jwtUtil;
     @Autowired
     private AuthenticationManager authenticationManager;
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {

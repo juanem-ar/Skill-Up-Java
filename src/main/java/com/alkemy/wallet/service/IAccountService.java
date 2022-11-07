@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface IAccountService {
 	ResponseUserBalanceDto getBalance(String token);
 
-    void addAccount(String email, CurrencyDto currency) throws Exception;
+    String addAccount(String email, CurrencyDto currency) throws Exception;
 
     Account createAccount(CurrencyDto currency);
 

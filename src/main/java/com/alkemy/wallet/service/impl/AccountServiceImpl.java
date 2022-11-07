@@ -1,8 +1,6 @@
 package com.alkemy.wallet.service.impl;
 
-
 import com.alkemy.wallet.dto.*;
-import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.exceptions.ResourceNotFoundException;
 import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.mapper.IAccountMapper;
@@ -15,14 +13,13 @@ import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import com.alkemy.wallet.mapper.IAccountMapper;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.service.ITransactionService;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.alkemy.wallet.model.ECurrency.ARS;
@@ -50,10 +47,12 @@ public class AccountServiceImpl implements IAccountService {
         this.jwtUtils = jwtUtils;
         this.userRepository = userRepository;
     }
+
     @Override
     public List<ResponseAccountDto> findAllByUser(Long id)  {
         User user = iUserService.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found User with number id: "+ id));
-        return accountMapper.accountsToAccountsDto(user.getAccounts());
+        //return accountMapper.accountsToAccountsDto(user.getAccounts()); TODO if findAll function is correct, delete this line
+        return accountMapper.accountsToAccountsDto(iAccountRepository.findAllByUserId(user.getId()));
     }
 
     @Override
@@ -70,31 +69,23 @@ public class AccountServiceImpl implements IAccountService {
 	@Override
 	public ResponseUserBalanceDto getBalance(String token) {
 		Long userId = jwtUtils.extractUserId(token);
-
-		User user = iUserService.getUserById(userId);
-
+		//User user = iUserService.getUserById(userId); TODO if foreach function is correct, delete this line
 		ResponseUserBalanceDto responseUserBalanceDto = new ResponseUserBalanceDto();
 		responseUserBalanceDto.setId(userId);
-
-		for(Account account : user.getAccounts()) {
+		for(Account account : iAccountRepository.findAllByUserId(userId)) {
 			AccountBalanceDto accountBalanceDto = accountMapper.accountToBalanceDto(account);
-
 			accountBalanceDto.setBalance(
 				calcularBalance(
 					account.getBalance(),
 					transactionService.findAllTransactionsWith(account.getId())));
-
 			responseUserBalanceDto.getAccountBalanceDtos().add(accountBalanceDto);
 		}
-
 		return responseUserBalanceDto;
 	}
-
 
 	private Double calcularBalance(
 		Double balanceBase, List<Transaction> transactions) {
 		Double b = balanceBase;
-
 		for(Transaction transaction : transactions) {
 			if(transaction.getType() == EType.DEPOSIT
 				|| transaction.getType() == EType.INCOME)
@@ -102,30 +93,33 @@ public class AccountServiceImpl implements IAccountService {
 			else if(transaction.getType() == EType.PAYMENT)
 				b -= transaction.getAmount();
 		}
-
 		return b;
 	}
 
     @Override
-    public void addAccount(String email, CurrencyDto currency) throws Exception {
-        try{
-            if(this.iAccountRepository.countByUserId(this.userRepository.findByEmail(email).getId()) <= 1) {
-                User userLogged = this.userRepository.findByEmail(email);
-                Account account = createAccount(currency);
-                account.setUser(userLogged);
-                this.iAccountRepository.save(account);
-            }else{
-                throw new Exception();
+    public String addAccount(String email, CurrencyDto currency) throws Exception {
+        int countByUserId = iAccountRepository.countByUserId(userRepository.findByEmail(email).getId()).intValue();
+        if (countByUserId < 0 || countByUserId >1){
+            throw new ResourceNotFoundException("You have 2 associated accounts");
+        }else{
+            if (iAccountRepository.getReferenceByUserId(userRepository.findByEmail(email).getId()) != null) {
+                Account accRegistered = iAccountRepository.getReferenceByUserId(userRepository.findByEmail(email).getId());
+                if (accRegistered.getCurrency() == currency.getCurrency()) {
+                    throw new ResourceNotFoundException("You already have an " + currency.getCurrency() + " associated account.");
+                }
             }
-        }catch (Exception e){
-            throw new BadRequestException("There is an " + currency.getCurrency() + " account with that email adress: " + email);
+            Account account = createAccount(currency);
+            User userLogged = userRepository.findByEmail(email);
+            account.setUser(userLogged);
+            iAccountRepository.save(account);
+            return HttpStatus.CREATED.getReasonPhrase();
         }
     }
+
     @Override
     public Account createAccount(CurrencyDto currency) {
         Account account = new Account();
         ECurrency currencyDto = currency.getCurrency();
-        System.out.println(currencyDto);
         if(currencyDto == ARS){
             account.setCurrency(ARS);
             account.setTransactionLimit(LIMIT_ARS);

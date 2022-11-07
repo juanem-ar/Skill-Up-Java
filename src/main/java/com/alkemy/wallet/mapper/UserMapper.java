@@ -3,29 +3,32 @@ package com.alkemy.wallet.mapper;
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IAccountRepository;
+import com.alkemy.wallet.security.dto.AuthenticationRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
     @Autowired
     private IAccountRepository iAccountRepository;
+/*
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder;
+*/
     public User toEntity(ResponseUserDto dto) {
         User userEntity = new User();
         userEntity.setFirstName(dto.getFirstName());
         userEntity.setLastName(dto.getLastName());
         userEntity.setEmail(dto.getEmail());
-        userEntity.setPassword(passwordEncoder.encode(dto.getPassword()));
+        //userEntity.setPassword(passwordEncoder.encode(dto.getPassword()));
+        userEntity.setPassword(dto.getPassword());
         userEntity.setRole(dto.getRole());
         userEntity.setUpdateDate(dto.getUpdateDate());
         userEntity.setCreationDate(dto.getCreationDate());
         userEntity.setDeleted(dto.getDeleted());
         return userEntity;
     }
-
     public ResponseUserDto toDto(User entity, Long idUser) {
         ResponseUserDto dto = new ResponseUserDto();
         dto.setFirstName(entity.getFirstName());
@@ -39,5 +42,11 @@ public class UserMapper {
         dto.setCreationDate(entity.getCreationDate());
         dto.setDeleted(entity.getDeleted());
         return dto;
+    }
+    public AuthenticationRequestDto toRequestDto (ResponseUserDto dto){
+        AuthenticationRequestDto auth = new AuthenticationRequestDto();
+        auth.setEmail(dto.getEmail());
+        auth.setPassword(dto.getPassword());
+        return auth;
     }
 }

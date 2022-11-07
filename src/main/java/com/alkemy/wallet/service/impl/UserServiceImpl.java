@@ -1,5 +1,6 @@
 package com.alkemy.wallet.service.impl;
 
+import com.alkemy.wallet.exceptions.ResourceNotFoundException;
 import com.alkemy.wallet.exceptions.UserNotFoundException;
 import com.alkemy.wallet.dto.CurrencyDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
@@ -62,10 +63,10 @@ public class UserServiceImpl implements IUserService {
                 responseDto.setJwt(login.getJwt());
                 return responseDto;
             }catch (Exception e){
-                throw new BadRequestException("Incorrect format email. Input email is " + e.getCause());
+                throw new ResourceNotFoundException("Incorrect format email or password." + "\n" + e.getMessage());
             }
         } else {
-            throw new BadRequestException("There is an account with that email adress: " + dto.getEmail());
+            throw new ResourceNotFoundException("There is an account with that email adress: " + dto.getEmail());
         }
     }
 

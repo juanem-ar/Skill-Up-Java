@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.alkemy.wallet.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -48,6 +49,41 @@ class AccountServiceImplTest {
 	@InjectMocks
 	private AccountServiceImpl accountService;
 
+	@Test
+	void updateAccount_AccountWithThreeValues_AccountUpdated() throws ResourceNotFoundException {
+		String token = "token";
+		long userId = 60;
+		when(jwtUtils.extractUserId(token)).thenReturn(userId);
+
+		// three transactions
+		Double transactionLimit = 100.0 ;
+
+		Double transactionLimit2 = 0.0 ;
+
+		Double transactionLimit3 = 1000.0 ;
+
+		//
+		long accountId = 1L;
+		Account account = new Account();
+		account.setId(accountId);
+		account.setTransactionLimit(transactionLimit);
+
+	//	User user = new User();
+	//	user.setAccounts(List.of(account));
+
+		when(accountService.findById(accountId)).thenReturn(account);
+
+		//when(transactionService.findAllTransactionsWith(accountId))
+		//		.thenReturn(transactions);
+
+		ResponseUserBalanceDto result =
+				accountService.updateAccount(account,requestAccountDto,token);
+		assertEquals(1, result.getAccountBalanceDtos().size());
+
+
+
+
+	}
 
 	@Test
 	void getBalance_AccountWithThreeTransactions_ExactBalance() {
@@ -84,7 +120,7 @@ class AccountServiceImplTest {
 		account.setBalance(balanceBase);
 
 		User user = new User();
-		user.setAccounts(List.of(account));
+//		user.setAccounts(List.of(account));
 
 		when(userService.getUserById(userId)).thenReturn(user);
 

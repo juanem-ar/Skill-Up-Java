@@ -4,13 +4,16 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
+import org.hibernate.validator.constraints.Length;
 
 @Entity
 @Getter
@@ -24,17 +27,21 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 
 	private Long id;
-	
+
+	@Size(min = 5, max = 50)
 	@NotNull
 	private String firstName;
-	
+
+	@Size(min = 5, max = 50)
 	@NotNull
 	private String lastName;
-	
+
+	@Email
 	@NotNull
 	@Column(unique = true)
 	private String email;
-	
+
+	@Length(min = 8)
 	@NotNull
 	private String password;
 	

@@ -10,4 +10,5 @@ import java.util.List;
 public interface IAccountRepository extends JpaRepository<Account, Long>{
     List<Account> findAllByUserId(Long id);
     Long countByUserId(Long id);
+    Account getReferenceByUserId(Long id);
 }

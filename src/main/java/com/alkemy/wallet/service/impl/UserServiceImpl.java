@@ -52,14 +52,18 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ResponseUserDto saveUser(ResponseUserDto dto) throws Exception{
         if (!existsByEmail(dto.getEmail())) {
-            User entity = userMapper.toEntity(dto);
-            User entitySaved = iUserRepository.save(entity);
-            this.iAccountServiceImpl.addAccount(entitySaved.getEmail(), new CurrencyDto(ECurrency.ARS));
-            this.iAccountServiceImpl.addAccount(entitySaved.getEmail(), new CurrencyDto(ECurrency.USD));
-            ResponseUserDto responseDto = userMapper.toDto(entitySaved, entitySaved.getId());
-            AuthenticationResponseDto login = login(userMapper.toRequestDto(responseDto));
-            responseDto.setJwt(login.getJwt());
-            return responseDto;
+            try{
+                User entity = userMapper.toEntity(dto);
+                User entitySaved = iUserRepository.save(entity);
+                this.iAccountServiceImpl.addAccount(entitySaved.getEmail(), new CurrencyDto(ECurrency.ARS));
+                this.iAccountServiceImpl.addAccount(entitySaved.getEmail(), new CurrencyDto(ECurrency.USD));
+                ResponseUserDto responseDto = userMapper.toDto(entitySaved, entitySaved.getId());
+                AuthenticationResponseDto login = login(userMapper.toRequestDto(responseDto));
+                responseDto.setJwt(login.getJwt());
+                return responseDto;
+            }catch (Exception e){
+                throw new BadRequestException("Incorrect format email. Input email is " + e.getCause());
+            }
         } else {
             throw new BadRequestException("There is an account with that email adress: " + dto.getEmail());
         }

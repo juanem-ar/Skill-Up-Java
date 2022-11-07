@@ -1,5 +1,6 @@
-package com.alkemy.wallet.security.dto;
+package com.alkemy.wallet.dto;
 
+import com.alkemy.wallet.model.ECurrency;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponseDto {
-    private String user;
-    private String jwt;
+public class CurrencyDto {
+    private ECurrency currency;
 }

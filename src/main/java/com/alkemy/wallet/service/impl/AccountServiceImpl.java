@@ -62,9 +62,9 @@ public class AccountServiceImpl implements IAccountService {
 
     @Override
     public ResponseAccountDto updateAccount(Account account, UpdateAccountDto requestAccount, String token){
-        //Long userId = jwtUtils.extractUserId(token);
-        //    if (!account.getUser().getId().equals(userId))
-        //        throw new AccessDeniedException("You don't have permission to access this resource");
+        String userName =  jwtUtils.extractUsername(jwtUtils.getJwt(token));
+        if (!account.getUser().getEmail().equals(userName))
+                throw new AccessDeniedException("You don't have permission to access this resource");
         account.setTransactionLimit(requestAccount.getTransactionLimit());
         return accountMapper.accountToAccountDto(iAccountRepository.save(account));
     }

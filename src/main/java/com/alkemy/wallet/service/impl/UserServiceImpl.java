@@ -3,6 +3,7 @@ package com.alkemy.wallet.service.impl;
 import com.alkemy.wallet.exceptions.ResourceNotFoundException;
 import com.alkemy.wallet.exceptions.UserNotFoundException;
 import com.alkemy.wallet.dto.CurrencyDto;
+import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.mapper.UserMapper;
@@ -21,12 +22,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.mapper.IuserMapper;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -37,17 +38,16 @@ public class UserServiceImpl implements IUserService {
     private IAccountService iAccountServiceImpl;
     private AuthenticationManager authenticationManager;
     private JwtUtils jwtUtils;
-    //private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl( IUserRepository iUserRepository /*, BCryptPasswordEncoder passwordEncoder*/ , @Lazy IAccountService iAccountServiceImpl,
-                            AuthenticationManager authenticationManager, UserMapper userMapper, JwtUtils jwtUtils) {
+    public UserServiceImpl( IUserRepository iUserRepository , @Lazy IAccountService iAccountServiceImpl,
+                            AuthenticationManager authenticationManager, UserMapper userMapper, JwtUtils jwtUtils, IuserMapper  iUserMapper) {
         this.iUserRepository = iUserRepository;
         this.userMapper = userMapper;
         this.iAccountServiceImpl = iAccountServiceImpl;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
-        /*this.passwordEncoder = passwordEncoder;*/
+        this.iUserMapper = iUserMapper;
     }
 
     @Override
@@ -130,5 +130,37 @@ public class UserServiceImpl implements IUserService {
         }
         return false;
     }
+
+	@Override
+	public ResponseUserDto getUserDetails(Long id, String token) {
+		Long tokenUserId = jwtUtils.extractUserId(token);
+		
+		sameIdOrThrowException(id, tokenUserId);
+		
+		return iUserMapper.toResponseUserDto(getUserById(tokenUserId));
+	}
+
+	@Override
+	public ResponseUserDto updateUserDetails(
+		Long id,
+		PatchRequestUserDto dto,
+		String token) {
+		Long tUserId = jwtUtils.extractUserId(token);
+		
+		sameIdOrThrowException(id, tUserId);
+		
+		User user = getUserById(tUserId);
+		
+		user = iUserRepository.save(
+			iUserMapper.updateUser(dto, user));
+		
+		return iUserMapper.toResponseUserDto(user);
+	}
+	
+	
+	private void sameIdOrThrowException(Long userId, Long tokenUserId) {
+		if(!Objects.equals(userId, tokenUserId))
+			throw new BadRequestException();
+	}
 
 }

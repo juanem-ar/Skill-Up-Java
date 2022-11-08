@@ -3,6 +3,7 @@ package com.alkemy.wallet.service.impl;
 import com.alkemy.wallet.exceptions.ResourceNotFoundException;
 import com.alkemy.wallet.exceptions.UserNotFoundException;
 import com.alkemy.wallet.dto.CurrencyDto;
+import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.mapper.UserMapper;
@@ -134,10 +135,23 @@ public class UserServiceImpl implements IUserService {
 	public ResponseUserDto getUserDetails(Long id, String token) {
 		Long tokenUserId = jwtUtils.extractUserId(token);
 		
-		if(!Objects.equals(id, tokenUserId))
-			throw new BadRequestException();
+		sameIdOrThrowException(id, tokenUserId);
 		
 		return iUserMapper.toResponseUserDto(getUserById(tokenUserId));
+	}
+
+	@Override
+	public ResponseUserDto updateUserDetails(
+		Long id,
+		PatchRequestUserDto dto,
+		String token) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private void sameIdOrThrowException(Long userId, Long tokenUserId) {
+		if(!Objects.equals(userId, tokenUserId))
+			throw new BadRequestException();
 	}
 
 }

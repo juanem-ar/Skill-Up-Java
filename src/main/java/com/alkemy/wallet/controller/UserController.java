@@ -10,11 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
 
 import java.util.List;
@@ -44,5 +47,14 @@ public class UserController {
     	@RequestHeader(name = "Authorization") String token,
     	@PathVariable Long id) {
 		return ResponseEntity.ok(userService.getUserDetails(id, token));
+    }
+    
+    @PatchMapping("/{id}")
+    public ResponseEntity<ResponseUserDto> updateUserDetails(
+    	@PathVariable Long id,
+    	@RequestBody PatchRequestUserDto dto,
+    	@RequestHeader(name = "Authorization") String token){
+		return ResponseEntity.ok(
+			userService.updateUserDetails(id, dto, token));
     }
 }

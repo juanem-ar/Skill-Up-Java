@@ -26,6 +26,7 @@ import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.mapper.IuserMapper;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -39,12 +40,13 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     public UserServiceImpl( IUserRepository iUserRepository , @Lazy IAccountService iAccountServiceImpl,
-                            AuthenticationManager authenticationManager, UserMapper userMapper, JwtUtils jwtUtils) {
+                            AuthenticationManager authenticationManager, UserMapper userMapper, JwtUtils jwtUtils, IuserMapper  iUserMapper) {
         this.iUserRepository = iUserRepository;
         this.userMapper = userMapper;
         this.iAccountServiceImpl = iAccountServiceImpl;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
+        this.iUserMapper = iUserMapper;
     }
 
     @Override
@@ -127,5 +129,15 @@ public class UserServiceImpl implements IUserService {
         }
         return false;
     }
+
+	@Override
+	public ResponseUserDto getUserDetails(Long id, String token) {
+		Long tokenUserId = jwtUtils.extractUserId(token);
+		
+		if(!Objects.equals(id, tokenUserId))
+			throw new BadRequestException();
+		
+		return iUserMapper.toResponseUserDto(getUserById(tokenUserId));
+	}
 
 }

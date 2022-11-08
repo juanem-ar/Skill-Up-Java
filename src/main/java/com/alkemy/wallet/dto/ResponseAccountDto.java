@@ -12,13 +12,15 @@ import lombok.Setter;
 public class ResponseAccountDto {
 
     @JsonProperty("id")
+    @Schema(type = "double", example = "1")
     private int id;
 
     @JsonProperty("balance")
-    @Schema(type = "double", example = "1002.5")
+    @Schema(type = "double", example = "100.5")
     private Double balance;
 
     @JsonProperty("currency")
+    @Schema(type = "double", example = "USD")
     private String currency;
 
     @JsonProperty("creationDate")
@@ -28,5 +30,6 @@ public class ResponseAccountDto {
     private String updateDate;
 
     @JsonProperty("transactionLimit")
+    @Schema(type = "double", example = "1000")
     private Double transactionLimit;
 }

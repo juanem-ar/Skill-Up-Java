@@ -128,4 +128,10 @@ public class UserServiceImpl implements IUserService {
         return false;
     }
 
+	@Override
+	public ResponseUserDto getUserDetails(Long id, String token) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

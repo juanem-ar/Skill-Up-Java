@@ -3,6 +3,7 @@ package com.alkemy.wallet.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.security.dto.AuthenticationRequestDto;
@@ -17,4 +18,8 @@ public interface IUserService {
 	public User getUserById(Long userId);
     AuthenticationResponseDto login(AuthenticationRequestDto dto) throws Exception;
     ResponseUserDto getUserDetails(Long id, String token);
+	ResponseUserDto updateUserDetails(
+		Long id,
+		PatchRequestUserDto dto,
+		String token);
 }

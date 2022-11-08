@@ -84,7 +84,7 @@ class AccountServiceImplTest {
 		account.setBalance(balanceBase);
 
 		User user = new User();
-		user.setAccounts(List.of(account));
+		//user.setAccounts(List.of(account));
 
 		when(userService.getUserById(userId)).thenReturn(user);
 

@@ -4,6 +4,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import com.alkemy.wallet.dto.UpdateAccountDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +41,14 @@ public class AccountController {
     @Autowired
     private IAccountService iAccountService;
 
+    @Operation(method = "HOLA", summary = "borrar", description = "todo",
+            responses = {
+            @ApiResponse(responseCode = "500", description = "todo bien", content = @Content(examples = @ExampleObject( value= "chau chau"))),
+            @ApiResponse(   responseCode = "200",
+                            description = "todo mal"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",  content = @Content(mediaType = "", examples = @ExampleObject( value= "null"))),
+    })
+    @ApiResponse(responseCode = "403", description = "forbidden", content = @Content(schema = @Schema(hidden = true)))
     @Secured(value = { "ROLE_ADMIN" })
     @GetMapping("{id}")
     public ResponseEntity<List<ResponseAccountDto>> listAccountsByUser(@PathVariable Long id){

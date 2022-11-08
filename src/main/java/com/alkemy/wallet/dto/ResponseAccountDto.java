@@ -2,6 +2,8 @@ package com.alkemy.wallet.dto;
 
 import com.alkemy.wallet.model.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +15,7 @@ public class ResponseAccountDto {
     private int id;
 
     @JsonProperty("balance")
+    @Schema(type = "double", example = "1002.5")
     private Double balance;
 
     @JsonProperty("currency")

@@ -1,10 +1,15 @@
 package com.alkemy.wallet.controller;
 
 
+import com.alkemy.wallet.dto.ResponseAccountDto;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 import com.alkemy.wallet.dto.TransactionDtoPay;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.impl.TransactionServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +37,6 @@ public class TransactionController {
         this.jwtUtils = jwtUtils;
     }
 
-
-
     /*
     @PostMapping("/sendArs")
     public ResponseEntity<ResponseTransactionDto> sendArs(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Double amount) {
@@ -44,11 +47,23 @@ public class TransactionController {
         return ResponseEntity.ok().body(transactionService.sendUsd(token,accountId,amount));
     }*/
 
+    @Operation(method = "POST", summary = "transactionPayment", description = "Registrar un pago.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
+                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+            })
     @PostMapping("payment")
-    public ResponseEntity<TransactionDtoPay>  transactionPayment(@RequestBody @Valid TransactionDtoPay transactionDtoPay){
+    public ResponseEntity<TransactionDtoPay> transactionPayment(@RequestBody @Valid TransactionDtoPay transactionDtoPay){
         return new ResponseEntity<>(transactionService.payment(transactionDtoPay), HttpStatus.CREATED);
     }
 
+    @Operation(method = "POST", summary = "saveDeposit", description = "Registrar un depósito.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
+                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+            })
     @PostMapping("/deposit")
     public ResponseEntity<ResponseTransactionDto> saveDeposit(
             @RequestBody ResponseTransactionDto deposit){
@@ -56,6 +71,12 @@ public class TransactionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(depositCreated);
     }
 
+    @Operation(method = "GET", summary = "getListTransactionByAdminUser", description = "Traer todas las transacciones de un administrador.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
+                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+            })
     @GetMapping("/{userId}")
     public ResponseEntity<?> getListTransactionByAdminUser(@PathVariable("userId") Long userId) {
         //IF PARA VALIDAR USUARIO ADMINISTRADOR
@@ -66,6 +87,13 @@ public class TransactionController {
             return new ResponseEntity<>(listTransactionsByUser, HttpStatus.OK);
         }
     }
+
+    @Operation(method = "GET", summary = "getTransactionByAuthUser", description = "Traer todas las transacciones de un usuario.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
+                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+            })
     @GetMapping("transaction/{id}")
     public ResponseEntity<?> getTransactionByAuthUser(@PathVariable("id") Long id){
         //IF PARA VALIDAR USUARIO AUTENTICADO
@@ -76,6 +104,13 @@ public class TransactionController {
             return new ResponseEntity<>(responseTransactionDto, HttpStatus.OK);
         }
     }
+
+    @Operation(method = "PATCH", summary = "editTransactionByAuthUser", description = "Actualizar transacción.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
+                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+            })
     @PatchMapping("{id}")
     public ResponseEntity<?> editTransactionByAuthUser(@RequestBody Map<Object, String> description,
                                                        @PathVariable("id") Long id){

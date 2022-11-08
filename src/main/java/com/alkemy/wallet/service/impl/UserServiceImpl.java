@@ -21,12 +21,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.mapper.IuserMapper;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -37,17 +37,16 @@ public class UserServiceImpl implements IUserService {
     private IAccountService iAccountServiceImpl;
     private AuthenticationManager authenticationManager;
     private JwtUtils jwtUtils;
-    //private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl( IUserRepository iUserRepository /*, BCryptPasswordEncoder passwordEncoder*/ , @Lazy IAccountService iAccountServiceImpl,
-                            AuthenticationManager authenticationManager, UserMapper userMapper, JwtUtils jwtUtils) {
+    public UserServiceImpl( IUserRepository iUserRepository , @Lazy IAccountService iAccountServiceImpl,
+                            AuthenticationManager authenticationManager, UserMapper userMapper, JwtUtils jwtUtils, IuserMapper  iUserMapper) {
         this.iUserRepository = iUserRepository;
         this.userMapper = userMapper;
         this.iAccountServiceImpl = iAccountServiceImpl;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
-        /*this.passwordEncoder = passwordEncoder;*/
+        this.iUserMapper = iUserMapper;
     }
 
     @Override
@@ -130,5 +129,15 @@ public class UserServiceImpl implements IUserService {
         }
         return false;
     }
+
+	@Override
+	public ResponseUserDto getUserDetails(Long id, String token) {
+		Long tokenUserId = jwtUtils.extractUserId(token);
+		
+		if(!Objects.equals(id, tokenUserId))
+			throw new BadRequestException();
+		
+		return iUserMapper.toResponseUserDto(getUserById(tokenUserId));
+	}
 
 }

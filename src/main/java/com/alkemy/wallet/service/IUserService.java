@@ -16,4 +16,5 @@ public interface IUserService {
     Optional<User> findById(Long id);
 	public User getUserById(Long userId);
     AuthenticationResponseDto login(AuthenticationRequestDto dto) throws Exception;
+    ResponseUserDto getUserDetails(Long id, String token);
 }

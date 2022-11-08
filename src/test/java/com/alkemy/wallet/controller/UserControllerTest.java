@@ -21,7 +21,7 @@ import com.alkemy.wallet.service.impl.UserServiceImpl;
 @WebMvcTest(controllers = { UserController.class })
 @ContextConfiguration(classes = { UserController.class })
 class UserControllerTest {
-	private String uri = "/api/v1/";
+	private String uri = "/users";
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -36,8 +36,23 @@ class UserControllerTest {
 			.thenReturn(new ArrayList<ResponseUserDto>());
 		
 		mockMvc
-			.perform(get(uri + "users"))
+			.perform(get(uri))
 			.andExpect(status().isOk());
+	}
+
+
+	@Test
+	void getUserDetails_GetRequestWithUriWithVariable_ResponseOk()
+		throws Exception {
+		Long userId = 1L;
+		String token = "token";
+
+		mockMvc
+			.perform(
+				get(uri + "/" + userId.toString())
+					.header("authorization", "Bearer " + token))
+			.andExpect(status().isOk());
+
 	}
 
 }

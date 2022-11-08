@@ -7,7 +7,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -29,8 +28,8 @@ public class FixedTermDeposit {
     private Double amount;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "account_id", insertable = false, updatable = false)
-    private Account accountId;
+    @JoinColumn(name = "account_id", updatable = false)
+    private Account account;
 
     @NotNull
     private Double interest;
@@ -40,5 +39,7 @@ public class FixedTermDeposit {
 
     @UpdateTimestamp
     private Timestamp closingDate;
+
+    private Boolean deleted = Boolean.FALSE;
 
 }

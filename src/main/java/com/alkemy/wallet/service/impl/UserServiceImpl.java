@@ -145,9 +145,18 @@ public class UserServiceImpl implements IUserService {
 		Long id,
 		PatchRequestUserDto dto,
 		String token) {
-		// TODO Auto-generated method stub
-		return null;
+		Long tUserId = jwtUtils.extractUserId(token);
+		
+		sameIdOrThrowException(id, tUserId);
+		
+		User user = getUserById(tUserId);
+		
+		user = iUserRepository.save(
+			iUserMapper.updateUser(dto, user));
+		
+		return iUserMapper.toResponseUserDto(user);
 	}
+	
 	
 	private void sameIdOrThrowException(Long userId, Long tokenUserId) {
 		if(!Objects.equals(userId, tokenUserId))

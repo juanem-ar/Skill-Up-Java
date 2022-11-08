@@ -8,11 +8,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.alkemy.wallet.dto.ResponseAccountDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.dto.UpdateAccountDto;
+import io.swagger.v3.core.util.Json;
+import net.minidev.json.JSONUtil;
+import nonapi.io.github.classgraph.json.JSONUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -65,38 +69,25 @@ class AccountControllerTest {
 	}
 
 	@Test
-	void updateAccount_PatchRequest_ResponseOk() throws Exception {
+	void updateAccount_PatchRequest_ResponseAccountDto() throws Exception {
 		String token = "token";
 		long accountId = 60;
 		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
 		requestAccountDto.setTransactionLimit(9999.0);
+		String jsonRequest = Json.pretty(requestAccountDto);
 
-		when(accountService.updateAccount(accountService.findById(accountId), requestAccountDto, token))
-				.thenReturn(new ResponseAccountDto());
+		//when(accountService.updateAccount(accountService.findById(accountId), requestAccountDto, token))
+		//		.thenReturn(new ResponseAccountDto());
 
 		mockMvc
 				.perform(
-						patch(uri + "/" + accountId)
-								.header("authorization", "Bearer " + token))
+						patch(uri + '/' + accountId)
+								.header("authorization", "Bearer " + token)
+								.contentType(MediaType.APPLICATION_JSON_VALUE)
+								.accept(MediaType.APPLICATION_JSON)
+								.param("id", String.valueOf(accountId))
+								.content(jsonRequest))
 				.andExpect(status().isOk());
-		/*
-	  long id = 1;
-      String content = "new updated content";
-      MockHttpServletRequestBuilder builder =
-              MockMvcRequestBuilders.patch("/articles/" + id)
-                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    .characterEncoding("UTF-8")
-                                    .content(getArticleInJson(1, content));
-      this.mockMvc.perform(builder)
-                  .andExpect(MockMvcResultMatchers.status()
-                                                  .isOk())
-                  .andExpect(MockMvcResultMatchers.content()
-                                                  .string("Article updated with content: " + content))
-                  .andDo(MockMvcResultHandlers.print());
-	}
 
-
-	 */
 	}
 }

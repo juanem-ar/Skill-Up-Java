@@ -55,9 +55,10 @@ public class JwtUtils implements IJwtUtils {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+    
+    
 	@Override
 	public Long extractUserId(String token) {
-		// TODO Auto-generated method stub
-		return null;
+		return (Long) extractAllClaims(token).get("userId");
 	}
 }

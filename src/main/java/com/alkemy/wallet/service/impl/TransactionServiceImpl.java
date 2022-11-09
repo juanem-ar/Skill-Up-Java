@@ -14,6 +14,8 @@ import com.alkemy.wallet.service.ITransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 import com.alkemy.wallet.exceptions.ErrorEnum;
@@ -117,8 +119,12 @@ public class TransactionServiceImpl implements ITransactionService {
 	}
 
     @Override
-    public List<ResponseTransactionDto> findByUserId(Long userId) {
-        return transactionMapper.listModelToResponseTransactionDto(transactionRepository.findByAccount_UserId(userId));
+    public Page<Transaction> findByUserId(Long userId, String token, Pageable pageable) throws Exception{
+        if (jwtUtils.extractUserId(token).equals(userId)) {
+            return transactionRepository.findByAccount_UserId(userId, pageable);
+        } else {
+             throw new TransactionError("Token id does not match whit path id");
+        }
     }
     @Override
     public Optional<ResponseTransactionDto> findTransactionById(Long id) {

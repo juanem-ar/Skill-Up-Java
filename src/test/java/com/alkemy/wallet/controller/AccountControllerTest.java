@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.alkemy.wallet.dto.ResponseAccountDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.dto.UpdateAccountDto;
+import com.alkemy.wallet.model.Account;
 import io.swagger.v3.core.util.Json;
 import net.minidev.json.JSONUtil;
 import nonapi.io.github.classgraph.json.JSONUtils;
@@ -72,12 +73,17 @@ class AccountControllerTest {
 	void updateAccount_PatchRequest_ResponseAccountDto() throws Exception {
 		String token = "token";
 		long accountId = 60;
+		Account account = new Account();
 		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
+		ResponseAccountDto responseAccountDto = new ResponseAccountDto();
 		requestAccountDto.setTransactionLimit(9999.0);
 		String jsonRequest = Json.pretty(requestAccountDto);
 
-		//when(accountService.updateAccount(accountService.findById(accountId), requestAccountDto, token))
-		//		.thenReturn(new ResponseAccountDto());
+		when(accountService.findById(accountId))
+				.thenReturn(account);
+
+		when(accountService.updateAccount(accountId, requestAccountDto, token))
+				.thenReturn(responseAccountDto);
 
 		mockMvc
 				.perform(
@@ -87,7 +93,8 @@ class AccountControllerTest {
 								.accept(MediaType.APPLICATION_JSON)
 								.param("id", String.valueOf(accountId))
 								.content(jsonRequest))
-				.andExpect(status().isOk());
+				.andExpect(status().isOk())
+				;
 
 	}
 }

@@ -61,8 +61,9 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
-    public ResponseAccountDto updateAccount(Account account, UpdateAccountDto requestAccount, String token){
+    public ResponseAccountDto updateAccount(Long accountId, UpdateAccountDto requestAccount, String token) throws ResourceNotFoundException {
         String userName =  jwtUtils.extractUsername(jwtUtils.getJwt(token));
+        Account account = this.findById(accountId);
         if (!account.getUser().getEmail().equals(userName))
                 throw new AccessDeniedException("You don't have permission to access this resource");
         account.setTransactionLimit(requestAccount.getTransactionLimit());

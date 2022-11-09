@@ -1,14 +1,21 @@
 package com.alkemy.wallet.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import com.alkemy.wallet.dto.ResponseAccountDto;
+import com.alkemy.wallet.dto.UpdateAccountDto;
 import com.alkemy.wallet.exceptions.ResourceNotFoundException;
+import com.alkemy.wallet.model.*;
+import com.alkemy.wallet.repository.IUserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -18,20 +25,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.alkemy.wallet.dto.ResponseUserBalanceDto;
 import com.alkemy.wallet.mapper.IAccountMapper;
-import com.alkemy.wallet.model.Account;
-import com.alkemy.wallet.model.EType;
-import com.alkemy.wallet.model.Transaction;
-import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.ITransactionService;
 import com.alkemy.wallet.service.IUserService;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.access.AccessDeniedException;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 class AccountServiceImplTest {
 	@Mock
-	private IAccountRepository AccountRepository;
+	private IAccountRepository accountRepository;
+
+	@Mock
+	private IUserRepository userRepository;
 
 	@Mock
 	private IUserService userService;
@@ -50,38 +58,95 @@ class AccountServiceImplTest {
 	private AccountServiceImpl accountService;
 
 	@Test
-	void updateAccount_AccountWithThreeValues_AccountUpdated() throws ResourceNotFoundException {
+	void updateAccount_UpdateAccountDto_ResponseAccountDto()
+			throws ResourceNotFoundException {
+
 		String token = "token";
-		long userId = 60;
-		when(jwtUtils.extractUserId(token)).thenReturn(userId);
+		Long userId = 1L;
+		Long accountId = 2L;
+		Double transactionLimit = 9999.0 ;
 
-		// three transactions
-		Double transactionLimit = 100.0 ;
+		User user = new User();
+		user.setEmail("123@mail.com");
 
-		Double transactionLimit2 = 0.0 ;
-
-		Double transactionLimit3 = 1000.0 ;
-
-		//
-		long accountId = 1L;
+		//create the target account to update
 		Account account = new Account();
 		account.setId(accountId);
-		account.setTransactionLimit(transactionLimit);
+		account.setTransactionLimit(1000.0);
+		account.setCurrency(ECurrency.USD);
+		account.setBalance(1000.0);
+		account.setUser(user);
 
-	//	User user = new User();
-	//	user.setAccounts(List.of(account));
+		//create the request object
+		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
+		requestAccountDto.setTransactionLimit(transactionLimit);
 
-		when(accountService.findById(accountId)).thenReturn(account);
+		//create the response object
+		ResponseAccountDto responseAccountDto = new ResponseAccountDto();
 
-		//when(transactionService.findAllTransactionsWith(accountId))
-		//		.thenReturn(transactions);
+		//mock the repository calls
+		when(jwtUtils.getJwt(any(String.class))).thenReturn(token);
+		when(jwtUtils.extractUsername(any(String.class))).thenReturn(user.getEmail());
+		when(accountRepository.save(any(Account.class))).thenReturn(account);
+		when(accountRepository.findById(any(Long.class))).thenReturn(Optional.of(account));
 
-		ResponseUserBalanceDto result =
-				accountService.updateAccount(account,requestAccountDto,token);
-		assertEquals(1, result.getAccountBalanceDtos().size());
+		//get the result
+		responseAccountDto = accountService.updateAccount(account.getId(),requestAccountDto,token);
 
+		//assert results
+		assertEquals(requestAccountDto.getTransactionLimit(),responseAccountDto.getTransactionLimit());
 
+	}
 
+	@Test
+	void updateAccount_WithInvalidAccountId()
+			throws ResourceNotFoundException {
+
+		String token = "token";
+		Long accountId = 520L; //account doesn't exists
+		Double transactionLimit = 9999.0 ;
+
+		User user = new User();
+		user.setEmail("123@mail.com");
+
+		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
+		requestAccountDto.setTransactionLimit(transactionLimit);
+
+		//bypass the user validation
+		when(jwtUtils.getJwt(any(String.class))).thenReturn(token);
+		when(jwtUtils.extractUsername(any(String.class))).thenReturn("123@mail.com");
+
+		assertThrows(ResourceNotFoundException.class,
+				() -> accountService.updateAccount(accountId,requestAccountDto,token));
+
+	}
+
+	@Test
+	void updateAccount_WithInvalidUser(){
+
+		String token = "token";
+		Long accountId = 1L;
+		Long userId = 500L;
+		Double transactionLimit = 9999.0 ;
+
+		User user = new User();
+		user.setId(userId);
+		user.setEmail("123@mail.com");
+
+		Account account = new Account();
+		account.setId(accountId);
+		account.setUser(user);
+
+		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
+		requestAccountDto.setTransactionLimit(transactionLimit);
+
+		when(jwtUtils.getJwt(any(String.class))).thenReturn(token);
+		//the user logged in is different to the one making the request
+		when(jwtUtils.extractUsername(any(String.class))).thenReturn("1234@mail.com");
+		when(accountRepository.findById(any(Long.class))).thenReturn(Optional.of(account));
+
+		assertThrows(AccessDeniedException.class,
+				() -> accountService.updateAccount(accountId,requestAccountDto,token));
 
 	}
 

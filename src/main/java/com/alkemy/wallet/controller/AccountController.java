@@ -45,8 +45,7 @@ public class AccountController {
     @Secured(value = { "ROLE_USER" })
     @PatchMapping("{id}")
     public ResponseEntity<Object> updateAccount(@PathVariable Long id, @RequestHeader(name = "Authorization") String token, @RequestBody UpdateAccountDto requestAccountDto) throws ResourceNotFoundException {
-        Account account = iAccountService.findById(id);
-        return new ResponseEntity<>(iAccountService.updateAccount(account,requestAccountDto,token), HttpStatus.OK);
+        return new ResponseEntity<>(iAccountService.updateAccount(id,requestAccountDto,token), HttpStatus.OK);
     }
     @GetMapping("/balance")
 	public ResponseEntity<

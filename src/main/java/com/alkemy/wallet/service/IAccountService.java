@@ -23,5 +23,5 @@ public interface IAccountService {
 
     Account findById(Long id) throws ResourceNotFoundException;
 
-    ResponseAccountDto updateAccount(Account account, UpdateAccountDto transactionLimit, String token);
+    ResponseAccountDto updateAccount(Long id, UpdateAccountDto transactionLimit, String token) throws ResourceNotFoundException;
 }

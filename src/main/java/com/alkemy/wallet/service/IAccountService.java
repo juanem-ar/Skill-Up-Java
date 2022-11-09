@@ -1,12 +1,10 @@
 package com.alkemy.wallet.service;
 
-import com.alkemy.wallet.dto.ResponseUserBalanceDto;
-import com.alkemy.wallet.dto.CurrencyDto;
-import com.alkemy.wallet.dto.ResponseAccountDto;
-import com.alkemy.wallet.dto.UpdateAccountDto;
+import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.model.Account;
 import org.springframework.security.core.Authentication;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +17,8 @@ public interface IAccountService {
     Account createAccount(CurrencyDto currency);
 
     List<ResponseAccountDto> findAllByUser(Long id);
+
+    ResponseAccountsDto findAll(Integer page, HttpServletRequest httpServletRequest);
 
     Optional<Account> findById(Long id);
 

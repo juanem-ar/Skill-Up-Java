@@ -3,7 +3,8 @@ package com.alkemy.wallet.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import com.alkemy.wallet.dto.UpdateAccountDto;
+
+import com.alkemy.wallet.dto.*;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,9 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.alkemy.wallet.dto.CurrencyDto;
-import com.alkemy.wallet.dto.ResponseAccountDto;
-import com.alkemy.wallet.dto.ResponseUserBalanceDto;
 import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.model.Account;
@@ -34,7 +32,7 @@ import com.alkemy.wallet.service.IUserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/accounts")
+@RequestMapping("/api/accounts")
 @RestController
 public class AccountController {
     @Autowired
@@ -55,6 +53,24 @@ public class AccountController {
     @GetMapping("{id}")
     public ResponseEntity<List<ResponseAccountDto>> listAccountsByUser(@PathVariable Long id){
         return new ResponseEntity<>(iAccountService.findAllByUser(id), HttpStatus.OK);
+    }
+
+
+    @Operation(method = "GET", summary = "findAllAccounts", description = "Traer todas las cuentas.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
+                    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(hidden = true))),
+                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+            })
+    //@Secured(value = { "ROLE_ADMIN" })
+    @GetMapping
+    public ResponseEntity<ResponseAccountsDto> findAllAccounts(
+            @RequestParam(required = false, name = "page") Integer page,
+            HttpServletRequest httpServletRequest){
+        return ResponseEntity.ok(iAccountService.findAll(
+                page,
+                httpServletRequest));
     }
 
     @Operation(method = "PATCH", summary = "updateAccount", description = "Actualizar una cuenta.",

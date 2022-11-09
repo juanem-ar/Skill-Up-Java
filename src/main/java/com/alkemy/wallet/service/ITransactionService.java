@@ -7,6 +7,9 @@ import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 
 import com.alkemy.wallet.dto.TransactionDtoPay;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +24,7 @@ public interface ITransactionService {
     List<Transaction> findAllTransactionsWith(Long accountId);
 
     public TransactionDtoPay payment(TransactionDtoPay transitionDtoPay);
-    List<ResponseTransactionDto> findByUserId(Long userId);
+    Page<Transaction> findByUserId(Long userId, String token, Pageable pageable) throws Exception;
 
     Optional<ResponseTransactionDto> findTransactionById(Long id);
     ResponseTransactionDto updateDescriptionFromTransaction(ResponseTransactionDto responseTransactionDto, String description);

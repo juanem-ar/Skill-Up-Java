@@ -4,6 +4,7 @@ package com.alkemy.wallet.controller;
 import com.alkemy.wallet.dto.ResponseAccountDto;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 import com.alkemy.wallet.dto.TransactionDtoPay;
+import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.impl.TransactionServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +12,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -77,15 +81,11 @@ public class TransactionController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
-    @GetMapping("/{userId}")
-    public ResponseEntity<?> getListTransactionByAdminUser(@PathVariable("userId") Long userId) {
-        //IF PARA VALIDAR USUARIO ADMINISTRADOR
-        List<ResponseTransactionDto> listTransactionsByUser = transactionService.findByUserId(userId);
-        if (listTransactionsByUser.isEmpty()) {
-            return new ResponseEntity<>("User doesn't exist or has not transactions", HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(listTransactionsByUser, HttpStatus.OK);
-        }
+    @GetMapping(value = "/{userId}")
+    public ResponseEntity<Page<Transaction>> getListTransactionByAdminUser(@PageableDefault(page=0, size=10) Pageable pageable,
+                                                                           @PathVariable("userId") Long userId,
+                                                                           @RequestHeader(name = "Authorization") String token) throws Exception{
+        return ResponseEntity.ok(transactionService.findByUserId(userId, token, pageable));
     }
 
     @Operation(method = "GET", summary = "getTransactionByAuthUser", description = "Traer todas las transacciones de un usuario.",

@@ -31,7 +31,7 @@ import com.alkemy.wallet.dto.ResponseUserDto;
 
 import java.util.List;
 
-@RequestMapping("/users")
+@RequestMapping("api/users")
 @RestController
 @AllArgsConstructor
 public class UserController {

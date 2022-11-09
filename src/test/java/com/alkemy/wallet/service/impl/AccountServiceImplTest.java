@@ -10,24 +10,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
+import com.alkemy.wallet.dto.AccountBalanceDto;
 import com.alkemy.wallet.dto.ResponseUserBalanceDto;
 import com.alkemy.wallet.mapper.IAccountMapper;
 import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
-import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.ITransactionService;
 import com.alkemy.wallet.service.IUserService;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
 class AccountServiceImplTest {
 	@Mock
 	private IAccountRepository AccountRepository;
@@ -41,8 +37,7 @@ class AccountServiceImplTest {
 	@Mock
 	private ITransactionService transactionService;
 
-	@Autowired
-	@Spy
+	@Mock
 	private IAccountMapper accountMapper;
 
 	@InjectMocks
@@ -83,25 +78,27 @@ class AccountServiceImplTest {
 		account.setId(accountId);
 		account.setBalance(balanceBase);
 
-		User user = new User();
-		//user.setAccounts(List.of(account));
+		AccountBalanceDto balanceDto =
+			new AccountBalanceDto(accountId, null, balanceBase);
 
-		when(userService.getUserById(userId)).thenReturn(user);
+		when(accountMapper.accountToBalanceDto(account))
+			.thenReturn(balanceDto);
+
+		when(AccountRepository.findAllByUserId(userId))
+			.thenReturn(List.of(account));
 
 		when(transactionService.findAllTransactionsWith(accountId))
 			.thenReturn(transactions);
 
 		Double balanceFinal =
-			balanceBase
-			+ incomeAmount
-			+ depositAmount 
-			- paymentAmount;
+			balanceBase + incomeAmount + depositAmount
+				- paymentAmount;
 
 		ResponseUserBalanceDto result =
 			accountService.getBalance(token);
 
 		assertEquals(1, result.getAccountBalanceDtos().size());
-		
+
 		double epsilon = 0.000001d;
 		assertEquals(
 			balanceFinal,

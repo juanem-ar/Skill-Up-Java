@@ -17,6 +17,9 @@ import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,11 +27,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.dto.ResponseUserDto;
+import com.alkemy.wallet.dto.ResponseUsersDto;
 import com.alkemy.wallet.mapper.IuserMapper;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -38,6 +44,7 @@ public class UserServiceImpl implements IUserService {
     private IAccountService iAccountServiceImpl;
     private AuthenticationManager authenticationManager;
     private JwtUtils jwtUtils;
+    private static final Integer USERSFORPAGE = 10;
 
     @Autowired
     public UserServiceImpl( IUserRepository iUserRepository , @Lazy IAccountService iAccountServiceImpl,
@@ -79,8 +86,44 @@ public class UserServiceImpl implements IUserService {
     }
 
 	@Override
-	public List<ResponseUserDto> findAllUsers() {
-		return iUserMapper.usersToResponseUserDtos(iUserRepository.findAll());
+	public ResponseUsersDto findAllUsers(
+		Integer page, 
+		HttpServletRequest httpServletRequest) {
+		ResponseUsersDto dto = new ResponseUsersDto();
+		// without request parameter
+		if(page == null) {
+			dto.setUserDtos(
+				iUserMapper.usersToResponseUserDtos(
+					iUserRepository.findAll()));
+			return dto;
+		}
+		
+		// with request parameter
+		Page<User> users = iUserRepository.findAll(
+			PageRequest.of(page, USERSFORPAGE));
+		
+		if(users.isEmpty())
+			throw new BadRequestException();
+		
+		dto.setUserDtos(
+			iUserMapper.usersToResponseUserDtos(
+				users.toList()));
+		
+		// url
+		String url = httpServletRequest
+			.getRequestURL().toString() + "?" + "page=";
+		
+		if(users.hasPrevious()) {
+			int previousPage = users.getNumber() - 1;
+			dto.setPreviousPage(url + previousPage);
+		}
+		
+		if (users.hasNext()) {
+			int nextPage = users.getNumber() + 1;
+			dto.setPreviousPage(url + nextPage);
+		}
+		
+		return dto;
 	}
 
     @Override

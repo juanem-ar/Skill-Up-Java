@@ -6,8 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
+import com.alkemy.wallet.dto.ResponseUsersDto;
 import com.alkemy.wallet.service.impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,12 +37,26 @@ class UserControllerTest {
 
 
 	@Test
-	void findAllUsers_GetRequest_ResponseOk() throws Exception {
-		when(userService.findAllUsers())
-			.thenReturn(new ArrayList<ResponseUserDto>());
+	void findAllUsers_GetRequestWithoutRequestParameter_ResponseOk() throws Exception {
+		when(userService.findAllUsers(any(), any()))
+			.thenReturn(new ResponseUsersDto());
 		
 		mockMvc
 			.perform(get(uri))
+			.andExpect(status().isOk());
+	}
+
+
+	@Test
+	void findAllUsers_GetRequestWithRequestParameter_ResponseOk() throws Exception {
+		when(userService.findAllUsers(any(), any()))
+			.thenReturn(new ResponseUsersDto());
+		
+		Integer pageNumber = 1;
+		
+		mockMvc
+			.perform(get(uri)
+				.param("page", pageNumber.toString()))
 			.andExpect(status().isOk());
 	}
 
@@ -69,14 +82,7 @@ class UserControllerTest {
 		String token = "token";
 		ResponseUserDto dto = new ResponseUserDto();
 
-		when(
-			userService
-				.updateUserDetails(
-					any(),
-					any(),
-					any()
-					)
-				)
+		when(userService.updateUserDetails(any(), any(), any()))
 			.thenReturn(dto);
 
 		String body =

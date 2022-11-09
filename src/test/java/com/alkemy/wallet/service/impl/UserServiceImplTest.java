@@ -3,6 +3,7 @@ package com.alkemy.wallet.service.impl;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -14,10 +15,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 
 import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
+import com.alkemy.wallet.dto.ResponseUsersDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.exceptions.UserNotFoundException;
 import com.alkemy.wallet.mapper.IuserMapper;
@@ -66,11 +70,25 @@ class UserServiceImplTest {
 		when(iUserMapper.usersToResponseUserDtos(users))
 			.thenReturn(responseUserDtos);
 
-		List<ResponseUserDto> result = userService.findAllUsers();
+		ResponseUsersDto result =
+			userService.findAllUsers(null, null);
 
-		assertEquals(2, result.size());
+		assertEquals(2, result.getUserDtos().size());
 	}
 
+
+	@Test
+	void findAllUsers_PageIsEmpty_ThrowBadRequestException() {
+		Integer page = 9;
+
+		when(userRepository.findAll(any(Pageable.class)))
+			.thenReturn(Page.empty());
+
+		assertThrows(
+			BadRequestException.class,
+			() -> userService.findAllUsers(page, null));
+	}
+	
 
 	@Test
 	void getUserById_NotFound_ThrowException() {

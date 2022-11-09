@@ -1,13 +1,10 @@
 package com.alkemy.wallet.controller;
 
 
-
-import com.alkemy.wallet.service.impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alkemy.wallet.service.IUserService;
 
@@ -24,14 +21,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
+import com.alkemy.wallet.dto.ResponseUsersDto;
 
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
-@RequestMapping("api/users")
+@RequestMapping("/users")
 @RestController
 @AllArgsConstructor
 public class UserController {
@@ -57,8 +56,12 @@ public class UserController {
             })
     @Secured(value = { "ROLE_ADMIN" })
     @GetMapping
-    public ResponseEntity<List<ResponseUserDto>> findAllUsers () {
-    	return ResponseEntity.ok(userService.findAllUsers());
+    public ResponseEntity<ResponseUsersDto> findAllUsers (
+    	@RequestParam(required = false, name = "page") Integer page,
+    	HttpServletRequest httpServletRequest) {
+    	return ResponseEntity.ok(userService.findAllUsers(
+    		page, 
+    		httpServletRequest));
     }
     
     

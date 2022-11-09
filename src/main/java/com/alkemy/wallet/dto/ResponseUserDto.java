@@ -25,6 +25,7 @@ public class ResponseUserDto {
 	private String lastName;
 	@NotNull
 	@Email
+	@Size(min = 6)
 	private String email;
 	@NotNull
 	@Length(min = 8)

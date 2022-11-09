@@ -58,6 +58,6 @@ public class JwtUtils implements IJwtUtils {
     
 	@Override
 	public Long extractUserId(String token) {
-		return (Long) extractAllClaims(token).get("userId");
+		return Long.valueOf(extractAllClaims(token).get("userId").toString());
 	}
 }

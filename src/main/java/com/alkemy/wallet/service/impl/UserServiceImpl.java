@@ -14,10 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.dto.ResponseUserDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import com.alkemy.wallet.dto.ResponseUsersDto;
 import org.springframework.web.bind.annotation.PathVariable;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,8 @@ public class UserServiceImpl implements IUserService {
     private IUserRepository  iUserRepository;
     private JwtUtils jwtUtils;
     private IuserMapper iUserMapper;
+    private static final Integer USERSFORPAGE = 10;
+
     @Autowired
     public UserServiceImpl( IuserMapper iUserMapper, IUserRepository iUserRepository, JwtUtils jwtUtils) {
         this.iUserRepository = iUserRepository;
@@ -42,8 +47,44 @@ public class UserServiceImpl implements IUserService {
     }
 
 	@Override
-	public List<ResponseUserDto> findAllUsers() {
-		return iUserMapper.usersToResponseUserDtos(iUserRepository.findAll());
+	public ResponseUsersDto findAllUsers(
+		Integer page, 
+		HttpServletRequest httpServletRequest) {
+		ResponseUsersDto dto = new ResponseUsersDto();
+		// without request parameter
+		if(page == null) {
+			dto.setUserDtos(
+				iUserMapper.usersToResponseUserDtos(
+					iUserRepository.findAll()));
+			return dto;
+		}
+		
+		// with request parameter
+		Page<User> users = iUserRepository.findAll(
+			PageRequest.of(page, USERSFORPAGE));
+		
+		if(users.isEmpty())
+			throw new BadRequestException();
+		
+		dto.setUserDtos(
+			iUserMapper.usersToResponseUserDtos(
+				users.toList()));
+		
+		// url
+		String url = httpServletRequest
+			.getRequestURL().toString() + "?" + "page=";
+		
+		if(users.hasPrevious()) {
+			int previousPage = users.getNumber() - 1;
+			dto.setPreviousPage(url + previousPage);
+		}
+		
+		if (users.hasNext()) {
+			int nextPage = users.getNumber() + 1;
+			dto.setPreviousPage(url + nextPage);
+		}
+		
+		return dto;
 	}
 
     @Override

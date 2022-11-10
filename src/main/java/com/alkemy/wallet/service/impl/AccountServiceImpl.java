@@ -165,4 +165,23 @@ public class AccountServiceImpl implements IAccountService {
         }
         return dto;
     }
+
+    public Account getAccountByUserIdAndCurrency(Long userId, String currency){
+
+        Account foundAcc = null;
+        int i = 0;
+        boolean flag = true;
+
+        List<ResponseAccountDto> accounts = findAllByUser(userId);
+
+        while(i < accounts.size() && flag){
+            if(accounts.get(i).getCurrency().equals(currency))
+            {
+                foundAcc = accountMapper.accountDtoToAccount(accounts.get(i));
+                flag = false;
+            }
+            i++;
+        }
+        return foundAcc;
+    }
 }

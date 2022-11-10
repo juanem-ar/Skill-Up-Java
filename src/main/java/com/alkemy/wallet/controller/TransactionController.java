@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RequestMapping("api/v1/transactions")
@@ -40,16 +41,6 @@ public class TransactionController {
         this.transactionService = transactionService;
         this.jwtUtils = jwtUtils;
     }
-
-    /*
-    @PostMapping("/sendArs")
-    public ResponseEntity<ResponseTransactionDto> sendArs(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Double amount) {
-        return ResponseEntity.ok().body(transactionService.sendUsd(token,accountId,amount));
-    }
-    @PostMapping("/sendUsd")
-    public ResponseEntity<ResponseTransactionDto> sendUsd(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Double amount) {
-        return ResponseEntity.ok().body(transactionService.sendUsd(token,accountId,amount));
-    }*/
 
     @Operation(method = "POST", summary = "transactionPayment", description = "Registrar un pago.",
             responses = {
@@ -121,5 +112,19 @@ public class TransactionController {
         }else {
             return new ResponseEntity<>(transactionService.updateDescriptionFromTransaction(responseTransactionDto.get(),description.get("description")), HttpStatus.OK);
         }
+    }
+
+    @PostMapping("/sendArs/{id}")
+    public ResponseEntity<TransactionDtoPay> sendArs(HttpServletRequest req, @PathVariable("id") Long accountId, Double amount) {
+        String token = req.getHeader("Authorization");
+        Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
+        return ResponseEntity.ok().body(transactionService.sendUsd(senderId,accountId,amount));
+    }
+
+    @PostMapping("/sendUsd/{id}")
+    public ResponseEntity<TransactionDtoPay> sendUsd(HttpServletRequest req, @PathVariable("id") Long accountId, Double amount) {
+        String token = req.getHeader("Authorization");
+        Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
+        return ResponseEntity.ok().body(transactionService.sendUsd(senderId,accountId,amount));
     }
 }

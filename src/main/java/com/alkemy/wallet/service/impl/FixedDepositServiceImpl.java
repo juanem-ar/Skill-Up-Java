@@ -1,6 +1,7 @@
 package com.alkemy.wallet.service.impl;
 
 import com.alkemy.wallet.dto.FixedDepositDto;
+import com.alkemy.wallet.dto.ResponseSimulateFixedDepositDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.mapper.FixedDepositMapper;
 import com.alkemy.wallet.model.Account;
@@ -16,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.temporal.ChronoUnit;
+import static com.alkemy.wallet.model.ECurrency.ARS;
+import static com.alkemy.wallet.model.ECurrency.USD;
 
 @Service
 public class FixedDepositServiceImpl implements IFixedDepositService {
@@ -52,21 +55,28 @@ public class FixedDepositServiceImpl implements IFixedDepositService {
 
             long compareDate = ChronoUnit.DAYS.between(Timestamp.from(fixedTermDeposit.getCreationDate().toInstant()).toInstant(),fixedTermDeposit.getClosingDate().toInstant());
 
-            if(compareDate >= MIN_DAYS ){
-                account.setBalance(account.getBalance() - dto.getAmount());
-                Account accountSaved = iAccountRepository.save(account);
-                createFixedDeposit(accountSaved,fixedTermDeposit);
-            }else{
+            if(compareDate < MIN_DAYS )
                 throw new BadRequestException("The minimum term is 30 days.");
-            }
+
+            account.setBalance(account.getBalance() - dto.getAmount());
+            Account accountSaved = iAccountRepository.save(account);
+            fixedTermDeposit.setAccount(account);
+            iFixedTermDepositRepository.save(fixedTermDeposit);
+
         }else{
             throw new BadRequestException("You don't create a fixed deposit with a lower balance.");
         }
         return HttpStatus.CREATED.getReasonPhrase();
     }
-    public FixedTermDeposit createFixedDeposit(Account account,FixedTermDeposit entity) throws Exception{
-            entity.setAccount(account);
-            FixedTermDeposit fixedTermDepositSaved = iFixedTermDepositRepository.save(entity);
-            return fixedTermDepositSaved;
+
+    @Override
+    public ResponseSimulateFixedDepositDto simulateFixedDeposit(FixedDepositDto dto) {
+        if (dto.getAmount() <= 0)
+            throw new BadRequestException("Invalid amount.");
+        if (dto.getCurrency() != ARS && dto.getCurrency() != USD )
+            throw new BadRequestException("Invalid currency.");
+        if (dto.getPeriod()<MIN_DAYS)
+            throw new BadRequestException("The minimum term is 30 days.");
+        return fixedDepositMapper.toSimulateFixedDeposit(dto);
     }
 }

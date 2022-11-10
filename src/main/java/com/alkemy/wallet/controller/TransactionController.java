@@ -94,8 +94,8 @@ public class TransactionController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
-    @GetMapping("transaction/{id}")
-    public ResponseEntity<?> getTransactionByAuthUser(@PathVariable("id") Long id,
+    @GetMapping("transaction/{transactionId}")
+    public ResponseEntity<?> getTransactionByAuthUser(@PathVariable("transactionId") Long id,
                                                       @RequestHeader(name = "Authorization") String token) throws Exception{
         return ResponseEntity.ok(transactionService.findTransactionById(id, token));
 
@@ -107,10 +107,10 @@ public class TransactionController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
-    @PatchMapping("{id}")
+    @PatchMapping("{transactionId}")
     public ResponseEntity<?> editTransactionByAuthUser(@RequestBody Map<Object, String> description,
                                                        @RequestHeader(name = "Authorization") String token,
-                                                       @PathVariable("id") Long id) throws Exception {
-        return ResponseEntity.ok(transactionService.findTransactionById(id, token));
+                                                       @PathVariable("transactionId") Long id) throws Exception {
+        return ResponseEntity.ok(transactionService.updateDescriptionFromTransaction(id, token, description.get("description")));
     }
 }

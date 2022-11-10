@@ -42,7 +42,11 @@ public class Transaction {
     @CreationTimestamp
     private Timestamp transactionDate;
 
-
+    public Transaction(Double amount, String description, Account account)
+    {
+        this.amount = amount;
+        this.description = description;
+    }
 }
 
 

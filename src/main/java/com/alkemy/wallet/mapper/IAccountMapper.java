@@ -15,4 +15,6 @@ public interface IAccountMapper {
     AccountBalanceDto accountToBalanceDto(Account account);
 
     ResponseAccountDto accountToAccountDto(Account account);
+
+    Account accountDtoToAccount(ResponseAccountDto responseAccountDto);
 }

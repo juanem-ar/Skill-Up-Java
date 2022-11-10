@@ -1,6 +1,7 @@
 package com.alkemy.wallet.service.impl;
 
 import com.alkemy.wallet.dto.*;
+import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.exceptions.ResourceNotFoundException;
 import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.mapper.IAccountMapper;
@@ -12,7 +13,11 @@ import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.AllArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -20,6 +25,8 @@ import org.springframework.stereotype.Service;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.service.ITransactionService;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +34,7 @@ import static com.alkemy.wallet.model.ECurrency.ARS;
 import static com.alkemy.wallet.model.ECurrency.USD;
 
 @Service
+@AllArgsConstructor
 public class AccountServiceImpl implements IAccountService {
     public static final Double LIMIT_ARS = 300000.00;
     public static final Double LIMIT_USD = 1000.00;
@@ -34,20 +42,10 @@ public class AccountServiceImpl implements IAccountService {
     private IJwtUtils jwtUtils;
     private IUserRepository userRepository;
     private IUserService iUserService;
-
-    @Autowired
     private ITransactionService transactionService;
-
-    @Autowired
     private IAccountMapper accountMapper;
+    private static final Integer ACCOUNTSFORPAGE = 10;
 
-    @Autowired
-    public AccountServiceImpl( IAccountRepository iAccountRepository, IUserService iUserService , IJwtUtils jwtUtils, IUserRepository userRepository) {
-        this.iAccountRepository = iAccountRepository;
-        this.iUserService = iUserService;
-        this.jwtUtils = jwtUtils;
-        this.userRepository = userRepository;
-    }
 
     @Override
     public List<ResponseAccountDto> findAllByUser(Long id) throws ResourceNotFoundException {
@@ -67,24 +65,25 @@ public class AccountServiceImpl implements IAccountService {
         if (!account.getUser().getEmail().equals(userName))
                 throw new AccessDeniedException("You don't have permission to access this resource");
         account.setTransactionLimit(requestAccount.getTransactionLimit());
-        return accountMapper.accountToAccountDto(iAccountRepository.save(account));
+        ResponseAccountDto response = accountMapper.accountToAccountDto(iAccountRepository.save(account));
+        return response;
     }
 
 	@Override
 	public ResponseUserBalanceDto getBalance(String token) {
 		Long userId = jwtUtils.extractUserId(token);
 		//User user = iUserService.getUserById(userId); TODO if foreach function is correct, delete this line
-		ResponseUserBalanceDto responseUserBalanceDto = new ResponseUserBalanceDto();
-		responseUserBalanceDto.setId(userId);
+		ResponseUserBalanceDto dto = new ResponseUserBalanceDto();
+		dto.setId(userId);
 		for(Account account : iAccountRepository.findAllByUserId(userId)) {
-			AccountBalanceDto accountBalanceDto = accountMapper.accountToBalanceDto(account);
-			accountBalanceDto.setBalance(
+			AccountBalanceDto balanceDto = accountMapper.accountToBalanceDto(account);
+			balanceDto.setBalance(
 				calcularBalance(
 					account.getBalance(),
 					transactionService.findAllTransactionsWith(account.getId())));
-			responseUserBalanceDto.getAccountBalanceDtos().add(accountBalanceDto);
+			dto.getAccountBalanceDtos().add(balanceDto);
 		}
-		return responseUserBalanceDto;
+		return dto;
 	}
 
 	private Double calcularBalance(
@@ -134,5 +133,41 @@ public class AccountServiceImpl implements IAccountService {
         account.setDeleted(false);
         account.setBalance(0.00);
         return account;
+    }
+
+    @Override
+    public ResponseAccountsDto findAll(Integer page, HttpServletRequest httpServletRequest) {
+        ResponseAccountsDto dto = new ResponseAccountsDto();
+        if (page == null) {
+            dto.setAccountsDto(
+                    accountMapper.accountsToAccountsDto(
+                            iAccountRepository.findAll()));
+            return dto;
+        }
+
+        Page<Account> accounts = iAccountRepository.findAll(
+                PageRequest.of(page, ACCOUNTSFORPAGE));
+
+        if (accounts.isEmpty())
+            throw new BadRequestException();
+
+        dto.setAccountsDto(
+                accountMapper.accountsToAccountsDto(
+                        accounts.toList()));
+
+        // url
+        String url = httpServletRequest
+                .getRequestURL().toString() + "?" + "page=";
+
+        if(accounts.hasPrevious()) {
+            int previousPage = accounts.getNumber() - 1;
+            dto.setPreviousPage(url + previousPage);
+        }
+
+        if (accounts.hasNext()) {
+            int nextPage = accounts.getNumber() + 1;
+            dto.setNextpage(url + nextPage);
+        }
+        return dto;
     }
 }

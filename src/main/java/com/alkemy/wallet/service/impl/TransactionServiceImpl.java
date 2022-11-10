@@ -14,6 +14,8 @@ import com.alkemy.wallet.service.ITransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 import com.alkemy.wallet.exceptions.ErrorEnum;
@@ -117,23 +119,26 @@ public class TransactionServiceImpl implements ITransactionService {
 	}
 
     @Override
-    public List<ResponseTransactionDto> findByUserId(Long userId) {
-        return transactionMapper.listModelToResponseTransactionDto(transactionRepository.findByAccount_UserId(userId));
-    }
-    @Override
-    public Optional<ResponseTransactionDto> findTransactionById(Long id) {
-        if (iTransactionRepository.findById(id).isPresent()){
-            return Optional.of(transactionMapper.modelToResponseTransactionDto(iTransactionRepository.findById(id).get()));
-        }else {
-            return Optional.empty();
+    public Page<Transaction> findByUserId(Long userId, String token, Pageable pageable) throws Exception{
+        if (jwtUtils.extractUserId(token).equals(userId)) {
+            return transactionRepository.findByAccount_UserId(userId, pageable);
+        } else {
+             throw new TransactionError("Token id does not match whit path id");
         }
     }
     @Override
-    public ResponseTransactionDto updateDescriptionFromTransaction(ResponseTransactionDto responseTransactionDto, String description) {
-        responseTransactionDto.setDescription(description);
-        Transaction saveTransaction = transactionMapper.responseTransactionDtoToModel(responseTransactionDto);
-        iTransactionRepository.save(saveTransaction);
-        return responseTransactionDto;
+    public Optional<ResponseTransactionDto> findTransactionById(Long id, String token) throws Exception {
+        List<Transaction> transactions = iTransactionRepository.findByAccount_UserId(jwtUtils.extractUserId(token));
+            return Optional.of(transactionMapper.modelToResponseTransactionDto(transactions.stream()
+                    .filter(transaction -> transaction.getId().equals(id)).findFirst().get()));
+    }
+    @Override
+    public ResponseTransactionDto updateDescriptionFromTransaction(Long id, String token, String description) throws Exception {
+        Optional<ResponseTransactionDto> responseTransactionDto = findTransactionById(id, token);
+            Transaction saveTransaction = transactionMapper.responseTransactionDtoToModel(responseTransactionDto.get());
+            saveTransaction.setDescription(description);
+            iTransactionRepository.save(saveTransaction);
+            return transactionMapper.modelToResponseTransactionDto(saveTransaction);
     }
 }
 

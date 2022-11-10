@@ -127,11 +127,13 @@ public class TransactionServiceImpl implements ITransactionService {
         }
     }
     @Override
-    public Optional<ResponseTransactionDto> findTransactionById(Long id) {
-        if (iTransactionRepository.findById(id).isPresent()){
-            return Optional.of(transactionMapper.modelToResponseTransactionDto(iTransactionRepository.findById(id).get()));
+    public Optional<ResponseTransactionDto> findTransactionById(Long id, String token) throws Exception {
+        List<Transaction> transactions = iTransactionRepository.findByAccount_UserId(jwtUtils.extractUserId(token));
+        if (!transactions.isEmpty()){
+            return Optional.of(transactionMapper.modelToResponseTransactionDto(transactions.stream()
+                    .filter(transaction -> transaction.getId().equals(id)).findFirst().get()));
         }else {
-            return Optional.empty();
+            throw new TransactionError("Token id Error or transaction do not exist");
         }
     }
     @Override

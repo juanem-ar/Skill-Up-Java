@@ -95,14 +95,10 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @GetMapping("transaction/{id}")
-    public ResponseEntity<?> getTransactionByAuthUser(@PathVariable("id") Long id){
-        //IF PARA VALIDAR USUARIO AUTENTICADO
-        Optional<ResponseTransactionDto> responseTransactionDto = transactionService.findTransactionById(id);
-        if(!responseTransactionDto.isPresent()){
-            return new ResponseEntity<>("The transaction ID does not exist", HttpStatus.NOT_FOUND);
-        }else {
-            return new ResponseEntity<>(responseTransactionDto, HttpStatus.OK);
-        }
+    public ResponseEntity<?> getTransactionByAuthUser(@PathVariable("id") Long id,
+                                                      @RequestHeader(name = "Authorization") String token) throws Exception{
+        return ResponseEntity.ok(transactionService.findTransactionById(id, token));
+
     }
 
     @Operation(method = "PATCH", summary = "editTransactionByAuthUser", description = "Actualizar transacción.",
@@ -113,13 +109,8 @@ public class TransactionController {
             })
     @PatchMapping("{id}")
     public ResponseEntity<?> editTransactionByAuthUser(@RequestBody Map<Object, String> description,
-                                                       @PathVariable("id") Long id){
-        //IF PARA VALIDAR USUARIO AUTENTICADO
-        Optional<ResponseTransactionDto> responseTransactionDto = transactionService.findTransactionById(id);
-        if(responseTransactionDto.isEmpty()){
-            return new ResponseEntity<>("The transaction ID does not exist", HttpStatus.NOT_FOUND);
-        }else {
-            return new ResponseEntity<>(transactionService.updateDescriptionFromTransaction(responseTransactionDto.get(),description.get("description")), HttpStatus.OK);
-        }
+                                                       @RequestHeader(name = "Authorization") String token,
+                                                       @PathVariable("id") Long id) throws Exception {
+        return ResponseEntity.ok(transactionService.findTransactionById(id, token));
     }
 }

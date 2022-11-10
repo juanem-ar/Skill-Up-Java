@@ -35,36 +35,44 @@ public class TransactionServiceImpl implements ITransactionService {
     private final ITransactionRepository transactionRepository;
     private final IUserRepository userRepository;
     private final IAccountRepository accountRepository;
-    private final ITransactionRepository iTransactionRepository;
     private final ITransactionMapper transactionMapper;
     private final IAccountService accountService;
 
     @Autowired
     private IJwtUtils jwtUtils;
 
-    public String getJwt(String token){
-        String jwt = token.substring(7);
-        return jwt;
-    }
-
 
     public TransactionDtoPay sendArs(Long senderId, Long accountId, Double amount) {
-
         String description = "Money transfer in ARS";
-
         Account senderAccount = accountService.getAccountByUserIdAndCurrency(senderId, "ARS");
-        long senderAccId = senderAccount.getId();
+        Account receiverAccount = accountService.getAccountByUserIdAndCurrency(accountId, "ARS");
 
-        Account receiverAccount = accountRepository.getReferenceByUserId(accountId);
+        Transaction sendTransaction = new Transaction();
+        sendTransaction.setAmount(amount);
+        sendTransaction.setDescription(description);
+        sendTransaction.setAccount(senderAccount);
 
-        Transaction transaction = new Transaction(amount,description,receiverAccount);
-        TransactionDtoPay transactionDto = transactionMapper.transactionToTransactionDto(transaction);
-        TransactionDtoPay arsTransaction = null;
+        Transaction receiveTransaction = new Transaction();
+        receiveTransaction.setAmount(amount);
+        receiveTransaction.setDescription(description);
+        receiveTransaction.setAccount(receiverAccount);
+
+        ResponseTransactionDto sendTransactionDto = transactionMapper.modelToResponseTransactionDto(sendTransaction);
+        ResponseTransactionDto receiveTransactionDto = transactionMapper.modelToResponseTransactionDto(receiveTransaction);
+        TransactionDtoPay arsTransaction = new TransactionDtoPay();
 
         if (amount <= senderAccount.getBalance() && amount <= senderAccount.getTransactionLimit()) {
-            arsTransaction = payment(transactionDto);
-            //income(accountId, receiverId, amount, EType.INCOME);
+            ResponseTransactionDto senderPayment = payment(sendTransactionDto, EType.PAYMENT);
+            ResponseTransactionDto receiverIncome = payment(receiveTransactionDto, EType.INCOME);
 
+            if (senderPayment != null && receiverIncome != null){
+                arsTransaction.setAmount(amount);
+                arsTransaction.setDescription(description);
+                arsTransaction.setSenderAccountId(senderAccount.getId());
+                arsTransaction.setReceiverAccountId(receiverAccount.getId());
+
+                transactionRepository.save(transactionMapper.transactionDtoToTransaction(arsTransaction));
+            }
         } else {
             log.error("No balance or the amount to send is less than the transaction limit");
         }
@@ -72,22 +80,36 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
     public TransactionDtoPay sendUsd(Long senderId, Long accountId, Double amount) {
-
         String description = "Money transfer in USD";
-
         Account senderAccount = accountService.getAccountByUserIdAndCurrency(senderId, "USD");
-        long senderAccId = senderAccount.getId();
+        Account receiverAccount = accountService.getAccountByUserIdAndCurrency(accountId, "USD");
 
-        Account receiverAccount = accountRepository.getReferenceByUserId(accountId);
+        Transaction sendTransaction = new Transaction();
+        sendTransaction.setAmount(amount);
+        sendTransaction.setDescription(description);
+        sendTransaction.setAccount(senderAccount);
 
-        Transaction transaction = new Transaction(amount,description,receiverAccount);
-        TransactionDtoPay transactionDto = transactionMapper.transactionToTransactionDto(transaction);
-        TransactionDtoPay usdTransaction = null;
+        Transaction receiveTransaction = new Transaction();
+        receiveTransaction.setAmount(amount);
+        receiveTransaction.setDescription(description);
+        receiveTransaction.setAccount(receiverAccount);
+
+        ResponseTransactionDto sendTransactionDto = transactionMapper.modelToResponseTransactionDto(sendTransaction);
+        ResponseTransactionDto receiveTransactionDto = transactionMapper.modelToResponseTransactionDto(receiveTransaction);
+        TransactionDtoPay usdTransaction = new TransactionDtoPay();
 
         if (amount <= senderAccount.getBalance() && amount <= senderAccount.getTransactionLimit()) {
-            usdTransaction = payment(transactionDto);
-            //income(accountId, receiverId, amount, EType.INCOME);
+            ResponseTransactionDto senderPayment = payment(sendTransactionDto, EType.PAYMENT);
+            ResponseTransactionDto receiverIncome = payment(receiveTransactionDto, EType.INCOME);
 
+            if (senderPayment != null && receiverIncome != null){
+                usdTransaction.setAmount(amount);
+                usdTransaction.setDescription(description);
+                usdTransaction.setSenderAccountId(senderAccount.getId());
+                usdTransaction.setReceiverAccountId(receiverAccount.getId());
+
+                transactionRepository.save(transactionMapper.transactionDtoToTransaction(usdTransaction));
+            }
         } else {
             log.error("No balance or the amount to send is less than the transaction limit");
         }
@@ -95,14 +117,29 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
     @Override
-    public TransactionDtoPay payment( TransactionDtoPay transitionDtoPay) {
-        Transaction transaction = transactionMapper.transactionDtoToTransaction(transitionDtoPay);
-        transaction.setType(EType.PAYMENT);
-        iTransactionRepository.save(transaction);
-        TransactionDtoPay  transactionDtoPay = transactionMapper.transactionToTransactionDto(transaction);
-        return transactionDtoPay;
+    public ResponseTransactionDto payment(ResponseTransactionDto transactionDto, EType type) {
+        Transaction transaction = transactionMapper.responseTransactionDtoToModel(transactionDto);
+        transaction.setType(type);
 
+        Account account = transaction.getAccount();
+
+        if(type.equals(EType.PAYMENT))
+        {
+            Double currentBalance = account.getBalance();
+            account.setBalance(currentBalance - transaction.getAmount());
+        }
+        else if(type.equals(EType.INCOME))
+        {
+            Double currentBalance = account.getBalance();
+            account.setBalance(currentBalance + transaction.getAmount());
+        }
+
+        transactionRepository.save(transaction);
+        ResponseTransactionDto savedTransaction = transactionMapper.modelToResponseTransactionDto(transaction);
+
+        return savedTransaction;
     }
+
     public ResponseTransactionDto save(ResponseTransactionDto transactionDto){
         if (transactionDto.getAmount() <= 0) {
             throw new TransactionError(ErrorEnum.DEPOSITNOTVALID.getMessage());
@@ -130,8 +167,8 @@ public class TransactionServiceImpl implements ITransactionService {
     }
     @Override
     public Optional<ResponseTransactionDto> findTransactionById(Long id) {
-        if (iTransactionRepository.findById(id).isPresent()){
-            return Optional.of(transactionMapper.modelToResponseTransactionDto(iTransactionRepository.findById(id).get()));
+        if (transactionRepository.findById(id).isPresent()){
+            return Optional.of(transactionMapper.modelToResponseTransactionDto(transactionRepository.findById(id).get()));
         }else {
             return Optional.empty();
         }
@@ -140,7 +177,7 @@ public class TransactionServiceImpl implements ITransactionService {
     public ResponseTransactionDto updateDescriptionFromTransaction(ResponseTransactionDto responseTransactionDto, String description) {
         responseTransactionDto.setDescription(description);
         Transaction saveTransaction = transactionMapper.responseTransactionDtoToModel(responseTransactionDto);
-        iTransactionRepository.save(saveTransaction);
+        transactionRepository.save(saveTransaction);
         return responseTransactionDto;
     }
 }

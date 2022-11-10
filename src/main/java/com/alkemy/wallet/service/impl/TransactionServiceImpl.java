@@ -4,12 +4,14 @@ package com.alkemy.wallet.service.impl;
 
 import com.alkemy.wallet.dto.TransactionDtoPay;
 import com.alkemy.wallet.mapper.ITransactionMapper;
+import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.repository.ITransactionRepository;
 import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.security.service.IJwtUtils;
+import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.ITransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,7 @@ public class TransactionServiceImpl implements ITransactionService {
     private final IAccountRepository accountRepository;
     private final ITransactionRepository iTransactionRepository;
     private final ITransactionMapper transactionMapper;
+    private final IAccountService accountService;
 
     @Autowired
     private IJwtUtils jwtUtils;
@@ -44,54 +47,53 @@ public class TransactionServiceImpl implements ITransactionService {
         return jwt;
     }
 
-    // Comentadas porque faltan funcionalidades llamadas dentro (de Account e income)
-    /*
-    public ResponseTransactionDto sendArs(String token, Long accountId, Double amount) {
 
-        Long senderId = jwtUtils.extractUserId(getJwt(token));
+    public TransactionDtoPay sendArs(Long senderId, Long accountId, Double amount) {
 
         String description = "Money transfer in ARS";
-        //Account senderAccount = accountRepository.findUsdAccountByUserId(senderId);
-        //Long receiverAccount = accountRepository.findArsAccountByUserId(accountId);
-        TransactionDtoPay transactionDtoPay = new TransactionDtoPay(amount, description, receiverId);
+
+        Account senderAccount = accountService.getAccountByUserIdAndCurrency(senderId, "ARS");
+        long senderAccId = senderAccount.getId();
+
+        Account receiverAccount = accountRepository.getReferenceByUserId(accountId);
+
+        Transaction transaction = new Transaction(amount,description,receiverAccount);
+        TransactionDtoPay transactionDto = transactionMapper.transactionToTransactionDto(transaction);
         TransactionDtoPay arsTransaction = null;
 
         if (amount <= senderAccount.getBalance() && amount <= senderAccount.getTransactionLimit()) {
-
-            arsTransaction = payment(transactionDtoPay);
+            arsTransaction = payment(transactionDto);
             //income(accountId, receiverId, amount, EType.INCOME);
-            log.info("Successful ARS transaction");
-            save(arsTransaction);
 
         } else {
-            log.error("ARS transaction failed");
+            log.error("No balance or the amount to send is less than the transaction limit");
         }
         return arsTransaction;
     }
 
-    public ResponseTransactionDto sendUsd(String token, Long accountId, Double amount) {
-
-        Long senderId = jwtUtils.extractUserId(getJwt(token));
+    public TransactionDtoPay sendUsd(Long senderId, Long accountId, Double amount) {
 
         String description = "Money transfer in USD";
-        // Account senderAccount = accountRepository.findUsdAccountByUserId(senderId);
-        //Long receiverAccount = accountRepository.findUsdAccountByUserId(accountId);
 
-        TransactionDtoPay transactionDtoPay = new TransactionDtoPay(amount, description, receiverId);
+        Account senderAccount = accountService.getAccountByUserIdAndCurrency(senderId, "USD");
+        long senderAccId = senderAccount.getId();
+
+        Account receiverAccount = accountRepository.getReferenceByUserId(accountId);
+
+        Transaction transaction = new Transaction(amount,description,receiverAccount);
+        TransactionDtoPay transactionDto = transactionMapper.transactionToTransactionDto(transaction);
         TransactionDtoPay usdTransaction = null;
 
         if (amount <= senderAccount.getBalance() && amount <= senderAccount.getTransactionLimit()) {
-
-            usdTransaction = payment(transactionDtoPay);
+            usdTransaction = payment(transactionDto);
             //income(accountId, receiverId, amount, EType.INCOME);
-            log.info("Successful USD transaction");
-            save(usdTransaction);
 
         } else {
-            log.error("USD transaction failed");
+            log.error("No balance or the amount to send is less than the transaction limit");
         }
         return usdTransaction;
-    }*/
+    }
+
     @Override
     public TransactionDtoPay payment( TransactionDtoPay transitionDtoPay) {
         Transaction transaction = transactionMapper.transactionDtoToTransaction(transitionDtoPay);

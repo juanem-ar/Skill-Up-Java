@@ -23,4 +23,6 @@ public interface IAccountService {
     Optional<Account> findById(Long id);
 
     ResponseAccountDto updateAccount(Account account, UpdateAccountDto transactionLimit, Authentication authentication);
+
+    Account getAccountByUserIdAndCurrency(Long userId, String currency);
 }

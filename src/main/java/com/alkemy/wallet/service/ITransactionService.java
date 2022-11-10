@@ -16,14 +16,13 @@ import java.util.Optional;
 
 public interface ITransactionService {
 
-    String getJwt(String token);
-    //ResponseTransactionDto sendArs(String token, Long accountId, Double amount) // faltan métodos llamados dentro
-    //ResponseTransactionDto sendUsd(String token, Long accountId, Double amount) // faltan métodos llamados dentro
+    TransactionDtoPay sendArs(Long senderId, Long accountId, Double amount);
+    TransactionDtoPay sendUsd(Long senderId, Long accountId, Double amount);
     ResponseTransactionDto save(ResponseTransactionDto transactionDto);
 
     List<Transaction> findAllTransactionsWith(Long accountId);
 
-    public TransactionDtoPay payment(TransactionDtoPay transitionDtoPay);
+    ResponseTransactionDto payment(ResponseTransactionDto transactionDto, EType type);
     Page<Transaction> findByUserId(Long userId, String token, Pageable pageable) throws Exception;
 
     Optional<ResponseTransactionDto> findTransactionById(Long id);

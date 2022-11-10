@@ -4,6 +4,7 @@ package com.alkemy.wallet.controller;
 import com.alkemy.wallet.dto.ResponseAccountDto;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 import com.alkemy.wallet.dto.TransactionDtoPay;
+import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.impl.TransactionServiceImpl;
@@ -49,8 +50,8 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("payment")
-    public ResponseEntity<TransactionDtoPay> transactionPayment(@RequestBody @Valid TransactionDtoPay transactionDtoPay){
-        return new ResponseEntity<>(transactionService.payment(transactionDtoPay), HttpStatus.CREATED);
+    public ResponseEntity<ResponseTransactionDto> transactionPayment(@RequestBody @Valid ResponseTransactionDto responseTransactionDto){
+        return new ResponseEntity<>(transactionService.payment(responseTransactionDto, EType.PAYMENT), HttpStatus.CREATED);
     }
 
     @Operation(method = "POST", summary = "saveDeposit", description = "Registrar un depósito.",
@@ -118,7 +119,7 @@ public class TransactionController {
     public ResponseEntity<TransactionDtoPay> sendArs(HttpServletRequest req, @PathVariable("id") Long accountId, Double amount) {
         String token = req.getHeader("Authorization");
         Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
-        return ResponseEntity.ok().body(transactionService.sendUsd(senderId,accountId,amount));
+        return ResponseEntity.ok().body(transactionService.sendArs(senderId,accountId,amount));
     }
 
     @PostMapping("/sendUsd/{id}")

@@ -3,7 +3,8 @@ package com.alkemy.wallet.controller;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.alkemy.wallet.dto.ResponseAccountDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
@@ -26,6 +27,8 @@ import com.alkemy.wallet.mapper.IAccountMapper;
 import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IUserService;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 
@@ -74,16 +77,18 @@ class AccountControllerTest {
 		String token = "token";
 		long accountId = 60;
 		Account account = new Account();
+		account.setTransactionLimit(100.0);
 		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
 		ResponseAccountDto responseAccountDto = new ResponseAccountDto();
 		requestAccountDto.setTransactionLimit(9999.0);
+//		responseAccountDto.setTransactionLimit(9999.0);
 		String jsonRequest = Json.pretty(requestAccountDto);
+
 
 		when(accountService.findById(accountId))
 				.thenReturn(account);
-
-		when(accountService.updateAccount(accountId, requestAccountDto, token))
-				.thenReturn(responseAccountDto);
+		//when(accountService.updateAccount(accountId, requestAccountDto, token))
+		//		.thenReturn(responseAccountDto);
 
 		mockMvc
 				.perform(
@@ -91,10 +96,15 @@ class AccountControllerTest {
 								.header("authorization", "Bearer " + token)
 								.contentType(MediaType.APPLICATION_JSON_VALUE)
 								.accept(MediaType.APPLICATION_JSON)
+								.characterEncoding("utf-8")
 								.param("id", String.valueOf(accountId))
 								.content(jsonRequest))
 				.andExpect(status().isOk())
-				;
+		//		.andExpect(content().contentType("application/json"))
+				.andExpect(jsonPath("$.transactionLimit").value(9999.0))
+		//		.andExpect(MockMvcResultMatchers.content()
+		//				.string("Article updated with content: " + content))
+				.andDo(print());
 
 	}
 }

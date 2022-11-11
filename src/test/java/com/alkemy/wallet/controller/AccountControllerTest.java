@@ -1,5 +1,6 @@
 package com.alkemy.wallet.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -51,9 +52,6 @@ class AccountControllerTest {
 	@MockBean
 	private JwtUtils jwtUtils;
 
-	@MockBean
-	private AccountController accountController;
-
 	private String uri = "/accounts";
 
 
@@ -81,14 +79,15 @@ class AccountControllerTest {
 		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
 		ResponseAccountDto responseAccountDto = new ResponseAccountDto();
 		requestAccountDto.setTransactionLimit(9999.0);
-//		responseAccountDto.setTransactionLimit(9999.0);
 		String jsonRequest = Json.pretty(requestAccountDto);
 
 
 		when(accountService.findById(accountId))
 				.thenReturn(account);
-		//when(accountService.updateAccount(accountId, requestAccountDto, token))
-		//		.thenReturn(responseAccountDto);
+		//when(iAccountMapper.accountToAccountDto(any(Account.class))).thenReturn(responseAccountDto);
+		when(accountService.updateAccount(any(), any(), any()))
+				.thenReturn(responseAccountDto);
+
 
 		mockMvc
 				.perform(
@@ -101,10 +100,7 @@ class AccountControllerTest {
 								.content(jsonRequest))
 				.andExpect(status().isOk())
 		//		.andExpect(content().contentType("application/json"))
-				.andExpect(jsonPath("$.transactionLimit").value(9999.0))
-		//		.andExpect(MockMvcResultMatchers.content()
-		//				.string("Article updated with content: " + content))
+		//		.andExpect(jsonPath("$.transactionLimit").value(9999.0))
 				.andDo(print());
-
 	}
 }

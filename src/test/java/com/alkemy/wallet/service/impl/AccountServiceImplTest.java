@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -71,6 +72,11 @@ class AccountServiceImplTest {
 		account.setId(accountId);
 		account.setTransactionLimit(1000.0);
 		account.setUser(user);
+		account.setCurrency(ECurrency.USD);
+		account.setCreationDate(LocalDateTime.now());
+		account.setUpdateDate(LocalDateTime.now());
+		account.setBalance(0.0);
+		account.setDeleted(false);
 
 		//create the request object
 		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
@@ -90,8 +96,9 @@ class AccountServiceImplTest {
 		ResponseAccountDto results = accountService.updateAccount(account.getId(),requestAccountDto,token);
 
 		//assert results
-		//assertEquals(requestAccountDto.getTransactionLimit(),responseAccountDto.getTransactionLimit());
 		assertNotNull(results);
+		//assertEquals(requestAccountDto.getTransactionLimit(),responseAccountDto.getTransactionLimit());
+
 	}
 
 	@Test

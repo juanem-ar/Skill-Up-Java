@@ -12,6 +12,7 @@ import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.IFixedDepositService;
 import com.alkemy.wallet.service.IUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,28 +22,17 @@ import static com.alkemy.wallet.model.ECurrency.ARS;
 import static com.alkemy.wallet.model.ECurrency.USD;
 
 @Service
+@RequiredArgsConstructor
 public class FixedDepositServiceImpl implements IFixedDepositService {
     private static final int MIN_DAYS = 30;
-    private IAccountRepository iAccountRepository;
-    private IUserService iUserService;
-    private IUserRepository userRepository;
-    private IFixedTermDepositRepository iFixedTermDepositRepository;
-    private FixedDepositMapper fixedDepositMapper;
-    private JwtUtils jwtUtils;
+    private final IAccountRepository iAccountRepository;
+    private final IUserService iUserService;
+    private final IUserRepository userRepository;
+    private final IFixedTermDepositRepository iFixedTermDepositRepository;
+    private final FixedDepositMapper fixedDepositMapper;
+    private final JwtUtils jwtUtils;
 
-    @Autowired
-    public FixedDepositServiceImpl(
-            IUserRepository userRepository,
-            IFixedTermDepositRepository iFixedTermDepositRepository,
-            FixedDepositMapper fixedDepositMapper,
-            IAccountRepository iAccountRepository, IUserService iUserService, JwtUtils jwtUtils){
-        this.userRepository = userRepository;
-        this.iAccountRepository = iAccountRepository;
-        this.iFixedTermDepositRepository = iFixedTermDepositRepository;
-        this. iUserService = iUserService;
-        this.jwtUtils = jwtUtils;
-        this.fixedDepositMapper = fixedDepositMapper;
-    }
+   
     public String addFixedDeposit(String email, FixedDepositDto dto) throws Exception{
 
         Long userId = userRepository.findByEmail(email).getId();

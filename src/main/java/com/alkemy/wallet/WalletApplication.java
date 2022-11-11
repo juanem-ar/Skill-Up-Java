@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 //import java.util.logging.Logger;
 
-@EnableJpaAuditing
 @SpringBootApplication
 @OpenAPIDefinition(
 		info = @Info(

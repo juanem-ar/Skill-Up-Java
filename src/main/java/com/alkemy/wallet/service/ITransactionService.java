@@ -24,8 +24,7 @@ public interface ITransactionService {
 
     ResponseTransactionDto payment(ResponseTransactionDto transactionDto, EType type);
     Page<Transaction> findByUserId(Long userId, String token, Pageable pageable) throws Exception;
-
-    Optional<ResponseTransactionDto> findTransactionById(Long id);
-    ResponseTransactionDto updateDescriptionFromTransaction(ResponseTransactionDto responseTransactionDto, String description);
+    Optional<ResponseTransactionDto> findTransactionById(Long id, String token) throws Exception;
+    ResponseTransactionDto updateDescriptionFromTransaction(Long id, String token, String description) throws Exception;
 
 }

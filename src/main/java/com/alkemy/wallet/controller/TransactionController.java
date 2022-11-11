@@ -86,15 +86,11 @@ public class TransactionController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
-    @GetMapping("transaction/{id}")
-    public ResponseEntity<?> getTransactionByAuthUser(@PathVariable("id") Long id){
-        //IF PARA VALIDAR USUARIO AUTENTICADO
-        Optional<ResponseTransactionDto> responseTransactionDto = transactionService.findTransactionById(id);
-        if(!responseTransactionDto.isPresent()){
-            return new ResponseEntity<>("The transaction ID does not exist", HttpStatus.NOT_FOUND);
-        }else {
-            return new ResponseEntity<>(responseTransactionDto, HttpStatus.OK);
-        }
+    @GetMapping("transaction/{transactionId}")
+    public ResponseEntity<?> getTransactionByAuthUser(@PathVariable("transactionId") Long id,
+                                                      @RequestHeader(name = "Authorization") String token) throws Exception{
+        return ResponseEntity.ok(transactionService.findTransactionById(id, token));
+
     }
 
     @Operation(method = "PATCH", summary = "editTransactionByAuthUser", description = "Actualizar transacción.",
@@ -103,16 +99,11 @@ public class TransactionController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
-    @PatchMapping("{id}")
+    @PatchMapping("{transactionId}")
     public ResponseEntity<?> editTransactionByAuthUser(@RequestBody Map<Object, String> description,
-                                                       @PathVariable("id") Long id){
-        //IF PARA VALIDAR USUARIO AUTENTICADO
-        Optional<ResponseTransactionDto> responseTransactionDto = transactionService.findTransactionById(id);
-        if(responseTransactionDto.isEmpty()){
-            return new ResponseEntity<>("The transaction ID does not exist", HttpStatus.NOT_FOUND);
-        }else {
-            return new ResponseEntity<>(transactionService.updateDescriptionFromTransaction(responseTransactionDto.get(),description.get("description")), HttpStatus.OK);
-        }
+                                                       @RequestHeader(name = "Authorization") String token,
+                                                       @PathVariable("transactionId") Long id) throws Exception {
+        return ResponseEntity.ok(transactionService.updateDescriptionFromTransaction(id, token, description.get("description")));
     }
 
     @PostMapping("/sendArs/{id}")

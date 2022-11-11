@@ -2,24 +2,22 @@ package com.alkemy.wallet.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import com.alkemy.wallet.dto.AccountBalanceDto;
+import com.alkemy.wallet.dto.ResponseFixedDepositDto;
 import com.alkemy.wallet.dto.ResponseUserBalanceDto;
 import com.alkemy.wallet.mapper.IAccountMapper;
+import com.alkemy.wallet.mapper.IFixedTermDepositMapper;
 import com.alkemy.wallet.model.Account;
-import com.alkemy.wallet.model.EType;
-import com.alkemy.wallet.model.Transaction;
+import com.alkemy.wallet.model.FixedTermDeposit;
 import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.security.service.IJwtUtils;
+import com.alkemy.wallet.service.IFixedDepositService;
 import com.alkemy.wallet.service.ITransactionService;
 import com.alkemy.wallet.service.IUserService;
 
@@ -39,6 +37,12 @@ class AccountServiceImplTest {
 
 	@Mock
 	private IAccountMapper accountMapper;
+	
+	@Mock
+	private IFixedDepositService fixedDepositService;
+	
+	@Mock
+	private IFixedTermDepositMapper fixedTermDepositMapper;
 
 	@InjectMocks
 	private AccountServiceImpl accountService;
@@ -51,29 +55,13 @@ class AccountServiceImplTest {
 		when(jwtUtils.getJwt(token)).thenReturn(token);
 		when(jwtUtils.extractUserId(token)).thenReturn(userId);
 
-		// three transactions
-		List<Transaction> transactions = new ArrayList<>();
+		Double ammountDeposit = 1.0;
+		FixedTermDeposit fixedTermDeposit = new FixedTermDeposit();
+		fixedTermDeposit.setAmount(ammountDeposit);
+		ResponseFixedDepositDto depositDto = new ResponseFixedDepositDto();
+		depositDto.setAmount(ammountDeposit);
 
-		Double incomeAmount = 1000.0;
-		Transaction income = new Transaction();
-		income.setType(EType.INCOME);
-		income.setAmount(incomeAmount);
-		transactions.add(income);
-
-		Double paymentAmount = 100.0;
-		Transaction payment = new Transaction();
-		payment.setType(EType.PAYMENT);
-		payment.setAmount(paymentAmount);
-		transactions.add(payment);
-
-		Double depositAmount = 10.0;
-		Transaction deposit = new Transaction();
-		deposit.setType(EType.DEPOSIT);
-		deposit.setAmount(depositAmount);
-		transactions.add(deposit);
-		//
-
-		Double balanceBase = 1.0;
+		Double balanceBase = 1000.0;
 		Long accountId = 1L;
 		Account account = new Account();
 		account.setId(accountId);
@@ -82,18 +70,19 @@ class AccountServiceImplTest {
 		AccountBalanceDto balanceDto =
 			new AccountBalanceDto(accountId, null, balanceBase);
 
+		when(AccountRepository.findAllByUserId(userId))
+          .thenReturn(List.of(account));
+		
 		when(accountMapper.accountToBalanceDto(account))
 			.thenReturn(balanceDto);
 
-		when(AccountRepository.findAllByUserId(userId))
-			.thenReturn(List.of(account));
-
-		when(transactionService.findAllTransactionsWith(accountId))
-			.thenReturn(transactions);
-
-		Double balanceFinal =
-			balanceBase + incomeAmount + depositAmount
-				- paymentAmount;
+		when(fixedDepositService.findAllBy(account))
+		  .thenReturn(List.of(fixedTermDeposit));
+		
+		when(fixedTermDepositMapper.toResponseFixedDepositDto(fixedTermDeposit))
+		  .thenReturn(depositDto);
+		
+		Double balanceFinal = balanceBase - ammountDeposit;
 
 		ResponseUserBalanceDto result =
 			accountService.getBalance(token);
@@ -105,6 +94,8 @@ class AccountServiceImplTest {
 			balanceFinal,
 			result.getAccountBalanceDtos().get(0).getBalance(),
 			epsilon);
+		
+		assertEquals(1, result.getDepositDtos().size());
 	}
 
 }

@@ -11,14 +11,16 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import org.hibernate.Filter;
 import org.hibernate.Session;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
@@ -34,218 +36,215 @@ import com.alkemy.wallet.service.IAccountService;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
-	@Mock
-	private IUserRepository userRepository;
+  @Mock
+  private IUserRepository userRepository;
 
-	@Mock
-	private IuserMapper iUserMapper;
+  @Mock
+  private IuserMapper iUserMapper;
 
-	@Mock
-	private UserMapper userMapper;
+  @Mock
+  private UserMapper userMapper;
 
-	@Mock
-	private IAccountService AccountServiceImpl;
+  @Mock
+  private IAccountService AccountServiceImpl;
 
-	@Mock
-	private AuthenticationManager authenticationManager;
+  @Mock
+  private AuthenticationManager authenticationManager;
 
-	@Mock
-	private JwtUtils jwtUtils;
-	
-	@Mock
-	private EntityManager entityManager;
-	
-	private Session session = Mockito.mock(Session.class);
-	
-	private Filter filter = Mockito.mock(Filter.class);
+  @Mock
+  private JwtUtils jwtUtils;
 
-	@InjectMocks
-	private UserServiceImpl userService;
+  @Mock
+  private EntityManager entityManager;
 
+  private Session session = Mockito.mock(Session.class);
 
-	@Test
-	void findAllUsers_ListWithTwoUsers_ListWithTwoDtos() {
-		List<User> users = new ArrayList<>();
-		users.add(new User());
-		users.add(new User());
-		
-		// entity manager
-		when(entityManager.unwrap(Session.class)).thenReturn(session);
-		when(session.enableFilter("deletedUserFilter")).thenReturn(filter);
-		when(filter.setParameter("isDeleted", false)).thenReturn(filter);
+  private Filter filter = Mockito.mock(Filter.class);
 
-		when(userRepository.findAll()).thenReturn(users);
+  @InjectMocks
+  private UserServiceImpl userService;
 
-		List<ResponseUserDto> responseUserDtos = new ArrayList<>();
-		responseUserDtos.add(new ResponseUserDto());
-		responseUserDtos.add(new ResponseUserDto());
+  @BeforeEach
+  public void createMocks() {
+    MockitoAnnotations.initMocks(this);
+  }
 
-		when(iUserMapper.usersToResponseUserDtos(users))
-			.thenReturn(responseUserDtos);
+  @Test
+  void findAllUsers_ListWithTwoUsers_ListWithTwoDtos() {
+    List<User> users = new ArrayList<>();
+    users.add(new User());
+    users.add(new User());
 
-		ResponseUsersDto result =
-			userService.findAllUsers(null, null);
+    // entity manager
+    when(entityManager.unwrap(Session.class)).thenReturn(session);
+    when(session.enableFilter("deletedUserFilter"))
+        .thenReturn(filter);
+    when(filter.setParameter("isDeleted", false))
+        .thenReturn(filter);
 
-		assertEquals(2, result.getUserDtos().size());
-	}
+    when(userRepository.findAll()).thenReturn(users);
 
+    List<ResponseUserDto> responseUserDtos = new ArrayList<>();
+    responseUserDtos.add(new ResponseUserDto());
+    responseUserDtos.add(new ResponseUserDto());
 
-	@Test
-	void findAllUsers_PageIsEmpty_ThrowBadRequestException() {
-		Integer page = 9;
-		
-	      // entity manager
-        when(entityManager.unwrap(Session.class)).thenReturn(session);
-        when(session.enableFilter("deletedUserFilter")).thenReturn(filter);
-        when(filter.setParameter("isDeleted", false)).thenReturn(filter);
+    when(iUserMapper.usersToResponseUserDtos(users))
+        .thenReturn(responseUserDtos);
 
-		when(userRepository.findAll(any(Pageable.class)))
-			.thenReturn(Page.empty());
+    ResponseUsersDto result = userService.findAllUsers(null, null);
 
-		assertThrows(
-			BadRequestException.class,
-			() -> userService.findAllUsers(page, null));
-	}
-	
-
-	@Test
-	void getUserById_NotFound_ThrowException() {
-		Long id = 2L;
-		when(userRepository.findById(id))
-			.thenReturn(Optional.empty());
-
-		assertThrows(
-			UserNotFoundException.class,
-			() -> userService.getUserById(id));
-	}
+    assertEquals(2, result.getUserDtos().size());
+  }
 
 
-	@Test
-	void getUserById_UserExist_ReturnUser() {
-		Long id = 2L;
-		when(userRepository.findById(id))
-			.thenReturn(Optional.of(new User()));
+  @Test
+  void findAllUsers_PageIsEmpty_ThrowBadRequestException() {
+    Integer page = 9;
 
-		User result = userService.getUserById(id);
+    // entity manager
+    when(entityManager.unwrap(Session.class)).thenReturn(session);
+    when(session.enableFilter("deletedUserFilter"))
+        .thenReturn(filter);
+    when(filter.setParameter("isDeleted", false))
+        .thenReturn(filter);
 
-		assertNotNull(result);
-	}
+    when(userRepository.findAll(any(PageRequest.class)))
+        .thenReturn(Page.empty());
 
-
-	@Test
-	void getUserDetails_IdAndTokenUserIdAreNotEqual_ThrowBadRequestException() {
-		Long userId = 1L;
-		Long tokenUserId = 2L;
-		String token = "token";
-
-		when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
-
-		assertThrows(
-			BadRequestException.class,
-			() -> userService.getUserDetails(userId, token));
-	}
+    assertThrows(BadRequestException.class,
+        () -> userService.findAllUsers(page, null));
+  }
 
 
-	@Test
-	void getUserDetails_IdAndTokenUserIdAreEqualAndNotFoundUser_ThrowUserNotFoundException() {
-		Long userId = 1L;
-		Long tokenUserId = 1L;
-		String token = "token";
+  @Test
+  void getUserById_NotFound_ThrowException() {
+    Long id = 2L;
+    when(userRepository.findById(id)).thenReturn(Optional.empty());
 
-		when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
-
-		when(userRepository.findById(tokenUserId))
-			.thenReturn(Optional.empty());
-
-		assertThrows(
-			UserNotFoundException.class,
-			() -> userService.getUserDetails(userId, token));
-	}
+    assertThrows(UserNotFoundException.class,
+        () -> userService.getUserById(id));
+  }
 
 
-	@Test
-	void getUserDetails_IdAndTokenUserIdAreEqualAndFoundUser_ReturnDto() {
-		Long userId = 1L;
-		Long tokenUserId = 1L;
-		String token = "token";
+  @Test
+  void getUserById_UserExist_ReturnUser() {
+    Long id = 2L;
+    when(userRepository.findById(id))
+        .thenReturn(Optional.of(new User()));
 
-		when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
+    User result = userService.getUserById(id);
 
-		User user = new User();
-		when(userRepository.findById(tokenUserId))
-			.thenReturn(Optional.of(user));
-
-		when(iUserMapper.toResponseUserDto(user))
-			.thenReturn(new ResponseUserDto());
-
-		ResponseUserDto result =
-			userService.getUserDetails(userId, token);
-
-		assertNotNull(result);
-	}
+    assertNotNull(result);
+  }
 
 
-	@Test
-	void updateUserDetails_IdAndTokenUserIdAreNotEqual_ThrowBadRequestException() {
-		Long userId = 1L;
-		Long tokenUserId = 2L;
-		String token = "token";
-		PatchRequestUserDto dto = new PatchRequestUserDto();
+  @Test
+  void getUserDetails_IdAndTokenUserIdAreNotEqual_ThrowBadRequestException() {
+    Long userId = 1L;
+    Long tokenUserId = 2L;
+    String token = "token";
 
-		when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
+    when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
 
-		assertThrows(
-			BadRequestException.class,
-			() -> userService
-				.updateUserDetails(userId, dto, token));
-	}
+    assertThrows(BadRequestException.class,
+        () -> userService.getUserDetails(userId, token));
+  }
 
 
-	@Test
-	void updateUserDetails_IdAndTokenUserIdAreEqualNotFounUser_ThrowUserNotFoundException() {
-		Long userId = 1L;
-		Long tokenUserId = 1L;
-		String token = "token";
-		PatchRequestUserDto dto = new PatchRequestUserDto();
+  @Test
+  void getUserDetails_IdAndTokenUserIdAreEqualAndNotFoundUser_ThrowUserNotFoundException() {
+    Long userId = 1L;
+    Long tokenUserId = 1L;
+    String token = "token";
 
-		when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
+    when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
 
-		when(userRepository.findById(tokenUserId))
-			.thenReturn(Optional.empty());
+    when(userRepository.findById(tokenUserId))
+        .thenReturn(Optional.empty());
 
-		assertThrows(
-			UserNotFoundException.class,
-			() -> userService
-				.updateUserDetails(userId, dto, token));
-	}
+    assertThrows(UserNotFoundException.class,
+        () -> userService.getUserDetails(userId, token));
+  }
 
 
-	@Test
-	void updateUserDetails_IdAndTokenUserIdAreEqualAndFoundUser_ReturnDto() {
-		Long userId = 1L;
-		Long tokenUserId = 1L;
-		String token = "token";
-		PatchRequestUserDto patchDto = new PatchRequestUserDto();
+  @Test
+  void getUserDetails_IdAndTokenUserIdAreEqualAndFoundUser_ReturnDto() {
+    Long userId = 1L;
+    Long tokenUserId = 1L;
+    String token = "token";
 
-		when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
+    when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
 
-		User user = new User();
+    User user = new User();
+    when(userRepository.findById(tokenUserId))
+        .thenReturn(Optional.of(user));
 
-		when(userRepository.findById(tokenUserId))
-			.thenReturn(Optional.of(user));
+    when(iUserMapper.toResponseUserDto(user))
+        .thenReturn(new ResponseUserDto());
 
-		when(userRepository.save(user)).thenReturn(user);
+    ResponseUserDto result =
+        userService.getUserDetails(userId, token);
 
-		when(iUserMapper.updateUser(patchDto, user))
-			.thenReturn(user);
+    assertNotNull(result);
+  }
 
-		when(iUserMapper.toResponseUserDto(user))
-			.thenReturn(new ResponseUserDto());
 
-		ResponseUserDto result =
-			userService.updateUserDetails(userId, patchDto, token);
+  @Test
+  void updateUserDetails_IdAndTokenUserIdAreNotEqual_ThrowBadRequestException() {
+    Long userId = 1L;
+    Long tokenUserId = 2L;
+    String token = "token";
+    PatchRequestUserDto dto = new PatchRequestUserDto();
 
-		assertNotNull(result);
-	}
+    when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
+
+    assertThrows(BadRequestException.class,
+        () -> userService.updateUserDetails(userId, dto, token));
+  }
+
+
+  @Test
+  void updateUserDetails_IdAndTokenUserIdAreEqualNotFounUser_ThrowUserNotFoundException() {
+    Long userId = 1L;
+    Long tokenUserId = 1L;
+    String token = "token";
+    PatchRequestUserDto dto = new PatchRequestUserDto();
+
+    when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
+
+    when(userRepository.findById(tokenUserId))
+        .thenReturn(Optional.empty());
+
+    assertThrows(UserNotFoundException.class,
+        () -> userService.updateUserDetails(userId, dto, token));
+  }
+
+
+  @Test
+  void updateUserDetails_IdAndTokenUserIdAreEqualAndFoundUser_ReturnDto() {
+    Long userId = 1L;
+    Long tokenUserId = 1L;
+    String token = "token";
+    PatchRequestUserDto patchDto = new PatchRequestUserDto();
+
+    when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
+
+    User user = new User();
+
+    when(userRepository.findById(tokenUserId))
+        .thenReturn(Optional.of(user));
+
+    when(userRepository.save(user)).thenReturn(user);
+
+    when(iUserMapper.updateUser(patchDto, user)).thenReturn(user);
+
+    when(iUserMapper.toResponseUserDto(user))
+        .thenReturn(new ResponseUserDto());
+
+    ResponseUserDto result =
+        userService.updateUserDetails(userId, patchDto, token);
+
+    assertNotNull(result);
+  }
 
 }

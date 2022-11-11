@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import static com.alkemy.wallet.model.ECurrency.ARS;
 import static com.alkemy.wallet.model.ECurrency.USD;
 
@@ -68,5 +69,10 @@ public class FixedDepositServiceImpl implements IFixedDepositService {
         if (dto.getPeriod()<MIN_DAYS)
             throw new BadRequestException("The minimum term is 30 days.");
         return fixedDepositMapper.toSimulateFixedDeposit(dto);
+    }
+
+    @Override
+    public List<FixedTermDeposit> findAllBy(Account account) {
+      return iFixedTermDepositRepository.findByAccount(account);
     }
 }

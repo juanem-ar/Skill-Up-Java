@@ -2,8 +2,10 @@ package com.alkemy.wallet.controller;
 
 
 import com.alkemy.wallet.dto.ResponseAccountDto;
+import com.alkemy.wallet.dto.ResponseSendTransactionDto;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 import com.alkemy.wallet.dto.TransactionDtoPay;
+import com.alkemy.wallet.model.ECurrency;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.security.service.IJwtUtils;
@@ -46,8 +48,8 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("payment")
-    public ResponseEntity<ResponseTransactionDto> transactionPayment(@RequestBody @Valid ResponseTransactionDto responseTransactionDto){
-        return new ResponseEntity<>(transactionService.payment(responseTransactionDto), HttpStatus.CREATED);
+    public ResponseEntity<ResponseTransactionDto> transactionPayment(@RequestBody @Valid TransactionDtoPay transactionDtoPay){
+        return new ResponseEntity<>(transactionService.payment(transactionDtoPay), HttpStatus.CREATED);
     }
 
     @Operation(method = "POST", summary = "saveDeposit", description = "Registrar un depósito.",
@@ -102,17 +104,29 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.updateDescriptionFromTransaction(id, token, description.get("description")));
     }
 
-    @PostMapping("/sendArs/{id}")
-    public ResponseEntity<TransactionDtoPay> sendArs(HttpServletRequest req, @PathVariable("id") Long accountId, Double amount) {
+    @Operation(method = "POST", summary = "sendArs", description = "Send pesos.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
+                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+            })
+    @PostMapping("/sendArs")
+    public ResponseEntity<ResponseTransactionDto> sendArs(HttpServletRequest req, ResponseSendTransactionDto responseSendTransactionDto) {
         String token = req.getHeader("Authorization");
         Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
-        return ResponseEntity.ok().body(transactionService.sendArs(senderId,accountId,amount));
+        return ResponseEntity.ok().body(transactionService.send(senderId, responseSendTransactionDto, ECurrency.ARS));
     }
 
-    @PostMapping("/sendUsd/{id}")
-    public ResponseEntity<TransactionDtoPay> sendUsd(HttpServletRequest req, @PathVariable("id") Long accountId, Double amount) {
+    @Operation(method = "POST", summary = "sendUsd", description = "Send dollars.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
+                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+            })
+    @PostMapping("/sendUsd")
+    public ResponseEntity<ResponseTransactionDto> sendUsd(HttpServletRequest req, ResponseSendTransactionDto responseSendTransactionDto) {
         String token = req.getHeader("Authorization");
         Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
-        return ResponseEntity.ok().body(transactionService.sendUsd(senderId,accountId,amount));
+        return ResponseEntity.ok().body(transactionService.send(senderId, responseSendTransactionDto, ECurrency.USD));
     }
 }

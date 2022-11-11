@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,17 +33,11 @@ import javax.validation.Valid;
 
 @RequestMapping("/transactions")
 @RestController
-
+@RequiredArgsConstructor
 public class TransactionController {
 
     private final TransactionServiceImpl transactionService;
     private final IJwtUtils jwtUtils;
-
-    @Autowired
-    public TransactionController(TransactionServiceImpl transactionService, IJwtUtils jwtUtils) {
-        this.transactionService = transactionService;
-        this.jwtUtils = jwtUtils;
-    }
 
     @Operation(method = "POST", summary = "transactionPayment", description = "Registrar un pago.",
             responses = {

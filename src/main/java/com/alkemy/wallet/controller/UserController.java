@@ -11,6 +11,7 @@ import com.alkemy.wallet.service.IUserService;
 import lombok.AllArgsConstructor;
 
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -32,9 +33,9 @@ import javax.servlet.http.HttpServletRequest;
 
 @RequestMapping("/users")
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
-    private IUserService userService;
+    private final IUserService userService;
 
     @Operation(method = "DELETE", summary = "deleteUsers", description = "Eliminar usuario.",
             responses = {

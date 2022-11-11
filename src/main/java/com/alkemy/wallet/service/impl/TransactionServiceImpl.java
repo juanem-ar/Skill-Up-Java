@@ -5,13 +5,13 @@ package com.alkemy.wallet.service.impl;
 import com.alkemy.wallet.dto.TransactionDtoPay;
 import com.alkemy.wallet.mapper.ITransactionMapper;
 import com.alkemy.wallet.model.Account;
+import com.alkemy.wallet.model.ECurrency;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.repository.ITransactionRepository;
 import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.security.service.IJwtUtils;
-import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.ITransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,16 +36,14 @@ public class TransactionServiceImpl implements ITransactionService {
     private final IUserRepository userRepository;
     private final IAccountRepository accountRepository;
     private final ITransactionMapper transactionMapper;
-    private final IAccountService accountService;
 
     @Autowired
     private IJwtUtils jwtUtils;
 
-
-    public TransactionDtoPay sendArs(Long senderId, Long accountId, Double amount) {
+    public TransactionDtoPay sendArs(Long senderId, Long accountId, Double amount){ // TODO: throws TransactionError
         String description = "Money transfer in ARS";
-        Account senderAccount = accountService.getAccountByUserIdAndCurrency(senderId, "ARS");
-        Account receiverAccount = accountService.getAccountByUserIdAndCurrency(accountId, "ARS");
+        Account senderAccount = accountRepository.getReferenceByUserIdAndCurrency(senderId, ECurrency.ARS);
+        Account receiverAccount = accountRepository.getReferenceByUserIdAndCurrency(accountId, ECurrency.ARS);
 
         Transaction sendTransaction = new Transaction();
         sendTransaction.setAmount(amount);
@@ -57,32 +55,29 @@ public class TransactionServiceImpl implements ITransactionService {
         receiveTransaction.setDescription(description);
         receiveTransaction.setAccount(receiverAccount);
 
-        ResponseTransactionDto sendTransactionDto = transactionMapper.modelToResponseTransactionDto(sendTransaction);
-        ResponseTransactionDto receiveTransactionDto = transactionMapper.modelToResponseTransactionDto(receiveTransaction);
         TransactionDtoPay arsTransaction = new TransactionDtoPay();
 
         if (amount <= senderAccount.getBalance() && amount <= senderAccount.getTransactionLimit()) {
-            ResponseTransactionDto senderPayment = payment(sendTransactionDto, EType.PAYMENT);
-            ResponseTransactionDto receiverIncome = payment(receiveTransactionDto, EType.INCOME);
+            // TODO: senderPayment and receiverIncome try-catch and throw of TransactionError
+            ResponseTransactionDto senderPayment = payment(transactionMapper.modelToResponseTransactionDto(sendTransaction));
+            ResponseTransactionDto receiverIncome = payment(transactionMapper.modelToResponseTransactionDto(receiveTransaction));
 
             if (senderPayment != null && receiverIncome != null){
                 arsTransaction.setAmount(amount);
                 arsTransaction.setDescription(description);
                 arsTransaction.setSenderAccountId(senderAccount.getId());
                 arsTransaction.setReceiverAccountId(receiverAccount.getId());
-
-                //transactionRepository.save(transactionMapper.transactionDtoToTransaction(arsTransaction));
             }
         } else {
             log.error("No balance or the amount to send is less than the transaction limit");
         }
-        return arsTransaction;
+        return arsTransaction; // TODO: convert to ResponseEntity (fixedtermdeposit)
     }
 
-    public TransactionDtoPay sendUsd(Long senderId, Long accountId, Double amount) {
+    public TransactionDtoPay sendUsd(Long senderId, Long accountId, Double amount){ // TODO: turn into 1 send method
         String description = "Money transfer in USD";
-        Account senderAccount = accountService.getAccountByUserIdAndCurrency(senderId, "USD");
-        Account receiverAccount = accountService.getAccountByUserIdAndCurrency(accountId, "USD");
+        Account senderAccount = accountRepository.getReferenceByUserIdAndCurrency(senderId, ECurrency.USD);
+        Account receiverAccount = accountRepository.getReferenceByUserIdAndCurrency(accountId, ECurrency.USD);
 
         Transaction sendTransaction = new Transaction();
         sendTransaction.setAmount(amount);
@@ -94,50 +89,43 @@ public class TransactionServiceImpl implements ITransactionService {
         receiveTransaction.setDescription(description);
         receiveTransaction.setAccount(receiverAccount);
 
-        ResponseTransactionDto sendTransactionDto = transactionMapper.modelToResponseTransactionDto(sendTransaction);
-        ResponseTransactionDto receiveTransactionDto = transactionMapper.modelToResponseTransactionDto(receiveTransaction);
         TransactionDtoPay usdTransaction = new TransactionDtoPay();
 
         if (amount <= senderAccount.getBalance() && amount <= senderAccount.getTransactionLimit()) {
-            ResponseTransactionDto senderPayment = payment(sendTransactionDto, EType.PAYMENT);
-            ResponseTransactionDto receiverIncome = payment(receiveTransactionDto, EType.INCOME);
+            // TODO: senderPayment and receiverIncome try-catch and throw of TransactionError
+            ResponseTransactionDto senderPayment = payment(transactionMapper.modelToResponseTransactionDto(sendTransaction));
+            ResponseTransactionDto receiverIncome = payment(transactionMapper.modelToResponseTransactionDto(receiveTransaction));
 
             if (senderPayment != null && receiverIncome != null){
                 usdTransaction.setAmount(amount);
                 usdTransaction.setDescription(description);
                 usdTransaction.setSenderAccountId(senderAccount.getId());
                 usdTransaction.setReceiverAccountId(receiverAccount.getId());
-
-                //transactionRepository.save(transactionMapper.transactionDtoToTransaction(usdTransaction));
             }
         } else {
             log.error("No balance or the amount to send is less than the transaction limit");
         }
-        return usdTransaction;
+        return usdTransaction; // TODO: convert to ResponseEntity (fixedtermdeposit)
     }
 
+
     @Override
-    public ResponseTransactionDto payment(ResponseTransactionDto transactionDto, EType type) {
-        Transaction transaction = transactionMapper.responseTransactionDtoToModel(transactionDto);
-        transaction.setType(type);
-
+    public ResponseTransactionDto payment(ResponseTransactionDto responseTransactionDto) {
+        Transaction transaction = transactionMapper.responseTransactionDtoToModel(responseTransactionDto);
         Account account = transaction.getAccount();
+        Double currentBalance = account.getBalance();
 
-        if(type.equals(EType.PAYMENT))
+        if(transaction.getType() == EType.PAYMENT)
         {
-            Double currentBalance = account.getBalance();
             account.setBalance(currentBalance - transaction.getAmount());
         }
-        else if(type.equals(EType.INCOME))
+        else if(transaction.getType() == EType.INCOME)
         {
-            Double currentBalance = account.getBalance();
             account.setBalance(currentBalance + transaction.getAmount());
         }
 
         transactionRepository.save(transaction);
-        ResponseTransactionDto savedTransaction = transactionMapper.modelToResponseTransactionDto(transaction);
-
-        return savedTransaction;
+        return transactionMapper.modelToResponseTransactionDto(transaction);
     }
 
     public ResponseTransactionDto save(ResponseTransactionDto transactionDto){

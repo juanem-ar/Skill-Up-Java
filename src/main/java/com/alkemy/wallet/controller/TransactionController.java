@@ -51,7 +51,7 @@ public class TransactionController {
             })
     @PostMapping("payment")
     public ResponseEntity<ResponseTransactionDto> transactionPayment(@RequestBody @Valid ResponseTransactionDto responseTransactionDto){
-        return new ResponseEntity<>(transactionService.payment(responseTransactionDto, EType.PAYMENT), HttpStatus.CREATED);
+        return new ResponseEntity<>(transactionService.payment(responseTransactionDto), HttpStatus.CREATED);
     }
 
     @Operation(method = "POST", summary = "saveDeposit", description = "Registrar un depósito.",

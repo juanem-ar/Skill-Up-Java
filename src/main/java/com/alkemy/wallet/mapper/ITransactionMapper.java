@@ -11,7 +11,8 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ITransactionMapper   {
-    /*@Mapping(target = "idAccount", source = "account.id")
+    /*
+    @Mapping(target = "idAccount", source = "account.id")
     TransactionDtoPay  transactionToTransactionDto (Transaction transaction);
 
     @Mapping( target = "account.id",source = "idAccount")

@@ -6,7 +6,6 @@ import org.springframework.security.core.Authentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface IAccountService {
@@ -23,6 +22,4 @@ public interface IAccountService {
     Optional<Account> findById(Long id);
 
     ResponseAccountDto updateAccount(Account account, UpdateAccountDto transactionLimit, Authentication authentication);
-
-    Account getAccountByUserIdAndCurrency(Long userId, String currency);
 }

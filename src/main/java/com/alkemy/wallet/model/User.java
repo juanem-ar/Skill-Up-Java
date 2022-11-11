@@ -9,13 +9,13 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -56,12 +56,12 @@ public class User implements UserDetails {
 	
 	@Column(name = "CREATION_DATE",
 	    updatable = false)
-	@CreatedDate
+	@CreationTimestamp
 	private Timestamp creationDate;
 
 	@Column(name = "UPDATE_DATE",
 	    nullable = false)
-	@LastModifiedDate
+	@UpdateTimestamp
 	private Timestamp updateDate;
 
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

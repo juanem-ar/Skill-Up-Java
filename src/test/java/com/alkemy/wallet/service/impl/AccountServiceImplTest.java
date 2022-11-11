@@ -102,7 +102,7 @@ class AccountServiceImplTest {
 	}
 
 	@Test
-	void updateAccount_WithInvalidAccountId(){
+	void updateAccount_WithInvalidAccountId_ResourceNotFoundException(){
 
 		String token = "token";
 		Long accountId = 520L; //account doesn't exists
@@ -124,7 +124,7 @@ class AccountServiceImplTest {
 	}
 
 	@Test
-	void updateAccount_WithInvalidUser(){
+	void updateAccount_WithInvalidUser_AccessDeniedException(){
 
 		String token = "token";
 		Long accountId = 1L;

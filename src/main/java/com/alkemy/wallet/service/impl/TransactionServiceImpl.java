@@ -71,7 +71,7 @@ public class TransactionServiceImpl implements ITransactionService {
                 arsTransaction.setSenderAccountId(senderAccount.getId());
                 arsTransaction.setReceiverAccountId(receiverAccount.getId());
 
-                transactionRepository.save(transactionMapper.transactionDtoToTransaction(arsTransaction));
+                //transactionRepository.save(transactionMapper.transactionDtoToTransaction(arsTransaction));
             }
         } else {
             log.error("No balance or the amount to send is less than the transaction limit");
@@ -108,7 +108,7 @@ public class TransactionServiceImpl implements ITransactionService {
                 usdTransaction.setSenderAccountId(senderAccount.getId());
                 usdTransaction.setReceiverAccountId(receiverAccount.getId());
 
-                transactionRepository.save(transactionMapper.transactionDtoToTransaction(usdTransaction));
+                //transactionRepository.save(transactionMapper.transactionDtoToTransaction(usdTransaction));
             }
         } else {
             log.error("No balance or the amount to send is less than the transaction limit");

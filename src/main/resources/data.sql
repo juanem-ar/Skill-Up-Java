@@ -1,4 +1,4 @@
-insert into wallet.roles(id, name)
+insert into roles(id, name)
 	select 1, 'ADMIN'
 where not exists
 	(select * from roles where id = 1 and name = 'ADMIN');

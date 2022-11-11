@@ -42,7 +42,6 @@ public class Transaction {
     @CreationTimestamp
     private Timestamp transactionDate;
 
-
 }
 
 

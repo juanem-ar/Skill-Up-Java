@@ -4,6 +4,8 @@ package com.alkemy.wallet.service.impl;
 
 import com.alkemy.wallet.dto.TransactionDtoPay;
 import com.alkemy.wallet.mapper.ITransactionMapper;
+import com.alkemy.wallet.model.Account;
+import com.alkemy.wallet.model.ECurrency;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.repository.ITransactionRepository;
@@ -33,74 +35,99 @@ public class TransactionServiceImpl implements ITransactionService {
     private final ITransactionRepository transactionRepository;
     private final IUserRepository userRepository;
     private final IAccountRepository accountRepository;
-    private final ITransactionRepository iTransactionRepository;
     private final ITransactionMapper transactionMapper;
 
     @Autowired
     private IJwtUtils jwtUtils;
 
-    public String getJwt(String token){
-        String jwt = token.substring(7);
-        return jwt;
-    }
-
-    // Comentadas porque faltan funcionalidades llamadas dentro (de Account e income)
-    /*
-    public ResponseTransactionDto sendArs(String token, Long accountId, Double amount) {
-
-        Long senderId = jwtUtils.extractUserId(getJwt(token));
-
+    public TransactionDtoPay sendArs(Long senderId, Long accountId, Double amount){ // TODO: throws TransactionError
         String description = "Money transfer in ARS";
-        //Account senderAccount = accountRepository.findUsdAccountByUserId(senderId);
-        //Long receiverAccount = accountRepository.findArsAccountByUserId(accountId);
-        TransactionDtoPay transactionDtoPay = new TransactionDtoPay(amount, description, receiverId);
-        TransactionDtoPay arsTransaction = null;
+        Account senderAccount = accountRepository.getReferenceByUserIdAndCurrency(senderId, ECurrency.ARS);
+        Account receiverAccount = accountRepository.getReferenceByUserIdAndCurrency(accountId, ECurrency.ARS);
+
+        Transaction sendTransaction = new Transaction();
+        sendTransaction.setAmount(amount);
+        sendTransaction.setDescription(description);
+        sendTransaction.setAccount(senderAccount);
+
+        Transaction receiveTransaction = new Transaction();
+        receiveTransaction.setAmount(amount);
+        receiveTransaction.setDescription(description);
+        receiveTransaction.setAccount(receiverAccount);
+
+        TransactionDtoPay arsTransaction = new TransactionDtoPay();
 
         if (amount <= senderAccount.getBalance() && amount <= senderAccount.getTransactionLimit()) {
+            // TODO: senderPayment and receiverIncome try-catch and throw of TransactionError
+            ResponseTransactionDto senderPayment = payment(transactionMapper.modelToResponseTransactionDto(sendTransaction));
+            ResponseTransactionDto receiverIncome = payment(transactionMapper.modelToResponseTransactionDto(receiveTransaction));
 
-            arsTransaction = payment(transactionDtoPay);
-            //income(accountId, receiverId, amount, EType.INCOME);
-            log.info("Successful ARS transaction");
-            save(arsTransaction);
-
+            if (senderPayment != null && receiverIncome != null){
+                arsTransaction.setAmount(amount);
+                arsTransaction.setDescription(description);
+                arsTransaction.setSenderAccountId(senderAccount.getId());
+                arsTransaction.setReceiverAccountId(receiverAccount.getId());
+            }
         } else {
-            log.error("ARS transaction failed");
+            log.error("No balance or the amount to send is less than the transaction limit");
         }
-        return arsTransaction;
+        return arsTransaction; // TODO: convert to ResponseEntity (fixedtermdeposit)
     }
 
-    public ResponseTransactionDto sendUsd(String token, Long accountId, Double amount) {
-
-        Long senderId = jwtUtils.extractUserId(getJwt(token));
-
+    public TransactionDtoPay sendUsd(Long senderId, Long accountId, Double amount){ // TODO: turn into 1 send method
         String description = "Money transfer in USD";
-        // Account senderAccount = accountRepository.findUsdAccountByUserId(senderId);
-        //Long receiverAccount = accountRepository.findUsdAccountByUserId(accountId);
+        Account senderAccount = accountRepository.getReferenceByUserIdAndCurrency(senderId, ECurrency.USD);
+        Account receiverAccount = accountRepository.getReferenceByUserIdAndCurrency(accountId, ECurrency.USD);
 
-        TransactionDtoPay transactionDtoPay = new TransactionDtoPay(amount, description, receiverId);
-        TransactionDtoPay usdTransaction = null;
+        Transaction sendTransaction = new Transaction();
+        sendTransaction.setAmount(amount);
+        sendTransaction.setDescription(description);
+        sendTransaction.setAccount(senderAccount);
+
+        Transaction receiveTransaction = new Transaction();
+        receiveTransaction.setAmount(amount);
+        receiveTransaction.setDescription(description);
+        receiveTransaction.setAccount(receiverAccount);
+
+        TransactionDtoPay usdTransaction = new TransactionDtoPay();
 
         if (amount <= senderAccount.getBalance() && amount <= senderAccount.getTransactionLimit()) {
+            // TODO: senderPayment and receiverIncome try-catch and throw of TransactionError
+            ResponseTransactionDto senderPayment = payment(transactionMapper.modelToResponseTransactionDto(sendTransaction));
+            ResponseTransactionDto receiverIncome = payment(transactionMapper.modelToResponseTransactionDto(receiveTransaction));
 
-            usdTransaction = payment(transactionDtoPay);
-            //income(accountId, receiverId, amount, EType.INCOME);
-            log.info("Successful USD transaction");
-            save(usdTransaction);
-
+            if (senderPayment != null && receiverIncome != null){
+                usdTransaction.setAmount(amount);
+                usdTransaction.setDescription(description);
+                usdTransaction.setSenderAccountId(senderAccount.getId());
+                usdTransaction.setReceiverAccountId(receiverAccount.getId());
+            }
         } else {
-            log.error("USD transaction failed");
+            log.error("No balance or the amount to send is less than the transaction limit");
         }
-        return usdTransaction;
-    }*/
-    @Override
-    public TransactionDtoPay payment( TransactionDtoPay transitionDtoPay) {
-        Transaction transaction = transactionMapper.transactionDtoToTransaction(transitionDtoPay);
-        transaction.setType(EType.PAYMENT);
-        iTransactionRepository.save(transaction);
-        TransactionDtoPay  transactionDtoPay = transactionMapper.transactionToTransactionDto(transaction);
-        return transactionDtoPay;
-
+        return usdTransaction; // TODO: convert to ResponseEntity (fixedtermdeposit)
     }
+
+
+    @Override
+    public ResponseTransactionDto payment(ResponseTransactionDto responseTransactionDto) {
+        Transaction transaction = transactionMapper.responseTransactionDtoToModel(responseTransactionDto);
+        Account account = transaction.getAccount();
+        Double currentBalance = account.getBalance();
+
+        if(transaction.getType() == EType.PAYMENT)
+        {
+            account.setBalance(currentBalance - transaction.getAmount());
+        }
+        else if(transaction.getType() == EType.INCOME)
+        {
+            account.setBalance(currentBalance + transaction.getAmount());
+        }
+
+        transactionRepository.save(transaction);
+        return transactionMapper.modelToResponseTransactionDto(transaction);
+    }
+
     public ResponseTransactionDto save(ResponseTransactionDto transactionDto){
         if (transactionDto.getAmount() <= 0) {
             throw new TransactionError(ErrorEnum.DEPOSITNOTVALID.getMessage());
@@ -128,7 +155,7 @@ public class TransactionServiceImpl implements ITransactionService {
     }
     @Override
     public Optional<ResponseTransactionDto> findTransactionById(Long id, String token) throws Exception {
-        List<Transaction> transactions = iTransactionRepository.findByAccount_UserId(jwtUtils.extractUserId(token));
+        List<Transaction> transactions = transactionRepository.findByAccount_UserId(jwtUtils.extractUserId(token));
             return Optional.of(transactionMapper.modelToResponseTransactionDto(transactions.stream()
                     .filter(transaction -> transaction.getId().equals(id)).findFirst().get()));
     }
@@ -137,7 +164,7 @@ public class TransactionServiceImpl implements ITransactionService {
         Optional<ResponseTransactionDto> responseTransactionDto = findTransactionById(id, token);
             Transaction saveTransaction = transactionMapper.responseTransactionDtoToModel(responseTransactionDto.get());
             saveTransaction.setDescription(description);
-            iTransactionRepository.save(saveTransaction);
+            transactionRepository.save(saveTransaction);
             return transactionMapper.modelToResponseTransactionDto(saveTransaction);
     }
 }

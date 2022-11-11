@@ -4,6 +4,7 @@ package com.alkemy.wallet.controller;
 import com.alkemy.wallet.dto.ResponseAccountDto;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 import com.alkemy.wallet.dto.TransactionDtoPay;
+import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.impl.TransactionServiceImpl;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RequestMapping("api/v1/transactions")
@@ -41,16 +43,6 @@ public class TransactionController {
         this.jwtUtils = jwtUtils;
     }
 
-    /*
-    @PostMapping("/sendArs")
-    public ResponseEntity<ResponseTransactionDto> sendArs(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Double amount) {
-        return ResponseEntity.ok().body(transactionService.sendUsd(token,accountId,amount));
-    }
-    @PostMapping("/sendUsd")
-    public ResponseEntity<ResponseTransactionDto> sendUsd(@RequestHeader("Authorization") String token, @PathVariable Long accountId, Double amount) {
-        return ResponseEntity.ok().body(transactionService.sendUsd(token,accountId,amount));
-    }*/
-
     @Operation(method = "POST", summary = "transactionPayment", description = "Registrar un pago.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
@@ -58,8 +50,8 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("payment")
-    public ResponseEntity<TransactionDtoPay> transactionPayment(@RequestBody @Valid TransactionDtoPay transactionDtoPay){
-        return new ResponseEntity<>(transactionService.payment(transactionDtoPay), HttpStatus.CREATED);
+    public ResponseEntity<ResponseTransactionDto> transactionPayment(@RequestBody @Valid ResponseTransactionDto responseTransactionDto){
+        return new ResponseEntity<>(transactionService.payment(responseTransactionDto), HttpStatus.CREATED);
     }
 
     @Operation(method = "POST", summary = "saveDeposit", description = "Registrar un depósito.",
@@ -112,5 +104,19 @@ public class TransactionController {
                                                        @RequestHeader(name = "Authorization") String token,
                                                        @PathVariable("transactionId") Long id) throws Exception {
         return ResponseEntity.ok(transactionService.updateDescriptionFromTransaction(id, token, description.get("description")));
+    }
+
+    @PostMapping("/sendArs/{id}")
+    public ResponseEntity<TransactionDtoPay> sendArs(HttpServletRequest req, @PathVariable("id") Long accountId, Double amount) {
+        String token = req.getHeader("Authorization");
+        Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
+        return ResponseEntity.ok().body(transactionService.sendArs(senderId,accountId,amount));
+    }
+
+    @PostMapping("/sendUsd/{id}")
+    public ResponseEntity<TransactionDtoPay> sendUsd(HttpServletRequest req, @PathVariable("id") Long accountId, Double amount) {
+        String token = req.getHeader("Authorization");
+        Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
+        return ResponseEntity.ok().body(transactionService.sendUsd(senderId,accountId,amount));
     }
 }

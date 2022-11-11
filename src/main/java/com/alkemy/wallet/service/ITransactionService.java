@@ -3,7 +3,6 @@ package com.alkemy.wallet.service;
 
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 
-import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 
 import com.alkemy.wallet.dto.TransactionDtoPay;

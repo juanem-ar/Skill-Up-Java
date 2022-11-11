@@ -1,10 +1,6 @@
-package com.alkemy.wallet.repository;
+package com.alkemy.wallet.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import java.sql.Timestamp;
 import java.util.Optional;
 import javax.persistence.EntityManager;
@@ -20,13 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import com.alkemy.wallet.model.Account;
-import com.alkemy.wallet.model.ECurrency;
-import com.alkemy.wallet.model.User;
+import com.alkemy.wallet.repository.IUserRepository;
 
 @DataJpaTest
 @ActiveProfiles(profiles = {"test"})
-class IUserRepositoryTest {
+class UserTest {
   @Autowired
   private IUserRepository userRepository;
 
@@ -146,7 +140,7 @@ class IUserRepositoryTest {
     Timestamp creationDate = user.getCreationDate();
 
     user.setFirstName("nuevo first date");
-    user = testEntityManager.persist(user);
+    user = testEntityManager.persistAndFlush(user);
 
     assertNotNull(creationDate);
     assertEquals(creationDate, user.getCreationDate());
@@ -161,7 +155,7 @@ class IUserRepositoryTest {
 
     Optional<User> updateUser =
         userRepository.findById(user.getId());
-    
+
     assertNotNull(updateUser.get().getUpdateDate());
     assertNotEquals(user.getCreationDate(),
         updateUser.get().getUpdateDate());

@@ -112,7 +112,7 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public ResponseUserDto getUserDetails(Long id, String token) {
-		Long tokenUserId = jwtUtils.extractUserId(token);
+		Long tokenUserId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
 		
 		sameIdOrThrowException(id, tokenUserId);
 		
@@ -124,7 +124,7 @@ public class UserServiceImpl implements IUserService {
 		Long id,
 		PatchRequestUserDto dto,
 		String token) {
-		Long tUserId = jwtUtils.extractUserId(token);
+		Long tUserId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
 		
 		sameIdOrThrowException(id, tUserId);
 		

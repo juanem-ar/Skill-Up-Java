@@ -144,6 +144,7 @@ class UserServiceImplTest {
     Long tokenUserId = 2L;
     String token = "token";
 
+    when(jwtUtils.getJwt(token)).thenReturn(token);
     when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
 
     assertThrows(BadRequestException.class,
@@ -158,7 +159,8 @@ class UserServiceImplTest {
     String token = "token";
 
     when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
-
+    when(jwtUtils.getJwt(token)).thenReturn(token);
+    
     when(userRepository.findById(tokenUserId))
         .thenReturn(Optional.empty());
 
@@ -173,6 +175,7 @@ class UserServiceImplTest {
     Long tokenUserId = 1L;
     String token = "token";
 
+    when(jwtUtils.getJwt(token)).thenReturn(token);
     when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
 
     User user = new User();
@@ -196,6 +199,7 @@ class UserServiceImplTest {
     String token = "token";
     PatchRequestUserDto dto = new PatchRequestUserDto();
 
+    when(jwtUtils.getJwt(token)).thenReturn(token);
     when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
 
     assertThrows(BadRequestException.class,
@@ -210,6 +214,7 @@ class UserServiceImplTest {
     String token = "token";
     PatchRequestUserDto dto = new PatchRequestUserDto();
 
+    when(jwtUtils.getJwt(token)).thenReturn(token);
     when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
 
     when(userRepository.findById(tokenUserId))
@@ -227,6 +232,7 @@ class UserServiceImplTest {
     String token = "token";
     PatchRequestUserDto patchDto = new PatchRequestUserDto();
 
+    when(jwtUtils.getJwt(token)).thenReturn(token);
     when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
 
     User user = new User();

@@ -9,8 +9,9 @@ import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.IUserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import org.hibernate.Filter;
+import org.hibernate.Session;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.dto.ResponseUserDto;
@@ -20,23 +21,19 @@ import com.alkemy.wallet.dto.ResponseUsersDto;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.util.Objects;
 import java.util.Optional;
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class UserServiceImpl implements IUserService {
 
     private IUserRepository  iUserRepository;
     private JwtUtils jwtUtils;
     private IuserMapper iUserMapper;
-    private static final Integer USERSFORPAGE = 10;
-
-    @Autowired
-    public UserServiceImpl( IuserMapper iUserMapper, IUserRepository iUserRepository, JwtUtils jwtUtils) {
-        this.iUserRepository = iUserRepository;
-        this.jwtUtils = jwtUtils;
-        this.iUserMapper = iUserMapper;
-    }
+    private EntityManager entityManager;
+    private static final Integer USERS_FOR_PAGE = 10;
+    
 
     @Override
     public String deleteUser(Long id) {
@@ -51,6 +48,11 @@ public class UserServiceImpl implements IUserService {
 		Integer page, 
 		HttpServletRequest httpServletRequest) {
 		ResponseUsersDto dto = new ResponseUsersDto();
+		// activate hibernate filter
+		Session session = entityManager.unwrap(Session.class);
+		Filter filter = session.enableFilter("deletedUserFilter");
+		filter.setParameter("isDeleted", false);
+		
 		// without request parameter
 		if(page == null) {
 			dto.setUserDtos(
@@ -61,7 +63,7 @@ public class UserServiceImpl implements IUserService {
 		
 		// with request parameter
 		Page<User> users = iUserRepository.findAll(
-			PageRequest.of(page, USERSFORPAGE));
+			PageRequest.of(page, USERS_FOR_PAGE));
 		
 		if(users.isEmpty())
 			throw new BadRequestException();

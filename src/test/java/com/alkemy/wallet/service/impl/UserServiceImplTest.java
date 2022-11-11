@@ -5,20 +5,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+import javax.persistence.EntityManager;
+import org.hibernate.Filter;
+import org.hibernate.Session;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
-
 import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.dto.ResponseUsersDto;
@@ -50,6 +51,13 @@ class UserServiceImplTest {
 
 	@Mock
 	private JwtUtils jwtUtils;
+	
+	@Mock
+	private EntityManager entityManager;
+	
+	private Session session = Mockito.mock(Session.class);
+	
+	private Filter filter = Mockito.mock(Filter.class);
 
 	@InjectMocks
 	private UserServiceImpl userService;
@@ -60,6 +68,11 @@ class UserServiceImplTest {
 		List<User> users = new ArrayList<>();
 		users.add(new User());
 		users.add(new User());
+		
+		// entity manager
+		when(entityManager.unwrap(Session.class)).thenReturn(session);
+		when(session.enableFilter("deletedUserFilter")).thenReturn(filter);
+		when(filter.setParameter("isDeleted", false)).thenReturn(filter);
 
 		when(userRepository.findAll()).thenReturn(users);
 
@@ -80,6 +93,11 @@ class UserServiceImplTest {
 	@Test
 	void findAllUsers_PageIsEmpty_ThrowBadRequestException() {
 		Integer page = 9;
+		
+	      // entity manager
+        when(entityManager.unwrap(Session.class)).thenReturn(session);
+        when(session.enableFilter("deletedUserFilter")).thenReturn(filter);
+        when(filter.setParameter("isDeleted", false)).thenReturn(filter);
 
 		when(userRepository.findAll(any(Pageable.class)))
 			.thenReturn(Page.empty());

@@ -48,6 +48,7 @@ class AccountServiceImplTest {
 	void getBalance_AccountWithThreeTransactions_ExactBalance() {
 		String token = "token";
 		Long userId = 1L;
+		when(jwtUtils.getJwt(token)).thenReturn(token);
 		when(jwtUtils.extractUserId(token)).thenReturn(userId);
 
 		// three transactions

@@ -67,7 +67,7 @@ public class AccountServiceImpl implements IAccountService {
 
 	@Override
 	public ResponseUserBalanceDto getBalance(String token) {
-		Long userId = jwtUtils.extractUserId(token);
+		Long userId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
 		//User user = iUserService.getUserById(userId); TODO if foreach function is correct, delete this line
 		ResponseUserBalanceDto dto = new ResponseUserBalanceDto();
 		dto.setId(userId);

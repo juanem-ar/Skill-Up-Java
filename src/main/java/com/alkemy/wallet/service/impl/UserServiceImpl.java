@@ -27,13 +27,11 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements IUserService {
-
     private IUserRepository  iUserRepository;
     private JwtUtils jwtUtils;
     private IuserMapper iUserMapper;
     private EntityManager entityManager;
     private static final Integer USERS_FOR_PAGE = 10;
-    
 
     @Override
     public String deleteUser(Long id) {

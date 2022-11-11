@@ -9,9 +9,11 @@ import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.impl.TransactionServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,19 +31,13 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-@RequestMapping("api/v1/transactions")
+@RequestMapping("/transactions")
 @RestController
-
+@RequiredArgsConstructor
 public class TransactionController {
 
     private final TransactionServiceImpl transactionService;
     private final IJwtUtils jwtUtils;
-
-    @Autowired
-    public TransactionController(TransactionServiceImpl transactionService, IJwtUtils jwtUtils) {
-        this.transactionService = transactionService;
-        this.jwtUtils = jwtUtils;
-    }
 
     @Operation(method = "POST", summary = "transactionPayment", description = "Registrar un pago.",
             responses = {
@@ -74,9 +70,9 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @GetMapping(value = "/{userId}")
-    public ResponseEntity<Page<Transaction>> getListTransactionByAdminUser(@PageableDefault(page=0, size=10) Pageable pageable,
-                                                                           @PathVariable("userId") Long userId,
-                                                                           @RequestHeader(name = "Authorization") String token) throws Exception{
+    public ResponseEntity<Page<Transaction>> getListTransactionByAdminUser(@Parameter(name = "Paginacion", description = "Default Page = 0 , Size = 10", required = false)@PageableDefault(page=0, size=10) Pageable pageable,
+                                                                           @Parameter(name = "User Id", description = "User Id (Debe coincidir con el Usuario del Token)", example = "1", required = true)@PathVariable("userId") Long userId,
+                                                                           @Parameter(name = "Authorization", description = "Header - Autorization", example = "YOUR_ACCESS_TOKEN", required = true)@RequestHeader(name = "Authorization") String token) throws Exception{
         return ResponseEntity.ok(transactionService.findByUserId(userId, token, pageable));
     }
 
@@ -87,9 +83,9 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @GetMapping("transaction/{transactionId}")
-    public ResponseEntity<?> getTransactionByAuthUser(@PathVariable("transactionId") Long id,
-                                                      @RequestHeader(name = "Authorization") String token) throws Exception{
-        return ResponseEntity.ok(transactionService.findTransactionById(id, token));
+    public ResponseEntity<ResponseTransactionDto> getTransactionByAuthUser(@Parameter(name = "Transaction Id", description = "Id de transferencia que se desea obtener", example = "9", required = true)@PathVariable("transactionId") Long id,
+                                                                           @Parameter(name = "Authorization", description = "Header - Autorization", example = "YOUR_ACCESS_TOKEN", required = true)@RequestHeader(name = "Authorization") String token) throws Exception{
+        return ResponseEntity.ok(transactionService.findTransactionById(id, token).get());
 
     }
 
@@ -100,9 +96,9 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PatchMapping("{transactionId}")
-    public ResponseEntity<?> editTransactionByAuthUser(@RequestBody Map<Object, String> description,
-                                                       @RequestHeader(name = "Authorization") String token,
-                                                       @PathVariable("transactionId") Long id) throws Exception {
+    public ResponseEntity<ResponseTransactionDto> editTransactionByAuthUser(@Parameter(name = "Descripcion", description = "String enviado por body para modificar la descripcion", schema = @Schema(example = "{\"description\" : \"String\"}"), required = true)@RequestBody Map<Object, String> description,
+                                                                            @Parameter(name = "Authorization", description = "Header - Autorization", example = "YOUR_ACCESS_TOKEN", required = true)@RequestHeader(name = "Authorization") String token,
+                                                                            @Parameter(name = "Transaction Id", description = "Id de transferencia que se desea Modificar", example = "9", required = true)@PathVariable("transactionId") Long id) throws Exception {
         return ResponseEntity.ok(transactionService.updateDescriptionFromTransaction(id, token, description.get("description")));
     }
 

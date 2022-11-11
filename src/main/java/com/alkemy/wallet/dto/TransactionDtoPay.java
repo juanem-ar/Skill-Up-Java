@@ -13,13 +13,16 @@ import javax.validation.constraints.Size;
 @Getter
 public class TransactionDtoPay {
 
-    @DecimalMin(value = "0.01",message = "the amount bigger to number 0")
+    @DecimalMin(value = "0.01",message = "Amount must be greater than 0")
     @Schema(type = "double", example = "980.75")
     private Double amount;
 
-    @Schema(type = "string", example = "pago de servicio")
+    @Schema(type = "string", example = "Tax payment")
     private String description;
 
     @Schema(type = "long", example = "1")
-    private Long idAccount;
+    private Long senderAccountId;
+
+    @Schema(type = "long", example = "1")
+    private Long receiverAccountId;
 }

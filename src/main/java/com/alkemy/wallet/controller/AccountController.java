@@ -32,7 +32,7 @@ import com.alkemy.wallet.service.IUserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api/accounts")
+@RequestMapping("/accounts")
 @RestController
 public class AccountController {
     @Autowired

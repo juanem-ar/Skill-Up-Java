@@ -30,7 +30,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-@RequestMapping("api/v1/transactions")
+@RequestMapping("/transactions")
 @RestController
 
 public class TransactionController {

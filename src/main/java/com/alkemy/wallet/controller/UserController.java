@@ -8,8 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import com.alkemy.wallet.service.IUserService;
 
-import lombok.AllArgsConstructor;
-
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alkemy.wallet.dto.PatchRequestUserDto;
-import com.alkemy.wallet.dto.ResponseUserDto;
+import com.alkemy.wallet.dto.ResponseDetailsUserDto;
 import com.alkemy.wallet.dto.ResponseUsersDto;
 
 import javax.servlet.http.HttpServletRequest;
@@ -67,14 +65,14 @@ public class UserController {
     
     
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseUserDto> getUserDetails(
+    public ResponseEntity<ResponseDetailsUserDto> getUserDetails(
     	@RequestHeader(name = "Authorization") String token,
     	@PathVariable Long id) {
 		return ResponseEntity.ok(userService.getUserDetails(id, token));
     }
     
     @PatchMapping("/{id}")
-    public ResponseEntity<ResponseUserDto> updateUserDetails(
+    public ResponseEntity<ResponseDetailsUserDto> updateUserDetails(
     	@PathVariable Long id,
     	@RequestBody PatchRequestUserDto dto,
     	@RequestHeader(name = "Authorization") String token){

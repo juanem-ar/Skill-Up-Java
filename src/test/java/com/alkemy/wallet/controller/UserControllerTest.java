@@ -16,7 +16,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import com.alkemy.wallet.dto.PatchRequestUserDto;
-import com.alkemy.wallet.dto.ResponseUserDto;
+import com.alkemy.wallet.dto.ResponseDetailsUserDto;
 import com.alkemy.wallet.dto.ResponseUsersDto;
 import com.alkemy.wallet.service.impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -92,7 +92,7 @@ class UserControllerTest {
 		throws Exception {
 		Long userId = 1L;
 		String token = "token";
-		ResponseUserDto dto = new ResponseUserDto();
+		ResponseDetailsUserDto dto = new ResponseDetailsUserDto();
 
 		when(userService.updateUserDetails(any(), any(), any()))
 			.thenReturn(dto);

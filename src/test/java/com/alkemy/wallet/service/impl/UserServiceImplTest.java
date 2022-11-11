@@ -23,7 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import com.alkemy.wallet.dto.PatchRequestUserDto;
-import com.alkemy.wallet.dto.ResponseUserDto;
+import com.alkemy.wallet.dto.ResponseDetailsUserDto;
 import com.alkemy.wallet.dto.ResponseUsersDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.exceptions.UserNotFoundException;
@@ -84,11 +84,11 @@ class UserServiceImplTest {
 
     when(userRepository.findAll()).thenReturn(users);
 
-    List<ResponseUserDto> responseUserDtos = new ArrayList<>();
-    responseUserDtos.add(new ResponseUserDto());
-    responseUserDtos.add(new ResponseUserDto());
+    List<ResponseDetailsUserDto> responseUserDtos = new ArrayList<>();
+    responseUserDtos.add(new ResponseDetailsUserDto());
+    responseUserDtos.add(new ResponseDetailsUserDto());
 
-    when(iUserMapper.usersToResponseUserDtos(users))
+    when(iUserMapper.toResponseDetailsUserDtos(users))
         .thenReturn(responseUserDtos);
 
     ResponseUsersDto result = userService.findAllUsers(null, null);
@@ -182,10 +182,10 @@ class UserServiceImplTest {
     when(userRepository.findById(tokenUserId))
         .thenReturn(Optional.of(user));
 
-    when(iUserMapper.toResponseUserDto(user))
-        .thenReturn(new ResponseUserDto());
+    when(iUserMapper.toResponseDetailsUserDto(user))
+        .thenReturn(new ResponseDetailsUserDto());
 
-    ResponseUserDto result =
+    ResponseDetailsUserDto result =
         userService.getUserDetails(userId, token);
 
     assertNotNull(result);
@@ -244,10 +244,10 @@ class UserServiceImplTest {
 
     when(iUserMapper.updateUser(patchDto, user)).thenReturn(user);
 
-    when(iUserMapper.toResponseUserDto(user))
-        .thenReturn(new ResponseUserDto());
+    when(iUserMapper.toResponseDetailsUserDto(user))
+        .thenReturn(new ResponseDetailsUserDto());
 
-    ResponseUserDto result =
+    ResponseDetailsUserDto result =
         userService.updateUserDetails(userId, patchDto, token);
 
     assertNotNull(result);

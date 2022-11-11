@@ -26,18 +26,12 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class UserServiceImpl implements IUserService {
 
-    private IUserRepository  iUserRepository;
-    private JwtUtils jwtUtils;
-    private IuserMapper iUserMapper;
+    private final IUserRepository  iUserRepository;
+    private final JwtUtils jwtUtils;
+    private final IuserMapper iUserMapper;
     private static final Integer USERSFORPAGE = 10;
 
-    @Autowired
-    public UserServiceImpl( IuserMapper iUserMapper, IUserRepository iUserRepository, JwtUtils jwtUtils) {
-        this.iUserRepository = iUserRepository;
-        this.jwtUtils = jwtUtils;
-        this.iUserMapper = iUserMapper;
-    }
-
+	
     @Override
     public String deleteUser(Long id) {
        User userSelected = iUserRepository.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found User with number id: "+ id));

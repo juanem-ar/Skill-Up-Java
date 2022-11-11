@@ -14,8 +14,9 @@ import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IUserService;
 
-import lombok.AllArgsConstructor;
 
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -33,16 +34,16 @@ import static com.alkemy.wallet.model.ECurrency.ARS;
 import static com.alkemy.wallet.model.ECurrency.USD;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AccountServiceImpl implements IAccountService {
     public static final Double LIMIT_ARS = 300000.00;
     public static final Double LIMIT_USD = 1000.00;
-    private IAccountRepository iAccountRepository;
-    private IJwtUtils jwtUtils;
-    private IUserRepository userRepository;
-    private IUserService iUserService;
-    private ITransactionService transactionService;
-    private IAccountMapper accountMapper;
+    private final IAccountRepository iAccountRepository;
+    private final IJwtUtils jwtUtils;
+    private final IUserRepository userRepository;
+    private final IUserService iUserService;
+    private final ITransactionService transactionService;
+    private final IAccountMapper accountMapper;
     private static final Integer ACCOUNTSFORPAGE = 10;
 
 

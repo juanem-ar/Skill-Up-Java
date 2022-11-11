@@ -14,33 +14,25 @@ import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IAuthenticationService;
 import com.alkemy.wallet.service.IUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationServiceImpl implements IAuthenticationService {
 
-    private IUserRepository iUserRepository;
-    private IAccountService iAccountService;
-    private IUserService iUserService;
-    private UserMapper userMapper;
-    private JwtUtils jwtUtils;
-    private AuthenticationManager authenticationManager;
-    private PasswordEncoder passwordEncoder;
+    private final IUserRepository iUserRepository;
+    private final IAccountService iAccountService;
+    private final IUserService iUserService;
+    private final UserMapper userMapper;
+    private final JwtUtils jwtUtils;
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public AuthenticationServiceImpl( IUserService iUserService,IAccountService iAccountService, IUserRepository iUserRepository, UserMapper userMapper, JwtUtils jwtUtils,
-                                      AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
-        this.iUserRepository = iUserRepository;
-        this.iUserService = iUserService;
-        this.userMapper = userMapper;
-        this.iAccountService = iAccountService;
-        this.jwtUtils = jwtUtils;
-        this.authenticationManager = authenticationManager;
-        this.passwordEncoder = passwordEncoder;
-    }
+
     @Override
     public ResponseUserDto saveUser(ResponseUserDto dto) throws Exception {
         if (!iUserService.existsByEmail(dto.getEmail())) {

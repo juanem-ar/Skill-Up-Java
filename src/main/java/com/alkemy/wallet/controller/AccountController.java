@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,15 +33,15 @@ import com.alkemy.wallet.service.IUserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api/accounts")
+@RequestMapping("/accounts")
 @RestController
+@RequiredArgsConstructor
 public class AccountController {
-    @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
-    private IUserService iUserService;
-    @Autowired
-    private IAccountService iAccountService;
+
+    private final JwtUtils jwtUtils;
+
+    private final IUserService iUserService;
+    private final IAccountService iAccountService;
 
     @Operation(method = "GET", summary = "listAccountsByUser", description = "Listar todas las cuentas de un Usuario.",
             responses = {

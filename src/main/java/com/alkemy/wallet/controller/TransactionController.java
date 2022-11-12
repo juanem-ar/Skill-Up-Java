@@ -111,7 +111,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/sendArs")
-    public ResponseEntity<ResponseTransactionDto> sendArs(HttpServletRequest req, ResponseSendTransactionDto responseSendTransactionDto) {
+    public ResponseEntity<ResponseTransactionDto> sendArs(HttpServletRequest req, @RequestBody ResponseSendTransactionDto responseSendTransactionDto) {
         String token = req.getHeader("Authorization");
         Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
         return ResponseEntity.ok().body(transactionService.send(senderId, responseSendTransactionDto, ECurrency.ARS));
@@ -124,7 +124,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/sendUsd")
-    public ResponseEntity<ResponseTransactionDto> sendUsd(HttpServletRequest req, ResponseSendTransactionDto responseSendTransactionDto) {
+    public ResponseEntity<ResponseTransactionDto> sendUsd(HttpServletRequest req, @RequestBody ResponseSendTransactionDto responseSendTransactionDto) {
         String token = req.getHeader("Authorization");
         Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
         return ResponseEntity.ok().body(transactionService.send(senderId, responseSendTransactionDto, ECurrency.USD));

@@ -43,10 +43,9 @@ public class TransactionServiceImpl implements ITransactionService {
     @Autowired
     private IJwtUtils jwtUtils;
 
-    public ResponseTransactionDto send(Long senderId, ResponseSendTransactionDto responseSendTransactionDto, ECurrency currency) throws TransactionError{
+    public ResponseTransactionDto send(Long senderId, ResponseSendTransactionDto responseSendTransactionDto, ECurrency currency) throws TransactionError {
         Account senderAccount = accountRepository.getReferenceByUserIdAndCurrency(senderId, currency);
-        Account receiverAccount = accountRepository.getReferenceByUserIdAndCurrency(responseSendTransactionDto.getReceiverAccountId(), currency);
-
+        Account receiverAccount = accountRepository.getReferenceById(responseSendTransactionDto.getReceiverAccountId());
         String description = "Money transfer in " + currency;
 
         TransactionDtoPay sendTransaction = new TransactionDtoPay();
@@ -59,45 +58,63 @@ public class TransactionServiceImpl implements ITransactionService {
         receiveTransaction.setAmount(responseSendTransactionDto.getAmount());
         receiveTransaction.setType(EType.INCOME);
         receiveTransaction.setDescription(description);
-        receiveTransaction.setAccountId(receiverAccount.getId());
+        receiveTransaction.setAccountId(responseSendTransactionDto.getReceiverAccountId());
 
         ResponseTransactionDto transaction = new ResponseTransactionDto();
 
-        if (sendTransaction.getAmount() <= senderAccount.getBalance() && sendTransaction.getAmount() <= senderAccount.getTransactionLimit()) {
-            // TODO: senderPayment and receiverIncome try-catch and throw of TransactionError
-            payment(sendTransaction);
-            payment(receiveTransaction);
-        } else {
-            throw new TransactionError("No balance or the amount to send is less than the transaction limit");
+        if(receiverAccount != null) {
+            if (!senderId.equals(receiverAccount.getUser().getId())) {
+                if(receiverAccount.getCurrency().equals(currency)) {
+                    if (sendTransaction.getAmount() <= senderAccount.getBalance()) {
+                        if (sendTransaction.getAmount() <= senderAccount.getTransactionLimit()) {
+                            transaction = payment(sendTransaction);
+                            payment(receiveTransaction);
+                        } else {
+                            throw new TransactionError("Amount trying to send is above the transaction limit");
+                        }
+                    } else {
+                        throw new TransactionError("Insufficient balance");
+                    }
+                } else{
+                    throw new TransactionError("Trying to send money to an account that holds another currency");
+                }
+            } else {
+                throw new TransactionError("User trying to receive the money is the same as the one who's sending it");
+            }
+        }else {
+            throw new TransactionError("Receiver account doesn't exist");
         }
-        return transaction; // TODO: convert to ResponseEntity (fixedtermdeposit)
+        return transaction;
     }
 
     @Override
     public ResponseTransactionDto payment(TransactionDtoPay transactionDtoPay) {
-        Account account = accountRepository.getReferenceByUserId(transactionDtoPay.getAccountId());
+        Account account = accountRepository.getReferenceById(transactionDtoPay.getAccountId());
 
         Transaction transaction = new Transaction();
-        transaction.setAccount(account);
         transaction.setAmount(transactionDtoPay.getAmount());
         transaction.setType(transactionDtoPay.getType());
         transaction.setDescription(transactionDtoPay.getDescription());
+        transaction.setAccount(account);
         Date date = new Date();
         transaction.setTransactionDate(new Timestamp(date.getTime()));
 
         Double currentBalance = account.getBalance();
 
-        if(transaction.getType() == EType.PAYMENT)
+        if(transaction.getType().equals(EType.PAYMENT))
         {
             account.setBalance(currentBalance - transaction.getAmount());
         }
-        else if(transaction.getType() == EType.INCOME)
+        else if(transaction.getType().equals(EType.INCOME))
         {
             account.setBalance(currentBalance + transaction.getAmount());
         }
 
         transactionRepository.save(transaction);
-        return transactionMapper.modelToResponseTransactionDto(transaction);
+        accountRepository.save(account);
+
+        ResponseTransactionDto response = transactionMapper.modelToResponseTransactionDto(transaction);
+        return response;
     }
 
     public ResponseTransactionDto save(ResponseTransactionDto transactionDto){

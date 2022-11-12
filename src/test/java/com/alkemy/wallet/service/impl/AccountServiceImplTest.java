@@ -70,6 +70,7 @@ class AccountServiceImplTest {
 
 		User user = new User();
 		user.setEmail("123@mail.com");
+		user.setId(1L);
 
 		//create the target account to update
 		Account account = new Account();
@@ -91,7 +92,7 @@ class AccountServiceImplTest {
 
 		//mock the repository calls and validations
 		when(jwtUtils.getJwt(any(String.class))).thenReturn(token);
-		when(jwtUtils.extractUsername(any(String.class))).thenReturn(user.getEmail());
+		when(jwtUtils.extractUserId(any(String.class))).thenReturn(user.getId());
 		when(accountRepository.save(any(Account.class))).thenReturn(account);
 		when(accountRepository.findById(any(Long.class))).thenReturn(Optional.of(account));
 		when(accountMapper.accountToAccountDto(any(Account.class))).thenReturn(responseAccountDto);
@@ -101,7 +102,6 @@ class AccountServiceImplTest {
 
 		//assert results
 		assertNotNull(results);
-		//assertEquals(requestAccountDto.getTransactionLimit(),responseAccountDto.getTransactionLimit());
 
 	}
 
@@ -114,13 +114,14 @@ class AccountServiceImplTest {
 
 		User user = new User();
 		user.setEmail("123@mail.com");
+		user.setId(1L);
 
 		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
 		requestAccountDto.setTransactionLimit(transactionLimit);
 
 		//bypass the user validation
 		when(jwtUtils.getJwt(any(String.class))).thenReturn(token);
-		when(jwtUtils.extractUsername(any(String.class))).thenReturn("123@mail.com");
+		when(jwtUtils.extractUserId(any(String.class))).thenReturn(1L);
 
 		assertThrows(ResourceNotFoundException.class,
 				() -> accountService.updateAccount(accountId,requestAccountDto,token));
@@ -138,6 +139,7 @@ class AccountServiceImplTest {
 		User user = new User();
 		user.setId(userId);
 		user.setEmail("123@mail.com");
+		user.setId(1L);
 
 		Account account = new Account();
 		account.setId(accountId);
@@ -148,7 +150,7 @@ class AccountServiceImplTest {
 
 		when(jwtUtils.getJwt(any(String.class))).thenReturn(token);
 		//the user logged in is different to the one making the request
-		when(jwtUtils.extractUsername(any(String.class))).thenReturn("1234@mail.com");
+		when(jwtUtils.extractUserId(any(String.class))).thenReturn(2L);
 		when(accountRepository.findById(any(Long.class))).thenReturn(Optional.of(account));
 
 		assertThrows(AccessDeniedException.class,

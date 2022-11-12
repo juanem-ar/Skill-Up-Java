@@ -84,10 +84,8 @@ class AccountControllerTest {
 
 		when(accountService.findById(accountId))
 				.thenReturn(account);
-		//when(iAccountMapper.accountToAccountDto(any(Account.class))).thenReturn(responseAccountDto);
 		when(accountService.updateAccount(any(), any(), any()))
 				.thenReturn(responseAccountDto);
-
 
 		mockMvc
 				.perform(
@@ -99,8 +97,6 @@ class AccountControllerTest {
 								.param("id", String.valueOf(accountId))
 								.content(jsonRequest))
 				.andExpect(status().isOk())
-		//		.andExpect(content().contentType("application/json"))
-		//		.andExpect(jsonPath("$.transactionLimit").value(9999.0))
 				.andDo(print());
 	}
 }

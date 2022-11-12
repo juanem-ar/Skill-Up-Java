@@ -8,6 +8,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 import com.alkemy.wallet.dto.PatchRequestUserDto;
+import com.alkemy.wallet.dto.ResponseDetailsUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.model.User;
 
@@ -25,4 +26,6 @@ public interface IuserMapper {
 		PatchRequestUserDto dto,
 		@MappingTarget User target);
 
+	ResponseDetailsUserDto toResponseDetailsUserDto(User user);
+	List<ResponseDetailsUserDto> toResponseDetailsUserDtos(List<User> users);
 }

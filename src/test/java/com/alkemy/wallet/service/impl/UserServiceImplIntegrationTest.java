@@ -44,5 +44,33 @@ class UserServiceImplIntegrationTest {
 			firstName, 
 			result.getUserDtos().get(0).getFirstName());
 	}
+	
+	@Test
+	@Transactional
+	void findAllUsers_DataBaseWithTwoUserButOneDeleted_ReturnAListWithOneDto() {
+	  userRepository.deleteAll();
+	  
+	  // create two users
+	  User user1 = new User();
+	  user1.setFirstName("one");
+	  user1.setLastName("one");
+	  user1.setEmail("one@email.com");
+	  user1.setPassword("one password");
+	  userRepository.save(user1);
+	  
+	  User user2 = new User();
+      user2.setFirstName("two");
+      user2.setLastName("two");
+      user2.setEmail("two@email.com");
+      user2.setPassword("two password");
+      userRepository.save(user2);
+      
+	  // delete one user
+      userRepository.delete(user1);
+	  
+	  ResponseUsersDto result = userService.findAllUsers(null, null);
+	  
+	  assertEquals(1, result.getUserDtos().size());
+	}
 
 }

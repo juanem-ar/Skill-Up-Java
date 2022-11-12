@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import com.alkemy.wallet.dto.UpdateAccountDto;
 import com.alkemy.wallet.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +37,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/accounts")
 @RestController
+@RequiredArgsConstructor
 public class AccountController {
-    @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
-    private IUserService iUserService;
-    @Autowired
-    private IAccountService iAccountService;
+
+    private final JwtUtils jwtUtils;
+
+    private final IUserService iUserService;
+    private final IAccountService iAccountService;
 
     @Operation(method = "GET", summary = "listAccountsByUser", description = "Listar todas las cuentas de un Usuario.",
             responses = {

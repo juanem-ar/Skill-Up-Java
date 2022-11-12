@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseUsersDto {
-	List<ResponseUserDto> userDtos;
+	List<ResponseDetailsUserDto> userDtos;
 	String previousPage;
 	String nextPage;
 }

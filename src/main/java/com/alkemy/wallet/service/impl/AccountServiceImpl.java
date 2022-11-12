@@ -4,6 +4,7 @@ import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.exceptions.ResourceNotFoundException;
 import com.alkemy.wallet.mapper.IAccountMapper;
+import com.alkemy.wallet.mapper.IFixedTermDepositMapper;
 import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.ECurrency;
 import com.alkemy.wallet.model.User;
@@ -11,18 +12,15 @@ import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.IAccountService;
+import com.alkemy.wallet.service.IFixedDepositService;
 import com.alkemy.wallet.service.IUserService;
-
 import lombok.AllArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import com.alkemy.wallet.model.EType;
-import com.alkemy.wallet.model.Transaction;
-import com.alkemy.wallet.service.ITransactionService;
+import com.alkemy.wallet.model.FixedTermDeposit;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -35,13 +33,14 @@ import static com.alkemy.wallet.model.ECurrency.USD;
 public class AccountServiceImpl implements IAccountService {
     public static final Double LIMIT_ARS = 300000.00;
     public static final Double LIMIT_USD = 1000.00;
-    private IAccountRepository iAccountRepository;
-    private IJwtUtils jwtUtils;
-    private IUserRepository userRepository;
-    private IUserService iUserService;
-    private ITransactionService transactionService;
-    private IAccountMapper accountMapper;
+    private final IAccountRepository iAccountRepository;
+    private final IJwtUtils jwtUtils;
+    private final IUserRepository userRepository;
+    private final IUserService iUserService;
+    private final IAccountMapper accountMapper;
     private static final Integer ACCOUNTSFORPAGE = 10;
+    private IFixedDepositService fixedDepositService;
+    private IFixedTermDepositMapper fixedTermDepositMapper;
 
 
     @Override
@@ -67,33 +66,32 @@ public class AccountServiceImpl implements IAccountService {
 
 	@Override
 	public ResponseUserBalanceDto getBalance(String token) {
-		Long userId = jwtUtils.extractUserId(token);
+		Long userId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
 		//User user = iUserService.getUserById(userId); TODO if foreach function is correct, delete this line
 		ResponseUserBalanceDto dto = new ResponseUserBalanceDto();
+		
 		dto.setId(userId);
+		
 		for(Account account : iAccountRepository.findAllByUserId(userId)) {
-			AccountBalanceDto balanceDto = accountMapper.accountToBalanceDto(account);
-			balanceDto.setBalance(
-				calcularBalance(
-					account.getBalance(),
-					transactionService.findAllTransactionsWith(account.getId())));
-			dto.getAccountBalanceDtos().add(balanceDto);
+		  AccountBalanceDto balanceDto = accountMapper.accountToBalanceDto(account);
+		  
+		  Double allDeposit = .0;
+		  for(FixedTermDeposit deposit: fixedDepositService.findAllBy(account)) {
+		    dto.getDepositDtos()
+		      .add(fixedTermDepositMapper.toResponseFixedDepositDto(deposit));
+		    
+		    allDeposit += deposit.getAmount();
+		  }
+		  
+		  balanceDto.setBalance(balanceDto.getBalance() - allDeposit);
+		  
+          dto.getAccountBalanceDtos()
+            .add(balanceDto);
+      
 		}
 		return dto;
 	}
 
-	private Double calcularBalance(
-		Double balanceBase, List<Transaction> transactions) {
-		Double b = balanceBase;
-		for(Transaction transaction : transactions) {
-			if(transaction.getType() == EType.DEPOSIT
-				|| transaction.getType() == EType.INCOME)
-				b += transaction.getAmount();
-			else if(transaction.getType() == EType.PAYMENT)
-				b -= transaction.getAmount();
-		}
-		return b;
-	}
 
     @Override
     public String addAccount(String email, CurrencyDto currency) throws Exception {

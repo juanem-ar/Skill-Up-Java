@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class ResponseSimulateFixedDepositDto {
+public class ResponseSimulatedFixedDepositDto {
 
     @NotNull(message = "Invalid amount.")
     private Double amount;

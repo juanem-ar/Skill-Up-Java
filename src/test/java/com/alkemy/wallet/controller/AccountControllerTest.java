@@ -1,14 +1,25 @@
 package com.alkemy.wallet.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.alkemy.wallet.dto.ResponseAccountDto;
+import com.alkemy.wallet.dto.ResponseUserDto;
+import com.alkemy.wallet.dto.UpdateAccountDto;
+import com.alkemy.wallet.model.Account;
+import io.swagger.v3.core.util.Json;
+import net.minidev.json.JSONUtil;
+import nonapi.io.github.classgraph.json.JSONUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -17,6 +28,10 @@ import com.alkemy.wallet.mapper.IAccountMapper;
 import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IUserService;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import java.util.ArrayList;
 
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = { AccountController.class })
@@ -55,4 +70,33 @@ class AccountControllerTest {
 			.andExpect(status().isOk());
 	}
 
+	@Test
+	void updateAccount_PatchRequest_ResponseAccountDto() throws Exception {
+		String token = "token";
+		long accountId = 60;
+		Account account = new Account();
+		account.setTransactionLimit(100.0);
+		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
+		ResponseAccountDto responseAccountDto = new ResponseAccountDto();
+		requestAccountDto.setTransactionLimit(9999.0);
+		String jsonRequest = Json.pretty(requestAccountDto);
+
+
+		when(accountService.findById(accountId))
+				.thenReturn(account);
+		when(accountService.updateAccount(any(), any(), any()))
+				.thenReturn(responseAccountDto);
+
+		mockMvc
+				.perform(
+						patch(uri + '/' + accountId)
+								.header("authorization", "Bearer " + token)
+								.contentType(MediaType.APPLICATION_JSON_VALUE)
+								.accept(MediaType.APPLICATION_JSON)
+								.characterEncoding("utf-8")
+								.param("id", String.valueOf(accountId))
+								.content(jsonRequest))
+				.andExpect(status().isOk())
+				.andDo(print());
+	}
 }

@@ -3,7 +3,6 @@ package com.alkemy.wallet.service.impl;
 import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.exceptions.ResourceNotFoundException;
-import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.mapper.IAccountMapper;
 import com.alkemy.wallet.mapper.IFixedTermDepositMapper;
 import com.alkemy.wallet.model.Account;
@@ -19,13 +18,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.model.FixedTermDeposit;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Optional;
 
 import static com.alkemy.wallet.model.ECurrency.ARS;
 import static com.alkemy.wallet.model.ECurrency.USD;
@@ -46,19 +44,22 @@ public class AccountServiceImpl implements IAccountService {
 
 
     @Override
-    public List<ResponseAccountDto> findAllByUser(Long id)  {
-        User user = iUserService.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found User with number id: "+ id));
-        //return accountMapper.accountsToAccountsDto(user.getAccounts()); TODO if findAll function is correct, delete this line
+    public List<ResponseAccountDto> findAllByUser(Long id) throws ResourceNotFoundException {
+        User user = iUserService.findById(id).orElseThrow(()-> new ResourceNotFoundException("Not found User with number id: "+ id));
         return accountMapper.accountsToAccountsDto(iAccountRepository.findAllByUserId(user.getId()));
     }
 
     @Override
-    public Optional<Account> findById(Long id) {
-        return iAccountRepository.findById(id);
+    public Account findById(Long id) throws ResourceNotFoundException {
+        return iAccountRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Not found Account with number id: "+ id));
     }
 
     @Override
-    public ResponseAccountDto updateAccount(Account account, UpdateAccountDto requestAccount, Authentication authentication){
+    public ResponseAccountDto updateAccount(Long accountId, UpdateAccountDto requestAccount, String token) throws ResourceNotFoundException {
+        Long userId =  jwtUtils.extractUserId(jwtUtils.getJwt(token));
+        Account account = this.findById(accountId);
+        if (!account.getUser().getId().equals(userId))
+                throw new AccessDeniedException("You don't have permission to access this resource");
         account.setTransactionLimit(requestAccount.getTransactionLimit());
         return accountMapper.accountToAccountDto(iAccountRepository.save(account));
     }

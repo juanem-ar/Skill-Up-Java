@@ -52,7 +52,6 @@ public class AccountController {
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
-    @Secured(value = { "ROLE_ADMIN" })
     @GetMapping("{id}")
     public ResponseEntity<List<ResponseAccountDto>> listAccountsByUser(@PathVariable Long id) throws ResourceNotFoundException {
         return new ResponseEntity<>(iAccountService.findAllByUser(id), HttpStatus.OK);
@@ -83,9 +82,9 @@ public class AccountController {
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
-    @Secured(value = { "ROLE_USER" })
     @PatchMapping("{id}")
-    public ResponseEntity<Object> updateAccount(@PathVariable Long id, @RequestHeader(name = "Authorization") String token, @RequestBody UpdateAccountDto requestAccountDto) throws ResourceNotFoundException {
+    public ResponseEntity<Object> updateAccount(@PathVariable Long id, HttpServletRequest req, @RequestBody UpdateAccountDto requestAccountDto) throws ResourceNotFoundException {
+        String token = req.getHeader("Authorization");
         return new ResponseEntity<>(iAccountService.updateAccount(id,requestAccountDto,token), HttpStatus.OK);
     }
 

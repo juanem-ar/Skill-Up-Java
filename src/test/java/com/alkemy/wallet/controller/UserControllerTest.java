@@ -37,7 +37,7 @@ class UserControllerTest {
 
 
 	@Test
-	@WithMockUser(authorities = {"ADMIN"})
+	@WithMockUser(roles = {"ADMIN"})
 	void findAllUsers_GetRequestWithoutRequestParameter_ResponseOk() throws Exception {
 		when(userService.findAllUsers(any(), any()))
 			.thenReturn(new ResponseUsersDto());
@@ -57,7 +57,7 @@ class UserControllerTest {
 
 
 	@Test
-	@WithMockUser(authorities = {"ADMIN"})
+	@WithMockUser(roles = {"ADMIN"})
 	void findAllUsers_GetRequestWithRequestParameter_ResponseOk() throws Exception {
 		when(userService.findAllUsers(any(), any()))
 			.thenReturn(new ResponseUsersDto());
@@ -72,7 +72,7 @@ class UserControllerTest {
 
 
 	@Test
-	@WithMockUser(authorities = {"USER"})
+	@WithMockUser(roles = {"USER"})
 	void getUserDetails_GetRequestWithUriWithVariable_ResponseOk()
 		throws Exception {
 		Long userId = 1L;
@@ -87,7 +87,7 @@ class UserControllerTest {
 
 
 	@Test
-    @WithMockUser(authorities = {"USER"})
+    @WithMockUser(roles = {"USER"})
 	void updateUserDetails_PatchRequestWithBodyAndUriWithId_ResponseOk()
 		throws Exception {
 		Long userId = 1L;

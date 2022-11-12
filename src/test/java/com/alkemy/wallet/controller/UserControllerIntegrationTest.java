@@ -11,15 +11,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false) // WARNING : without filters
+@AutoConfigureMockMvc // (addFilters = false) // WARNING : without filters
 class UserControllerIntegrationTest {
   @Autowired
   private MockMvc mockMvc;
-  
+
+  private String uri = "/users";
+
   // add repository ...
 
   @BeforeAll
@@ -37,15 +40,30 @@ class UserControllerIntegrationTest {
   @Test
   void endpointName_status_expectedResult() throws Exception {
     // change status, add info to database
-    
+
     // do the request with headers and body
-    String uri = "";
-    MvcResult result = mockMvc.perform(get(uri)).andExpect(status().isOk()).andReturn();
-    
+    MvcResult result = mockMvc.perform(get(uri))
+        .andExpect(status().isUnauthorized()).andReturn();
+
     // check result
     assertNotNull(result);
-    
-    fail("Not yet implemented");
+  }
+
+  @Test
+  void user_NoAuthenticaded_Unauthorized() throws Exception {
+    mockMvc.perform(get(uri)).andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @WithMockUser(roles = {"USER"})
+  void user_WithRoleUser_Forbidden() throws Exception {
+    mockMvc.perform(get(uri)).andExpect(status().isForbidden());
+  }
+
+  @Test
+  @WithMockUser(roles = {"ADMIN"})
+  void user_WithRoleUser_Ok() throws Exception {
+    mockMvc.perform(get(uri)).andExpect(status().isOk());
   }
 
 }

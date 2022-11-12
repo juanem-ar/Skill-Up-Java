@@ -14,5 +14,8 @@ public class ResponseUserBalanceDto {
 
 	private List<AccountBalanceDto> accountBalanceDtos =
 		new ArrayList<>();
+	
+	private List<ResponseFixedDepositDto> depositDtos =
+        new ArrayList<>();
 
 }

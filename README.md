@@ -140,3 +140,25 @@ GET /accounts?page=1
     "nextpage": "http://localhost:8080/accounts?page=2"
 }
 ```
+
+#### SEND ARS
+
+POST  /transactions/sendArs
+
+```
+{
+    "amount": 350.0,
+    "receiverAccountId": 3
+}
+```
+
+#### SEND USD
+
+POST  /transactions/sendUsd
+
+```
+{
+    "amount": 350.0,
+    "receiverAccountId": 4
+}
+```

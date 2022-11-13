@@ -1,5 +1,6 @@
 package com.alkemy.wallet.mapper;
 
+import com.alkemy.wallet.dto.RequestUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IAccountRepository;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class UserMapper {
     @Autowired
     private IAccountRepository iAccountRepository;
-    public User toEntity(ResponseUserDto dto) {
+    public User toEntity(RequestUserDto dto) {
         User userEntity = new User();
         userEntity.setFirstName(dto.getFirstName());
         userEntity.setLastName(dto.getLastName());
@@ -19,9 +20,6 @@ public class UserMapper {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         userEntity.setPassword(passwordEncoder.encode(dto.getPassword()));
         userEntity.setRole(dto.getRole());
-        userEntity.setUpdateDate(dto.getUpdateDate());
-        userEntity.setCreationDate(dto.getCreationDate());
-        userEntity.setDeleted(dto.getDeleted());
         return userEntity;
     }
     public ResponseUserDto toDto(User entity) {

@@ -2,23 +2,24 @@ package com.alkemy.wallet.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 public class ResponseAccountDto {
 
     @JsonProperty("id")
-    @Schema(type = "long", example = "1")
-    private Long id;
+    @Schema(type = "double", example = "1")
+    private int id;
 
     @JsonProperty("balance")
     @Schema(type = "double", example = "100.5")
     private Double balance;
 
     @JsonProperty("currency")
-    @Schema(type = "String", example = "USD")
+    @Schema(type = "double", example = "USD")
     private String currency;
 
     @JsonProperty("creationDate")
@@ -28,6 +29,6 @@ public class ResponseAccountDto {
     private String updateDate;
 
     @JsonProperty("transactionLimit")
-    @Schema(type = "double", example = "1000.0")
+    @Schema(type = "double", example = "1000")
     private Double transactionLimit;
 }

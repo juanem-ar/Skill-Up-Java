@@ -162,3 +162,13 @@ POST  /transactions/sendUsd
     "receiverAccountId": 4
 }
 ```
+
+#### EDIT TRANSACTION
+
+POST  /transactions/transaction/{transactionId}
+
+```
+{
+    "description": "example description",
+}
+```

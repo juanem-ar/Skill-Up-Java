@@ -97,3 +97,46 @@ POST  /fixedDeposit/simulate
 }
 ```
 
+#### CREATE A DEPOSIT
+
+POST  /transactions/deposit
+
+```
+{
+    "amount": "100.00",
+    "description": "Deposito" ,
+    "accountId" : 1
+}
+```
+
+#### GET ACCOUNTS BY ADMIN USER
+
+GET  /accounts
+
+GET /accounts?page=1
+
+```
+{
+    "accountsDto": [
+        {
+            "id": 11,
+            "balance": 12.0,
+            "currency": "ARS",
+            "creationDate": "2022-11-13T12:14:08.91228",
+            "updateDate": "2022-11-13T12:14:08.91228",
+            "transactionLimit": 300000.0
+        },
+        {...},
+        {
+            "id": 20,
+            "balance": 74.0,
+            "currency": "ARS",
+            "creationDate": "2022-11-13T12:14:08.91228",
+            "updateDate": "2022-11-13T12:14:08.91228",
+            "transactionLimit": 300000.0
+        }
+    ],
+    "previousPage": "http://localhost:8080/accounts?page=0",
+    "nextpage": "http://localhost:8080/accounts?page=2"
+}
+```

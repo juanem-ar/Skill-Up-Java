@@ -2,6 +2,7 @@ package com.alkemy.wallet.service.impl;
 
 
 
+import com.alkemy.wallet.dto.AccountBalanceDto;
 import com.alkemy.wallet.dto.ResponseSendTransactionDto;
 import com.alkemy.wallet.dto.TransactionDtoPay;
 import com.alkemy.wallet.mapper.ITransactionMapper;
@@ -123,8 +124,16 @@ public class TransactionServiceImpl implements ITransactionService {
         if (transactionDto.getAmount() <= 0) {
             throw new TransactionError(ErrorEnum.DEPOSITNOTVALID.getMessage());
         }
+        Account account = accountRepository.getReferenceById(transactionDto.getAccountId());
         transactionDto.setType(EType.DEPOSIT);
+
+        Double currentBalance = account.getBalance();
+        account.setBalance(currentBalance + transactionDto.getAmount());
+
+        transactionDto.setAccount(new AccountBalanceDto(account.getId(),account.getCurrency(), account.getBalance()));
+
         Transaction entity = transactionMapper.responseTransactionDtoToModel(transactionDto);
+
         Transaction entitySaved = transactionRepository.save(entity);
         return transactionMapper.modelToResponseTransactionDto(entitySaved);
     }

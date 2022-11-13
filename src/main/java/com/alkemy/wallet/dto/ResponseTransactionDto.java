@@ -33,7 +33,7 @@ public class ResponseTransactionDto {
 
     @Schema(type = "long", example = "1")
     private Long accountId;
-    private Account account;
+    private AccountBalanceDto account;
     private Timestamp transactionDate;
 
 

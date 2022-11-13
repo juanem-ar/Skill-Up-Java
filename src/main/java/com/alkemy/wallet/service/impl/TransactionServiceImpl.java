@@ -11,7 +11,6 @@ import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.repository.ITransactionRepository;
 import com.alkemy.wallet.repository.IAccountRepository;
-import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.ITransactionService;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,6 @@ import java.util.Optional;
 public class TransactionServiceImpl implements ITransactionService {
 
     private final ITransactionRepository transactionRepository;
-    private final IUserRepository userRepository;
     private final IAccountRepository accountRepository;
     private final ITransactionMapper transactionMapper;
 
@@ -52,7 +50,7 @@ public class TransactionServiceImpl implements ITransactionService {
         sendTransaction.setAmount(responseSendTransactionDto.getAmount());
         sendTransaction.setType(EType.PAYMENT);
         sendTransaction.setDescription(description);
-        sendTransaction.setAccountId(senderId);
+        sendTransaction.setAccountId(senderAccount.getId());
 
         TransactionDtoPay receiveTransaction = new TransactionDtoPay();
         receiveTransaction.setAmount(responseSendTransactionDto.getAmount());
@@ -63,27 +61,34 @@ public class TransactionServiceImpl implements ITransactionService {
         ResponseTransactionDto transaction = new ResponseTransactionDto();
 
         if(receiverAccount != null) {
-            if (!senderId.equals(receiverAccount.getUser().getId())) {
-                if(receiverAccount.getCurrency().equals(currency)) {
-                    if (sendTransaction.getAmount() <= senderAccount.getBalance()) {
-                        if (sendTransaction.getAmount() <= senderAccount.getTransactionLimit()) {
-                            transaction = payment(sendTransaction);
-                            payment(receiveTransaction);
+            if (senderId != receiverAccount.getUser().getId()) {
+                if (senderAccount.getId() != receiverAccount.getId()) {
+                    if (receiverAccount.getCurrency().equals(currency)) {
+                        if (sendTransaction.getAmount() <= senderAccount.getBalance()) {
+                            if (sendTransaction.getAmount() <= senderAccount.getTransactionLimit()) {
+
+                                transaction = payment(sendTransaction);
+                                payment(receiveTransaction);
+
+                            } else {
+                                throw new TransactionError("Amount trying to send is above the transaction limit");
+                            }
                         } else {
-                            throw new TransactionError("Amount trying to send is above the transaction limit");
+                            throw new TransactionError("Insufficient balance");
                         }
                     } else {
-                        throw new TransactionError("Insufficient balance");
+                        throw new TransactionError("Trying to send money to an account that holds another currency");
                     }
-                } else{
-                    throw new TransactionError("Trying to send money to an account that holds another currency");
+                } else {
+                    throw new TransactionError("Account trying to receive the money is the same as the one who's sending it");
                 }
             } else {
                 throw new TransactionError("User trying to receive the money is the same as the one who's sending it");
             }
-        }else {
+        } else {
             throw new TransactionError("Receiver account doesn't exist");
         }
+
         return transaction;
     }
 

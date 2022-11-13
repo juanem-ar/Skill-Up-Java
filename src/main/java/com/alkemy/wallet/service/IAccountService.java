@@ -1,7 +1,6 @@
 package com.alkemy.wallet.service;
 
 import com.alkemy.wallet.dto.*;
-import com.alkemy.wallet.exceptions.ResourceNotFoundException;
 import com.alkemy.wallet.model.Account;
 import org.springframework.security.core.Authentication;
 
@@ -16,11 +15,11 @@ public interface IAccountService {
 
     Account createAccount(CurrencyDto currency);
 
-    List<ResponseAccountDto> findAllByUser(Long id) throws ResourceNotFoundException;
+    List<ResponseAccountDto> findAllByUser(Long id);
 
     ResponseAccountsDto findAll(Integer page, HttpServletRequest httpServletRequest);
 
-    Account findById(Long id) throws ResourceNotFoundException;
+    Optional<Account> findById(Long id);
 
-    ResponseAccountDto updateAccount(Long id, UpdateAccountDto transactionLimit, String token) throws ResourceNotFoundException;
+    ResponseAccountDto updateAccount(Account account, UpdateAccountDto transactionLimit, Authentication authentication);
 }

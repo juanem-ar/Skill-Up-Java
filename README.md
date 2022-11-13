@@ -52,3 +52,48 @@ On the root folder run:
 ```
 mvn spring-boot:run
 ```
+
+### POSTMAN REQUESTS
+
+#### CREATE USER - USER OR ADMIN
+- proceed to login and return JWT Access token -
+
+POST  /auth/register
+
+```
+{
+      "firstName":"Juan",
+      "lastName":"Perez",
+      "email":"juanPerez@hotmail.com", // email format valid 
+      "password":"12345678", // min = 8
+      "role":{
+            "name":"USER", // or "ADMIN"
+            "description":"description user"
+      }
+}
+```
+
+#### LOGIN
+
+POST  /auth/login
+
+```
+{
+      "email":"juanPerez@hotmail.com", // email exists validation
+      "password":"12345678" // min = 8 and verify password to database (encoded)
+}
+```
+
+#### CREATE OR SILMULATE FIXED DEPOSIT
+
+POST  /fixedDeposit
+POST  /fixedDeposit/simulate
+
+```
+{
+      "amount" : 5040, // blance account > 0
+      "currency":"ARS", // or "USD"
+      "period" :60 // min = 30
+}
+```
+

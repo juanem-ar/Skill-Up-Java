@@ -160,7 +160,7 @@ class UserServiceImplTest {
 
     when(jwtUtils.extractUserId(token)).thenReturn(tokenUserId);
     when(jwtUtils.getJwt(token)).thenReturn(token);
-    
+
     when(userRepository.findById(tokenUserId))
         .thenReturn(Optional.empty());
 

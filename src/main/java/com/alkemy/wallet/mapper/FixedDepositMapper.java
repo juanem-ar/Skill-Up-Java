@@ -1,7 +1,7 @@
 package com.alkemy.wallet.mapper;
 
 import com.alkemy.wallet.dto.FixedDepositDto;
-import com.alkemy.wallet.dto.ResponseSimulateFixedDepositDto;
+import com.alkemy.wallet.dto.ResponseSimulatedFixedDepositDto;
 import com.alkemy.wallet.model.FixedTermDeposit;
 import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
@@ -20,10 +20,10 @@ public class FixedDepositMapper {
         entity.setClosingDate(Timestamp.from(new Timestamp(System.currentTimeMillis()).toInstant().plus(dto.getPeriod(), ChronoUnit.DAYS)));
         return entity;
     }
-    public ResponseSimulateFixedDepositDto toSimulateFixedDeposit(FixedDepositDto dto){
+    public ResponseSimulatedFixedDepositDto toSimulateFixedDeposit(FixedDepositDto dto){
         Double amount = dto.getAmount();
         Double interest = (dto.getPeriod() * 0.005)*dto.getAmount();
-        ResponseSimulateFixedDepositDto simulated = new ResponseSimulateFixedDepositDto();
+        ResponseSimulatedFixedDepositDto simulated = new ResponseSimulatedFixedDepositDto();
         simulated.setAmount(amount);
         simulated.setCurrency(dto.getCurrency());
         simulated.setPeriod(dto.getPeriod());

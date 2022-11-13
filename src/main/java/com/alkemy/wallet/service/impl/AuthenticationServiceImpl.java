@@ -1,6 +1,7 @@
 package com.alkemy.wallet.service.impl;
 
 import com.alkemy.wallet.dto.CurrencyDto;
+import com.alkemy.wallet.dto.RequestUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.mapper.UserMapper;
@@ -15,8 +16,6 @@ import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IAuthenticationService;
 import com.alkemy.wallet.service.IUserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -29,12 +28,11 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final IUserService iUserService;
     private final UserMapper userMapper;
     private final JwtUtils jwtUtils;
-    private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
 
 
     @Override
-    public ResponseUserDto saveUser(ResponseUserDto dto) throws Exception {
+    public ResponseUserDto saveUser(RequestUserDto dto) throws Exception {
         if (!iUserService.existsByEmail(dto.getEmail())) {
             if(dto.getPassword().isEmpty())
                 throw new BadRequestException("The Password is empty!");

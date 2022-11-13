@@ -129,4 +129,18 @@ class FixedTermDepositCreationControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    public void createFixedDeposit_NoPeriodSpecified_ResponseBadRequest() throws Exception{
+        String token = jwtUtils.generateToken(
+                new org.springframework.security.core.userdetails.User("a@gmail.com", "00000000", new ArrayList<>()));
+
+        dto.setPeriod(null);
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(uri)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
+                                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+    }
 }

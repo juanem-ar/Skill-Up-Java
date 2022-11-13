@@ -1,16 +1,8 @@
 package com.alkemy.wallet.service.impl;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import com.alkemy.wallet.dto.ResponseAccountDto;
-import com.alkemy.wallet.dto.UpdateAccountDto;
-import com.alkemy.wallet.exceptions.ResourceNotFoundException;
-import com.alkemy.wallet.model.*;
-import com.alkemy.wallet.repository.IUserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,15 +20,11 @@ import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.IFixedDepositService;
 import com.alkemy.wallet.service.ITransactionService;
 import com.alkemy.wallet.service.IUserService;
-import org.springframework.security.access.AccessDeniedException;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceImplTest {
 	@Mock
-	private IAccountRepository accountRepository;
-
-	@Mock
-	private IUserRepository userRepository;
+	private IAccountRepository AccountRepository;
 
 	@Mock
 	private IUserService userService;
@@ -49,114 +37,16 @@ class AccountServiceImplTest {
 
 	@Mock
 	private IAccountMapper accountMapper;
-
+	
 	@Mock
 	private IFixedDepositService fixedDepositService;
-
+	
 	@Mock
 	private IFixedTermDepositMapper fixedTermDepositMapper;
 
 	@InjectMocks
 	private AccountServiceImpl accountService;
 
-	@Test
-	void updateAccount_UpdateAccountDto_ResponseAccountDto()
-			throws ResourceNotFoundException {
-
-		String token = "token";
-		Long userId = 1L;
-		Long accountId = 2L;
-		Double transactionLimit = 9999.0 ;
-
-		User user = new User();
-		user.setEmail("123@mail.com");
-		user.setId(1L);
-
-		//create the target account to update
-		Account account = new Account();
-		account.setId(accountId);
-		account.setTransactionLimit(1000.0);
-		account.setUser(user);
-		account.setCurrency(ECurrency.USD);
-		account.setCreationDate(LocalDateTime.now());
-		account.setUpdateDate(LocalDateTime.now());
-		account.setBalance(0.0);
-		account.setDeleted(false);
-
-		//create the request object
-		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
-		requestAccountDto.setTransactionLimit(transactionLimit);
-
-		//create the response object
-		ResponseAccountDto responseAccountDto = new ResponseAccountDto();
-
-		//mock the repository calls and validations
-		when(jwtUtils.getJwt(any(String.class))).thenReturn(token);
-		when(jwtUtils.extractUserId(any(String.class))).thenReturn(user.getId());
-		when(accountRepository.save(any(Account.class))).thenReturn(account);
-		when(accountRepository.findById(any(Long.class))).thenReturn(Optional.of(account));
-		when(accountMapper.accountToAccountDto(any(Account.class))).thenReturn(responseAccountDto);
-
-		//get the result
-		ResponseAccountDto results = accountService.updateAccount(account.getId(),requestAccountDto,token);
-
-		//assert results
-		assertNotNull(results);
-
-	}
-
-	@Test
-	void updateAccount_WithInvalidAccountId_ResourceNotFoundException(){
-
-		String token = "token";
-		Long accountId = 520L; //account doesn't exists
-		Double transactionLimit = 9999.0 ;
-
-		User user = new User();
-		user.setEmail("123@mail.com");
-		user.setId(1L);
-
-		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
-		requestAccountDto.setTransactionLimit(transactionLimit);
-
-		//bypass the user validation
-		when(jwtUtils.getJwt(any(String.class))).thenReturn(token);
-		when(jwtUtils.extractUserId(any(String.class))).thenReturn(1L);
-
-		assertThrows(ResourceNotFoundException.class,
-				() -> accountService.updateAccount(accountId,requestAccountDto,token));
-
-	}
-
-	@Test
-	void updateAccount_WithInvalidUser_AccessDeniedException(){
-
-		String token = "token";
-		Long accountId = 1L;
-		Long userId = 500L;
-		Double transactionLimit = 9999.0 ;
-
-		User user = new User();
-		user.setId(userId);
-		user.setEmail("123@mail.com");
-		user.setId(1L);
-
-		Account account = new Account();
-		account.setId(accountId);
-		account.setUser(user);
-
-		UpdateAccountDto requestAccountDto = new UpdateAccountDto();
-		requestAccountDto.setTransactionLimit(transactionLimit);
-
-		when(jwtUtils.getJwt(any(String.class))).thenReturn(token);
-		//the user logged in is different to the one making the request
-		when(jwtUtils.extractUserId(any(String.class))).thenReturn(2L);
-		when(accountRepository.findById(any(Long.class))).thenReturn(Optional.of(account));
-
-		assertThrows(AccessDeniedException.class,
-				() -> accountService.updateAccount(accountId,requestAccountDto,token));
-
-	}
 
 	@Test
 	void getBalance_AccountWithThreeTransactions_ExactBalance() {
@@ -180,18 +70,18 @@ class AccountServiceImplTest {
 		AccountBalanceDto balanceDto =
 			new AccountBalanceDto(accountId, null, balanceBase);
 
-		when(accountRepository.findAllByUserId(userId))
+		when(AccountRepository.findAllByUserId(userId))
           .thenReturn(List.of(account));
-
+		
 		when(accountMapper.accountToBalanceDto(account))
 			.thenReturn(balanceDto);
 
 		when(fixedDepositService.findAllBy(account))
 		  .thenReturn(List.of(fixedTermDeposit));
-
+		
 		when(fixedTermDepositMapper.toResponseFixedDepositDto(fixedTermDeposit))
 		  .thenReturn(depositDto);
-
+		
 		Double balanceFinal = balanceBase - ammountDeposit;
 
 		ResponseUserBalanceDto result =
@@ -204,7 +94,7 @@ class AccountServiceImplTest {
 			balanceFinal,
 			result.getAccountBalanceDtos().get(0).getBalance(),
 			epsilon);
-
+		
 		assertEquals(1, result.getDepositDtos().size());
 	}
 

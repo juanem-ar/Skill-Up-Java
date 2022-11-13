@@ -32,7 +32,7 @@ public class ResponseTransactionDto {
     private Boolean softDelete = Boolean.FALSE;
 
     @Schema(type = "long", example = "1")
-//    private Long accountId;
+    private Long accountId;
     private AccountBalanceDto account;
     private Timestamp transactionDate;
 

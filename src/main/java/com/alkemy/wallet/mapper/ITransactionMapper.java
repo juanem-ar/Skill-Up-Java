@@ -19,8 +19,10 @@ public interface ITransactionMapper   {
     @Mapping( target = "account.id",source = "idAccount")
     Transaction transactionDtoToTransaction  (TransactionDtoPay transactionDtoPay);*/
 
-
+    @Mapping(target = "accountId", source = "account.id")
     ResponseTransactionDto modelToResponseTransactionDto(Transaction transaction);
+    @Mapping( target = "account.id",source = "accountId")
+    @Mapping(target = "account", source = "account")
     Transaction responseTransactionDtoToModel(ResponseTransactionDto dto);
     List<ResponseTransactionDto> listModelToResponseTransactionDto(List<Transaction> ListTransaction);
     List<Transaction> ListResponseTransactionDtoToModel(List<ResponseTransactionDto> dto);

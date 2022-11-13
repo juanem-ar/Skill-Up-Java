@@ -124,7 +124,7 @@ public class TransactionServiceImpl implements ITransactionService {
         if (transactionDto.getAmount() <= 0) {
             throw new TransactionError(ErrorEnum.DEPOSITNOTVALID.getMessage());
         }
-        Account account = accountRepository.getReferenceById(transactionDto.getAccount().getId());
+        Account account = accountRepository.getReferenceById(transactionDto.getAccountId());
         transactionDto.setType(EType.DEPOSIT);
 
         Double currentBalance = account.getBalance();

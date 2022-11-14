@@ -17,12 +17,11 @@ public class TransactionDtoPay {
     @Schema(type = "double", example = "980.75")
     private Double amount;
 
-    @Schema(type = "EType", example = "ARS")
+    @Schema(type = "EType", example = "PAYMENT")
     private EType type;
 
     @Schema(type = "string", example = "Tax payment")
     private String description;
 
-    @Schema(type = "long", example = "1")
     private Long accountId;
 }

@@ -2,16 +2,13 @@ package com.alkemy.wallet.service.impl;
 
 
 
+import com.alkemy.wallet.dto.AccountBalanceDto;
 import com.alkemy.wallet.dto.ResponseSendTransactionDto;
 import com.alkemy.wallet.dto.TransactionDtoPay;
 import com.alkemy.wallet.mapper.ITransactionMapper;
-import com.alkemy.wallet.model.Account;
-import com.alkemy.wallet.model.ECurrency;
-import com.alkemy.wallet.model.EType;
-import com.alkemy.wallet.model.Transaction;
+import com.alkemy.wallet.model.*;
 import com.alkemy.wallet.repository.ITransactionRepository;
 import com.alkemy.wallet.repository.IAccountRepository;
-import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.ITransactionService;
 import lombok.RequiredArgsConstructor;
@@ -36,76 +33,107 @@ import java.util.Optional;
 public class TransactionServiceImpl implements ITransactionService {
 
     private final ITransactionRepository transactionRepository;
-    private final IUserRepository userRepository;
     private final IAccountRepository accountRepository;
     private final ITransactionMapper transactionMapper;
 
     @Autowired
     private IJwtUtils jwtUtils;
 
-    public ResponseTransactionDto send(Long senderId, ResponseSendTransactionDto responseSendTransactionDto, ECurrency currency) throws TransactionError{
+    public ResponseTransactionDto send(Long senderId, ResponseSendTransactionDto responseSendTransactionDto, ECurrency currency) throws TransactionError {
         Account senderAccount = accountRepository.getReferenceByUserIdAndCurrency(senderId, currency);
-        Account receiverAccount = accountRepository.getReferenceByUserIdAndCurrency(responseSendTransactionDto.getReceiverAccountId(), currency);
-
+        Account receiverAccount = accountRepository.getReferenceById(responseSendTransactionDto.getReceiverAccountId());
         String description = "Money transfer in " + currency;
 
         TransactionDtoPay sendTransaction = new TransactionDtoPay();
         sendTransaction.setAmount(responseSendTransactionDto.getAmount());
         sendTransaction.setType(EType.PAYMENT);
         sendTransaction.setDescription(description);
-        sendTransaction.setAccountId(senderId);
+        sendTransaction.setAccountId(senderAccount.getId());
 
         TransactionDtoPay receiveTransaction = new TransactionDtoPay();
         receiveTransaction.setAmount(responseSendTransactionDto.getAmount());
         receiveTransaction.setType(EType.INCOME);
         receiveTransaction.setDescription(description);
-        receiveTransaction.setAccountId(receiverAccount.getId());
+        receiveTransaction.setAccountId(responseSendTransactionDto.getReceiverAccountId());
 
         ResponseTransactionDto transaction = new ResponseTransactionDto();
 
-        if (sendTransaction.getAmount() <= senderAccount.getBalance() && sendTransaction.getAmount() <= senderAccount.getTransactionLimit()) {
-            // TODO: senderPayment and receiverIncome try-catch and throw of TransactionError
-            payment(sendTransaction);
-            payment(receiveTransaction);
+        if(receiverAccount != null) {
+            if (senderId != receiverAccount.getUser().getId()) {
+                if (senderAccount.getId() != receiverAccount.getId()) {
+                    if (receiverAccount.getCurrency().equals(currency)) {
+                        if (sendTransaction.getAmount() <= senderAccount.getBalance()) {
+                            if (sendTransaction.getAmount() <= senderAccount.getTransactionLimit()) {
+
+                                transaction = payment(sendTransaction);
+                                payment(receiveTransaction);
+
+                            } else {
+                                throw new TransactionError("Amount trying to send is above the transaction limit");
+                            }
+                        } else {
+                            throw new TransactionError("Insufficient balance");
+                        }
+                    } else {
+                        throw new TransactionError("Trying to send money to an account that holds another currency");
+                    }
+                } else {
+                    throw new TransactionError("Account trying to receive the money is the same as the one who's sending it");
+                }
+            } else {
+                throw new TransactionError("User trying to receive the money is the same as the one who's sending it");
+            }
         } else {
-            throw new TransactionError("No balance or the amount to send is less than the transaction limit");
+            throw new TransactionError("Receiver account doesn't exist");
         }
-        return transaction; // TODO: convert to ResponseEntity (fixedtermdeposit)
+
+        return transaction;
     }
 
     @Override
     public ResponseTransactionDto payment(TransactionDtoPay transactionDtoPay) {
-        Account account = accountRepository.getReferenceByUserId(transactionDtoPay.getAccountId());
+        Account account = accountRepository.getReferenceById(transactionDtoPay.getAccountId());
 
         Transaction transaction = new Transaction();
-        transaction.setAccount(account);
         transaction.setAmount(transactionDtoPay.getAmount());
         transaction.setType(transactionDtoPay.getType());
         transaction.setDescription(transactionDtoPay.getDescription());
+        transaction.setAccount(account);
         Date date = new Date();
         transaction.setTransactionDate(new Timestamp(date.getTime()));
 
         Double currentBalance = account.getBalance();
 
-        if(transaction.getType() == EType.PAYMENT)
+        if(transaction.getType().equals(EType.PAYMENT))
         {
             account.setBalance(currentBalance - transaction.getAmount());
         }
-        else if(transaction.getType() == EType.INCOME)
+        else if(transaction.getType().equals(EType.INCOME))
         {
             account.setBalance(currentBalance + transaction.getAmount());
         }
 
         transactionRepository.save(transaction);
-        return transactionMapper.modelToResponseTransactionDto(transaction);
+        accountRepository.save(account);
+
+        ResponseTransactionDto response = transactionMapper.modelToResponseTransactionDto(transaction);
+        return response;
     }
 
     public ResponseTransactionDto save(ResponseTransactionDto transactionDto){
         if (transactionDto.getAmount() <= 0) {
             throw new TransactionError(ErrorEnum.DEPOSITNOTVALID.getMessage());
         }
+        Account account = accountRepository.getReferenceById(transactionDto.getAccountId());
         transactionDto.setType(EType.DEPOSIT);
+
+        Double currentBalance = account.getBalance();
+        account.setBalance(currentBalance + transactionDto.getAmount());
+
+        transactionDto.setAccount(new AccountBalanceDto(account.getId(),account.getCurrency(), account.getBalance()));
+
         Transaction entity = transactionMapper.responseTransactionDtoToModel(transactionDto);
+
         Transaction entitySaved = transactionRepository.save(entity);
         return transactionMapper.modelToResponseTransactionDto(entitySaved);
     }

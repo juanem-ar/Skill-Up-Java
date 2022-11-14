@@ -1,7 +1,7 @@
 package com.alkemy.wallet.service.impl;
 
 import com.alkemy.wallet.dto.FixedDepositDto;
-import com.alkemy.wallet.dto.ResponseSimulateFixedDepositDto;
+import com.alkemy.wallet.dto.ResponseSimulatedFixedDepositDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.mapper.FixedDepositMapper;
 import com.alkemy.wallet.model.Account;
@@ -13,7 +13,6 @@ import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.IFixedDepositService;
 import com.alkemy.wallet.service.IUserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
@@ -61,7 +60,7 @@ public class FixedDepositServiceImpl implements IFixedDepositService {
     }
 
     @Override
-    public ResponseSimulateFixedDepositDto simulateFixedDeposit(FixedDepositDto dto) {
+    public ResponseSimulatedFixedDepositDto simulateFixedDeposit(FixedDepositDto dto) {
         if (dto.getAmount() <= 0)
             throw new BadRequestException("Invalid amount.");
         if (dto.getCurrency() != ARS && dto.getCurrency() != USD )

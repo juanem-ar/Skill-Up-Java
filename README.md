@@ -52,3 +52,123 @@ On the root folder run:
 ```
 mvn spring-boot:run
 ```
+
+### POSTMAN REQUESTS
+
+#### CREATE USER - USER OR ADMIN
+- proceed to login and return JWT Access token -
+
+POST  /auth/register
+
+```
+{
+      "firstName":"Juan",
+      "lastName":"Perez",
+      "email":"juanPerez@hotmail.com", // email format valid 
+      "password":"12345678", // min = 8
+      "role":{
+            "name":"USER", // or "ADMIN"
+            "description":"description user"
+      }
+}
+```
+
+#### LOGIN
+
+POST  /auth/login
+
+```
+{
+      "email":"juanPerez@hotmail.com", // email exists validation
+      "password":"12345678" // min = 8 and verify password to database (encoded)
+}
+```
+
+#### CREATE OR SILMULATE FIXED DEPOSIT
+
+POST  /fixedDeposit
+POST  /fixedDeposit/simulate
+
+```
+{
+      "amount" : 5040, // blance account > 0
+      "currency":"ARS", // or "USD"
+      "period" :60 // min = 30
+}
+```
+
+#### CREATE A DEPOSIT
+
+POST  /transactions/deposit
+
+```
+{
+    "amount": "100.00",
+    "description": "Deposito" ,
+    "accountId" : 1
+}
+```
+
+#### GET ACCOUNTS BY ADMIN USER
+
+GET  /accounts
+
+GET /accounts?page=1
+
+```
+{
+    "accountsDto": [
+        {
+            "id": 11,
+            "balance": 12.0,
+            "currency": "ARS",
+            "creationDate": "2022-11-13T12:14:08.91228",
+            "updateDate": "2022-11-13T12:14:08.91228",
+            "transactionLimit": 300000.0
+        },
+        {...},
+        {
+            "id": 20,
+            "balance": 74.0,
+            "currency": "ARS",
+            "creationDate": "2022-11-13T12:14:08.91228",
+            "updateDate": "2022-11-13T12:14:08.91228",
+            "transactionLimit": 300000.0
+        }
+    ],
+    "previousPage": "http://localhost:8080/accounts?page=0",
+    "nextpage": "http://localhost:8080/accounts?page=2"
+}
+```
+
+#### SEND ARS
+
+POST  /transactions/sendArs
+
+```
+{
+    "amount": 350.0,
+    "receiverAccountId": 3
+}
+```
+
+#### SEND USD
+
+POST  /transactions/sendUsd
+
+```
+{
+    "amount": 350.0,
+    "receiverAccountId": 4
+}
+```
+
+#### EDIT TRANSACTION
+
+POST  /transactions/transaction/{transactionId}
+
+```
+{
+    "description": "example description",
+}
+```

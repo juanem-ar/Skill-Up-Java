@@ -46,13 +46,15 @@ public class UserAuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authenticationServiceService.saveUser(user));
     }
 
-    @Operation(method = "POST", summary = "signIn", description = "Login to app",
+    @Operation(method = "POST", summary = "signIn", description = "Login to the app",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Account logged!"),
-                    @ApiResponse(responseCode = "400", description = "Validation Error", content = @Content(schema = @Schema(hidden = true))),
+                    @ApiResponse(responseCode = "200", description = "Account logged!", content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = AuthenticationResponseDto.class)))
+                    }),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(hidden = true))),
-                    @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/login")

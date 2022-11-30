@@ -1,11 +1,10 @@
 package com.alkemy.wallet.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
@@ -26,7 +25,7 @@ public class Role implements Serializable {
     @Id
     @SequenceGenerator(name = "roleSequence",sequenceName = "roleSequence", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "roleSequence")
-    @Schema(readOnly = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -39,12 +38,12 @@ public class Role implements Serializable {
 
     @CreationTimestamp
     @Column(name = "CREATION_DATE")
-    @Schema(readOnly = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Timestamp creationDate;
 
     @UpdateTimestamp
     @Column(name = "UPDATE_DATE")
-    @Schema(readOnly = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Timestamp updateDate;
 
 }

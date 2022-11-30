@@ -1,6 +1,7 @@
 package com.alkemy.wallet.model;
 
 import com.sun.istack.NotNull;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -25,6 +26,7 @@ public class Role implements Serializable {
     @Id
     @SequenceGenerator(name = "roleSequence",sequenceName = "roleSequence", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "roleSequence")
+    @Schema(readOnly = true)
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -37,10 +39,12 @@ public class Role implements Serializable {
 
     @CreationTimestamp
     @Column(name = "CREATION_DATE")
+    @Schema(readOnly = true)
     private Timestamp creationDate;
 
     @UpdateTimestamp
     @Column(name = "UPDATE_DATE")
+    @Schema(readOnly = true)
     private Timestamp updateDate;
 
 }

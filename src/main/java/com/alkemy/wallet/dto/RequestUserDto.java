@@ -28,7 +28,7 @@ public class RequestUserDto {
     @NotNull
     @Email
     @Size(min = 6)
-    @Schema(required = true, pattern = "[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,}", example = "jhonMcKein@hotmail.com", minLength = 6, description = "User email")
+    @Schema(format = "email", example = "jhonMcKein@hotmail.com", minLength = 6, description = "User email")
     private String email;
 
     @NotNull

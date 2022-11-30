@@ -142,7 +142,7 @@ public class AccountServiceImpl implements IAccountService {
                 PageRequest.of(page, ACCOUNTSFORPAGE));
 
         if (accounts.isEmpty())
-            throw new BadRequestException();
+            throw new BadRequestException("account is empty");
 
         dto.setAccountsDto(
                 accountMapper.accountsToAccountsDto(

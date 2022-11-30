@@ -1,27 +1,27 @@
 package com.alkemy.wallet.exceptions;
 
 import com.alkemy.wallet.exceptions.messageCostumerErros.ErrorsResponseMessage;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
-@Slf4j
+@RestControllerAdvice
 public class GlobalExceptions {
     @ExceptionHandler({ResourceNotFoundException.class})
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
     public ResponseEntity<String> processErrorNotFound(ResourceNotFoundException ex) {
-        log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler({BadRequestException.class})
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> processErrorBadRequest(BadRequestException ex) {
-        log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
     @ExceptionHandler({UserNotFoundUserException.class})
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorsResponseMessage> processErrorBadRequest(UserNotFoundUserException ex) {
         ErrorsResponseMessage errorsResponseMessage = new ErrorsResponseMessage();
         errorsResponseMessage.setStatusCode(HttpStatus.BAD_REQUEST);

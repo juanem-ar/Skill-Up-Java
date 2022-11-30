@@ -64,7 +64,7 @@ public class UserServiceImpl implements IUserService {
 			PageRequest.of(page, USERS_FOR_PAGE));
 		
 		if(users.isEmpty())
-			throw new BadRequestException();
+			throw new BadRequestException("Insert an user");
 		
 		dto.setUserDtos(
 			iUserMapper.toResponseDetailsUserDtos(
@@ -139,7 +139,7 @@ public class UserServiceImpl implements IUserService {
 	
 	private void sameIdOrThrowException(Long userId, Long tokenUserId) {
 		if(!Objects.equals(userId, tokenUserId))
-			throw new BadRequestException();
+			throw new BadRequestException("not same");
 	}
 
     @Override

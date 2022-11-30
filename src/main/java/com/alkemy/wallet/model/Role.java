@@ -2,6 +2,8 @@ package com.alkemy.wallet.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
+import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -31,9 +33,11 @@ public class Role implements Serializable {
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "NAME")
+    @Schema(required = true, example = "USER", description = "User role")
     private ERoles name;
 
     @Column(name = "DESCRIPTION")
+    @Schema(required = true, example = "Scope or limits", description = "Role Description")
     private String description;
 
     @CreationTimestamp

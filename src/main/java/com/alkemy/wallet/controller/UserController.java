@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import com.alkemy.wallet.service.IUserService;
 
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/users")
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
 public class UserController {
     private final IUserService userService;
 

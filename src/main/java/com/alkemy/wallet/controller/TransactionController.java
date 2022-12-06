@@ -1,10 +1,7 @@
 package com.alkemy.wallet.controller;
 
 
-import com.alkemy.wallet.dto.ResponseAccountDto;
-import com.alkemy.wallet.dto.ResponseSendTransactionDto;
-import com.alkemy.wallet.dto.ResponseTransactionDto;
-import com.alkemy.wallet.dto.TransactionDtoPay;
+import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.model.ECurrency;
 import com.alkemy.wallet.model.EType;
 import com.alkemy.wallet.model.Transaction;
@@ -56,13 +53,13 @@ public class TransactionController {
 
     @Operation(method = "POST", summary = "saveDeposit", description = "Registrar un depósito.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
+                    @ApiResponse(responseCode = "201", description = "Ok. El recurso se obtiene correctamente",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseTransactionDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/deposit")
     public ResponseEntity<ResponseTransactionDto> saveDeposit(
-            @RequestBody ResponseTransactionDto deposit){
+            @RequestBody RequestTransactionDto deposit){
         ResponseTransactionDto depositCreated = transactionService.save(deposit);
         return ResponseEntity.status(HttpStatus.CREATED).body(depositCreated);
     }

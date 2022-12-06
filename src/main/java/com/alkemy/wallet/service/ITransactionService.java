@@ -1,6 +1,7 @@
 package com.alkemy.wallet.service;
 
 
+import com.alkemy.wallet.dto.RequestTransactionDto;
 import com.alkemy.wallet.dto.ResponseSendTransactionDto;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 
@@ -19,7 +20,7 @@ import java.util.Optional;
 public interface ITransactionService {
 
     ResponseTransactionDto send(Long senderId, ResponseSendTransactionDto responseSendTransactionDto, ECurrency currency) throws TransactionError;
-    ResponseTransactionDto save(ResponseTransactionDto transactionDto);
+    ResponseTransactionDto save(RequestTransactionDto transactionDto);
 
     List<Transaction> findAllTransactionsWith(Long accountId);
 

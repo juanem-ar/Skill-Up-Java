@@ -2,14 +2,10 @@ package com.alkemy.wallet.security.controller;
 
 import com.alkemy.wallet.dto.RequestUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
-import com.alkemy.wallet.exceptions.BadRequestException;
-import com.alkemy.wallet.exceptions.messageCostumerErros.ErrorsResponseMessage;
 import com.alkemy.wallet.security.dto.AuthenticationRequestDto;
 import com.alkemy.wallet.security.dto.AuthenticationResponseDto;
 import com.alkemy.wallet.service.IAuthenticationService;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

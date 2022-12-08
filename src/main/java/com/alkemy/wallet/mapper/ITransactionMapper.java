@@ -2,6 +2,7 @@ package com.alkemy.wallet.mapper;
 
 import com.alkemy.wallet.dto.AccountBalanceDto;
 import com.alkemy.wallet.dto.RequestTransactionDto;
+import com.alkemy.wallet.dto.TransactionDtoPay;
 import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 import org.mapstruct.Mapper;
@@ -13,9 +14,9 @@ public interface ITransactionMapper   {
     /*
     @Mapping(target = "idAccount", source = "account.id")
     TransactionDtoPay  transactionToTransactionDto (Transaction transaction);
-
-    @Mapping( target = "account.id",source = "idAccount")
-    Transaction transactionDtoToTransaction  (TransactionDtoPay transactionDtoPay);*/
+    */
+    @Mapping( target = "account.id",source = "accountId")
+    Transaction transactionDtoToTransaction  (TransactionDtoPay transactionDtoPay);
 
     @Mapping(target = "account", source = "account")
     ResponseTransactionDto modelToResponseTransactionDto(Transaction transaction);

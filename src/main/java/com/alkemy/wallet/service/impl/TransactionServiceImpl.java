@@ -90,30 +90,18 @@ public class TransactionServiceImpl implements ITransactionService {
     @Override
     public ResponseTransactionDto payment(TransactionDtoPay transactionDtoPay) {
         Account account = accountRepository.getReferenceById(transactionDtoPay.getAccountId());
-
-        Transaction transaction = new Transaction();
-        transaction.setAmount(transactionDtoPay.getAmount());
-        transaction.setType(transactionDtoPay.getType());
-        transaction.setDescription(transactionDtoPay.getDescription());
-        transaction.setAccount(account);
-        Date date = new Date();
-        transaction.setTransactionDate(new Timestamp(date.getTime()));
-
+        Transaction entity = transactionMapper.transactionDtoToTransaction(transactionDtoPay);
+        entity.setAccount(account);
         Double currentBalance = account.getBalance();
-
-        if(transaction.getType().equals(EType.PAYMENT))
-        {
-            account.setBalance(currentBalance - transaction.getAmount());
+        if(entity.getType().equals(EType.PAYMENT)) {
+            account.setBalance(currentBalance - entity.getAmount());
         }
-        else if(transaction.getType().equals(EType.INCOME))
-        {
-            account.setBalance(currentBalance + transaction.getAmount());
+        else if(entity.getType().equals(EType.INCOME)) {
+            account.setBalance(currentBalance + entity.getAmount());
         }
-
-        transactionRepository.save(transaction);
+        transactionRepository.save(entity);
         accountRepository.save(account);
-
-        ResponseTransactionDto response = transactionMapper.modelToResponseTransactionDto(transaction);
+        ResponseTransactionDto response = transactionMapper.modelToResponseTransactionDto(entity);
         return response;
     }
 

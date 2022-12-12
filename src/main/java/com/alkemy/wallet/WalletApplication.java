@@ -15,7 +15,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 		info = @Info(
 				title = "Wallet",
 				version = "1.0",
-				description = "Descripción"
+				description = "wallet application"
 		)
 )
 public class WalletApplication {

@@ -108,31 +108,31 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.updateDescriptionFromTransaction(id, token, description.get("description")));
     }
 
-    @Operation(method = "POST", summary = "sendArs", description = "Send pesos.",
+    @Operation(method = "POST", summary = "send money to user", description = "Send Pesos (AR).",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Ok"),
+                    @ApiResponse(responseCode = "200", description = "Ok"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/sendArs")
-    public ResponseEntity<ResponseTransactionDto> sendArs(HttpServletRequest req, @RequestBody ResponseSendTransactionDto responseSendTransactionDto) {
+    public ResponseEntity<ResponseTransactionDto> sendArs(HttpServletRequest req, @RequestBody RequestSendARTransactionDto requestTransactionDto) {
         String token = req.getHeader("Authorization");
         Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
-        return ResponseEntity.ok().body(transactionService.send(senderId, responseSendTransactionDto, ECurrency.ARS));
+        return ResponseEntity.ok().body(transactionService.send(senderId, requestTransactionDto, ECurrency.ARS));
     }
 
-    @Operation(method = "POST", summary = "sendUsd", description = "Send dollars.",
+    @Operation(method = "POST", summary = "send money to user", description = "Send Pesos (USD).",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Ok"),
+                    @ApiResponse(responseCode = "200", description = "Ok"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/sendUsd")
-    public ResponseEntity<ResponseTransactionDto> sendUsd(HttpServletRequest req, @RequestBody ResponseSendTransactionDto responseSendTransactionDto) {
+    public ResponseEntity<ResponseTransactionDto> sendUsd(HttpServletRequest req, @RequestBody RequestSendUSDTransactionDto requestTransactionDto) {
         String token = req.getHeader("Authorization");
         Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
-        return ResponseEntity.ok().body(transactionService.send(senderId, responseSendTransactionDto, ECurrency.USD));
+        return ResponseEntity.ok().body(transactionService.send(senderId, requestTransactionDto, ECurrency.USD));
     }
 }

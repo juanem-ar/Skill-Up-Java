@@ -66,26 +66,25 @@ public class TransactionController {
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
-    @GetMapping(value = "/{userId}")
+    @GetMapping("/list/{userId}")
     public ResponseEntity<Page<Transaction>> getListTransactionByAdminUser(@Parameter(name = "Paginacion", description = "Default Page = 0 , Size = 10", required = false)@PageableDefault(page=0, size=10) Pageable pageable,
                                                                            @Parameter(name = "User Id", description = "User Id (Debe coincidir con el Usuario del Token)", example = "1", required = true)@PathVariable("userId") Long userId,
                                                                            @Parameter(name = "Authorization", description = "Header - Autorization", example = "YOUR_ACCESS_TOKEN", required = true)@RequestHeader(name = "Authorization") String token) throws Exception{
         return ResponseEntity.ok(transactionService.findByUserId(userId, token, pageable));
     }
 
-    @Operation(method = "GET", summary = "getTransactionByAuthUser", description = "Traer todas las transacciones de un usuario.",
+    @Operation(method = "GET", summary = "getTransactionByAuthUser", description = "Get transaction by id",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Ok"),
+                    @ApiResponse(responseCode = "200", description = "Ok"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
-    @GetMapping("transaction/{transactionId}")
-    public ResponseEntity<ResponseTransactionDto> getTransactionByAuthUser(@Parameter(name = "Transaction Id", description = "Id de transferencia que se desea obtener", example = "9", required = true)@PathVariable("transactionId") Long id,
-                                                                           @Parameter(name = "Authorization", description = "Header - Autorization", example = "YOUR_ACCESS_TOKEN", required = true)@RequestHeader(name = "Authorization") String token) throws Exception{
-
-        return ResponseEntity.ok(transactionService.findResponseTransactionById(id, token));
-
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseTransactionDto> getTransactionByAuthUser
+            (HttpServletRequest req, @PathVariable Long id) throws Exception{
+        return ResponseEntity.ok(transactionService.findResponseTransactionById(id, jwtUtils.getJwt(req.getHeader("Authorization"))));
     }
 
     @Operation(method = "PATCH", summary = "editTransactionByAuthUser", description = "Update transaction descriptions.",
@@ -102,10 +101,7 @@ public class TransactionController {
         @RequestBody PatchTransactionDescriptionDto description,
         @PathVariable Long id
     ) throws Exception {
-        String token = req.getHeader("Authorization");
-        String jwt = jwtUtils.getJwt(token);
-        String transactionDescription = description.getDescription();
-        return ResponseEntity.ok(transactionService.updateDescriptionFromTransaction(id, jwt, transactionDescription));
+        return ResponseEntity.ok(transactionService.updateDescriptionFromTransaction(id, jwtUtils.getJwt(req.getHeader("Authorization")), description.getDescription()));
     }
 
     @Operation(method = "POST", summary = "send money to user", description = "Send Pesos (AR).",

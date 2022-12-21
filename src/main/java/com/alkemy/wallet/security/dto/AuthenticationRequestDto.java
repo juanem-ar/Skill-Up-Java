@@ -20,7 +20,7 @@ public class AuthenticationRequestDto {
     @NotNull
     @Email
     @Size(min = 6)
-    @Schema(format = "email", example = "jhonMcKein@hotmail.com", minLength = 6, description = "User email")
+    @Schema(format = "email", example = "juanem@hotmail.com", minLength = 6, description = "User email")
     private String email;
 
     @NotNull

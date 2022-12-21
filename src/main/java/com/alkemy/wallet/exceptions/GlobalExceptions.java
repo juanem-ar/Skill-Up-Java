@@ -20,6 +20,11 @@ public class GlobalExceptions {
     public ResponseEntity<String> processErrorBadRequest(BadRequestException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+    @ExceptionHandler({TransactionError.class})
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    public ResponseEntity<String> processErrorTransactionError(TransactionError ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
     @ExceptionHandler({UserNotFoundUserException.class})
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorsResponseMessage> processErrorBadRequest(UserNotFoundUserException ex) {

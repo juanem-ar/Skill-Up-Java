@@ -75,15 +75,13 @@ public class TransactionController {
 
     @Operation(method = "GET", summary = "getTransactionByAuthUser", description = "Get transaction by id",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok"),
+                    @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseTransactionDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-                    @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseTransactionDto> getTransactionByAuthUser
-            (HttpServletRequest req, @PathVariable Long id) throws Exception{
+    public ResponseEntity<ResponseTransactionDto> getTransactionByAuthUser(HttpServletRequest req, @PathVariable Long id) throws Exception{
         return ResponseEntity.ok(transactionService.findResponseTransactionById(id, jwtUtils.getJwt(req.getHeader("Authorization"))));
     }
 
@@ -92,15 +90,10 @@ public class TransactionController {
                     @ApiResponse(responseCode = "200", description = "Ok"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-                    @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PatchMapping("/{id}")
-    public ResponseEntity<ResponseTransactionDto> editTransactionByAuthUser(
-        HttpServletRequest req,
-        @RequestBody PatchTransactionDescriptionDto description,
-        @PathVariable Long id
-    ) throws Exception {
+    public ResponseEntity<ResponseTransactionDto> editTransactionByAuthUser(HttpServletRequest req, @RequestBody PatchTransactionDescriptionDto description, @PathVariable Long id) throws Exception {
         return ResponseEntity.ok(transactionService.updateDescriptionFromTransaction(id, jwtUtils.getJwt(req.getHeader("Authorization")), description.getDescription()));
     }
 

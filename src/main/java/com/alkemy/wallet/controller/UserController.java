@@ -2,6 +2,7 @@ package com.alkemy.wallet.controller;
 
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import com.alkemy.wallet.service.IUserService;
 
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/users")
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
 public class UserController {
     private final IUserService userService;
 
@@ -66,6 +69,7 @@ public class UserController {
     
     @GetMapping("/{id}")
     public ResponseEntity<ResponseDetailsUserDto> getUserDetails(
+        @Parameter(description = "id of User to be searched")
     	@RequestHeader(name = "Authorization") String token,
     	@PathVariable Long id) {
 		return ResponseEntity.ok(userService.getUserDetails(id, token));

@@ -4,6 +4,11 @@ import com.alkemy.wallet.dto.FixedDepositDto;
 import com.alkemy.wallet.dto.ResponseSimulatedFixedDepositDto;
 import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.IFixedDepositService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,15 +19,26 @@ import javax.validation.Valid;
 @RequestMapping("/fixedDeposit")
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
+@Tag(name = "FixedDeposit", description = "Create and simulate fixed deposit")
 public class FixedTermDepositController {
     private final IFixedDepositService fixedDepositService;
     private final JwtUtils jwtUtils;
+
+    @Operation(summary = "fixed deposit ", description = "Create", responses = {
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+    })
     @PostMapping
     public ResponseEntity<String> createFixedDeposit(HttpServletRequest req, @Valid @RequestBody FixedDepositDto dto) throws Exception {
         String token = req.getHeader("Authorization");
         String jwt = jwtUtils.getJwt(token);
         return ResponseEntity.status(HttpStatus.OK).body(fixedDepositService.addFixedDeposit(jwtUtils.extractUsername(jwt), dto));
     }
+
+    @Operation(summary = "fixed deposit ", description = "Simulate", responses = {
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Created", content = @Content)
+    })
     @PostMapping("/simulate")
     public ResponseEntity<ResponseSimulatedFixedDepositDto> simulateFixedDeposit(@Valid @RequestBody FixedDepositDto dto) throws Exception {
         return new ResponseEntity<>(fixedDepositService.simulateFixedDeposit(dto), HttpStatus.OK);

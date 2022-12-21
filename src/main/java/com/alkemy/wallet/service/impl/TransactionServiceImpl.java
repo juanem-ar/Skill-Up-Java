@@ -1,43 +1,29 @@
 package com.alkemy.wallet.service.impl;
 
-
-
-import com.alkemy.wallet.dto.AccountBalanceDto;
-import com.alkemy.wallet.dto.ResponseSendTransactionDto;
-import com.alkemy.wallet.dto.TransactionDtoPay;
+import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.mapper.ITransactionMapper;
 import com.alkemy.wallet.model.*;
 import com.alkemy.wallet.repository.ITransactionRepository;
 import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.ITransactionService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.alkemy.wallet.dto.ResponseTransactionDto;
 import com.alkemy.wallet.exceptions.ErrorEnum;
 import com.alkemy.wallet.exceptions.TransactionError;
-
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
+@AllArgsConstructor
 public class TransactionServiceImpl implements ITransactionService {
-
     private final ITransactionRepository transactionRepository;
     private final IAccountRepository accountRepository;
     private final ITransactionMapper transactionMapper;
-
-    @Autowired
-    private IJwtUtils jwtUtils;
+    private final IJwtUtils jwtUtils;
 
     public ResponseTransactionDto send(Long senderId, ResponseSendTransactionDto responseSendTransactionDto, ECurrency currency) throws TransactionError {
         Account senderAccount = accountRepository.getReferenceByUserIdAndCurrency(senderId, currency);
@@ -93,55 +79,36 @@ public class TransactionServiceImpl implements ITransactionService {
     @Override
     public ResponseTransactionDto payment(TransactionDtoPay transactionDtoPay) {
         Account account = accountRepository.getReferenceById(transactionDtoPay.getAccountId());
-
-        Transaction transaction = new Transaction();
-        transaction.setAmount(transactionDtoPay.getAmount());
-        transaction.setType(transactionDtoPay.getType());
-        transaction.setDescription(transactionDtoPay.getDescription());
-        transaction.setAccount(account);
-        Date date = new Date();
-        transaction.setTransactionDate(new Timestamp(date.getTime()));
-
+        Transaction entity = transactionMapper.transactionDtoToTransaction(transactionDtoPay);
+        entity.setAccount(account);
         Double currentBalance = account.getBalance();
-
-        if(transaction.getType().equals(EType.PAYMENT))
-        {
-            account.setBalance(currentBalance - transaction.getAmount());
+        if(entity.getType().equals(EType.PAYMENT)) {
+            account.setBalance(currentBalance - entity.getAmount());
         }
-        else if(transaction.getType().equals(EType.INCOME))
-        {
-            account.setBalance(currentBalance + transaction.getAmount());
+        else if(entity.getType().equals(EType.INCOME)) {
+            account.setBalance(currentBalance + entity.getAmount());
         }
-
-        transactionRepository.save(transaction);
+        transactionRepository.save(entity);
         accountRepository.save(account);
-
-        ResponseTransactionDto response = transactionMapper.modelToResponseTransactionDto(transaction);
+        ResponseTransactionDto response = transactionMapper.modelToResponseTransactionDto(entity);
         return response;
     }
 
-    public ResponseTransactionDto save(ResponseTransactionDto transactionDto){
+    public ResponseTransactionDto save(RequestTransactionDto transactionDto){
         if (transactionDto.getAmount() <= 0) {
             throw new TransactionError(ErrorEnum.DEPOSITNOTVALID.getMessage());
         }
         Account account = accountRepository.getReferenceById(transactionDto.getAccountId());
         transactionDto.setType(EType.DEPOSIT);
-
-        Double currentBalance = account.getBalance();
-        account.setBalance(currentBalance + transactionDto.getAmount());
-
-        transactionDto.setAccount(new AccountBalanceDto(account.getId(),account.getCurrency(), account.getBalance()));
-
-        Transaction entity = transactionMapper.responseTransactionDtoToModel(transactionDto);
-
+        account.setBalance(account.getBalance() + transactionDto.getAmount());
+        Transaction entity = transactionMapper.requestTransactionDtoToModel(transactionDto);
+        entity.setAccount(account);
         Transaction entitySaved = transactionRepository.save(entity);
         return transactionMapper.modelToResponseTransactionDto(entitySaved);
     }
 
-
 	@Override
-	public List<Transaction> findAllTransactionsWith(
-		Long accountId) {
+	public List<Transaction> findAllTransactionsWith(Long accountId) {
 		return transactionRepository.findAllByAccountId(accountId);
 	}
 
@@ -153,20 +120,30 @@ public class TransactionServiceImpl implements ITransactionService {
              throw new TransactionError("Token id does not match whit path id");
         }
     }
+
     @Override
-    public Optional<ResponseTransactionDto> findTransactionById(Long id, String token) throws Exception {
-        List<Transaction> transactions = transactionRepository.findByAccount_UserId(jwtUtils.extractUserId(token));
-            return Optional.of(transactionMapper.modelToResponseTransactionDto(transactions.stream()
-                    .filter(transaction -> transaction.getId().equals(id)).findFirst().get()));
+    public ResponseTransactionDto findResponseTransactionById(Long id, String token) throws Exception {
+        return transactionMapper.modelToResponseTransactionDto(findTransactionById(id, token));
     }
+
+    @Override
+    public Transaction findTransactionById(Long id, String token) throws Exception {
+        if (!transactionRepository.existsById(id))
+            throw new TransactionError("This transaction does not exist.");
+        Transaction entity = transactionRepository.getReferenceById(id);
+        if (entity.getAccount().getUser().getId() != jwtUtils.extractUserId(token))
+            throw new TransactionError("This transaction does not belong you");
+        return entity;
+    }
+
     @Override
     public ResponseTransactionDto updateDescriptionFromTransaction(Long id, String token, String description) throws Exception {
-        Optional<ResponseTransactionDto> responseTransactionDto = findTransactionById(id, token);
-            Transaction saveTransaction = transactionMapper.responseTransactionDtoToModel(responseTransactionDto.get());
-            saveTransaction.setDescription(description);
-            transactionRepository.save(saveTransaction);
-            return transactionMapper.modelToResponseTransactionDto(saveTransaction);
+        Transaction entity = findTransactionById(id,token);
+        entity.setDescription(description);
+        Transaction entitySaved = transactionRepository.save(entity);
+        return transactionMapper.modelToResponseTransactionDto(entitySaved);
     }
+
 }
 
     

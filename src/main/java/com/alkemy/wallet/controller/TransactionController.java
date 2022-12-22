@@ -2,19 +2,14 @@ package com.alkemy.wallet.controller;
 
 import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.model.ECurrency;
-import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.ITransactionService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 
 @RequestMapping("/transactions")
 @RestController
@@ -59,32 +55,28 @@ public class TransactionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(depositCreated);
     }
 
-    @Operation(method = "GET", summary = "getListTransactionByAdminUser", description = "Traer todas las transacciones de un administrador.",
+    @Operation(method = "GET", summary = "getListTransactionByUserLogged", description = "Get all transactions from user logged.",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Ok"),
+                    @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseTransactionDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
-    @GetMapping("/list/{userId}")
-    public ResponseEntity<Page<Transaction>> getListTransactionByAdminUser(@Parameter(name = "Paginacion", description = "Default Page = 0 , Size = 10", required = false)@PageableDefault(page=0, size=10) Pageable pageable,
-                                                                           @Parameter(name = "User Id", description = "User Id (Debe coincidir con el Usuario del Token)", example = "1", required = true)@PathVariable("userId") Long userId,
-                                                                           @Parameter(name = "Authorization", description = "Header - Autorization", example = "YOUR_ACCESS_TOKEN", required = true)@RequestHeader(name = "Authorization") String token) throws Exception{
-        return ResponseEntity.ok(transactionService.findByUserId(userId, token, pageable));
+    @GetMapping
+    public ResponseEntity<List<ResponseTransactionDto>> getListTransactionByUserLogged(HttpServletRequest req) throws Exception{
+        return ResponseEntity.ok(transactionService.findAllTransactionsByUserId(jwtUtils.getJwt(req.getHeader("Authorization"))));
     }
 
-    @Operation(method = "GET", summary = "getTransactionByAuthUser", description = "Get transaction by id",
+    @Operation(method = "GET", summary = "getTransactionByIdAndUserLogged", description = "Get transaction by id",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok"),
+                    @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseTransactionDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-                    @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseTransactionDto> getTransactionByAuthUser
-            (HttpServletRequest req, @PathVariable Long id) throws Exception{
-        return ResponseEntity.ok(transactionService.findResponseTransactionById(id, jwtUtils.getJwt(req.getHeader("Authorization"))));
+    @GetMapping("/{transactionId}")
+    public ResponseEntity<ResponseTransactionDto> getTransactionByIdAndUserLogged(HttpServletRequest req, @PathVariable Long transactionId) throws Exception{
+        return ResponseEntity.ok(transactionService.findResponseTransactionById(transactionId, jwtUtils.getJwt(req.getHeader("Authorization"))));
     }
 
     @Operation(method = "PATCH", summary = "editTransactionByAuthUser", description = "Update transaction descriptions.",
@@ -92,15 +84,10 @@ public class TransactionController {
                     @ApiResponse(responseCode = "200", description = "Ok"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-                    @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PatchMapping("/{id}")
-    public ResponseEntity<ResponseTransactionDto> editTransactionByAuthUser(
-        HttpServletRequest req,
-        @RequestBody PatchTransactionDescriptionDto description,
-        @PathVariable Long id
-    ) throws Exception {
+    public ResponseEntity<ResponseTransactionDto> editTransactionByAuthUser(HttpServletRequest req, @RequestBody PatchTransactionDescriptionDto description, @PathVariable Long id) throws Exception {
         return ResponseEntity.ok(transactionService.updateDescriptionFromTransaction(id, jwtUtils.getJwt(req.getHeader("Authorization")), description.getDescription()));
     }
 

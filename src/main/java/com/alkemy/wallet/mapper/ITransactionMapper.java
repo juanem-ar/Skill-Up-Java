@@ -24,7 +24,7 @@ public interface ITransactionMapper   {
     Transaction responseTransactionDtoToModel(ResponseTransactionDto dto);
     @Mapping( target = "account.id",source = "accountId")
     Transaction requestTransactionDtoToModel(RequestTransactionDto dto);
-    List<ResponseTransactionDto> listModelToResponseTransactionDto(List<Transaction> ListTransaction);
+    List<ResponseTransactionDto> listModelToResponseTransactionDto(List<Transaction> list);
     List<Transaction> ListResponseTransactionDtoToModel(List<ResponseTransactionDto> dto);
 
 }

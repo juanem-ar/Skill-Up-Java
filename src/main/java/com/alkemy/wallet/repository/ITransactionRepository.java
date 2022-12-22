@@ -1,5 +1,6 @@
 package com.alkemy.wallet.repository;
 
+import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,4 +12,5 @@ import java.util.List;
 public interface ITransactionRepository extends JpaRepository<Transaction, Long> {
     Page<Transaction> findByAccount_UserId(Long userId, Pageable pageable) throws Exception;
     List<Transaction> findAllByAccountId(Long accountId);
+    List<Transaction> findAllByAccountIn(List<Account> list);
 }

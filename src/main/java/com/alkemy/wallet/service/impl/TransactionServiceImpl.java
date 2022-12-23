@@ -9,7 +9,9 @@ import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.ITransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.exceptions.ErrorEnum;
 import com.alkemy.wallet.exceptions.TransactionError;
@@ -118,6 +120,38 @@ public class TransactionServiceImpl implements ITransactionService {
         if (transactionsList.size()==0)
             throw new TransactionError("You have not made any transaction");
         return transactionMapper.listModelToResponseTransactionDto(transactionsList);
+    }
+
+    @Override
+    public TransactionPageDto findAllByAccount(Integer page) throws Exception {
+        if (page <= 0)
+            throw new TransactionError("The page you request not found, try page 1");
+
+        Pageable pageWithTenElementsAndSortedByAccountAsc = PageRequest.of(page-1,2,
+                Sort.by("account.id")
+                        .ascending()
+                        .and(Sort.by("amount")
+                                .descending()));
+        Page<Transaction> transactionPage = transactionRepository.findAll(pageWithTenElementsAndSortedByAccountAsc);
+        List<Transaction> transactionList = transactionPage.getContent();
+
+        //Pagination DTO
+        TransactionPageDto pagination = new TransactionPageDto();
+        int totalPages = transactionPage.getTotalPages();
+        pagination.setTotalPages(totalPages);
+
+        if (page > transactionPage.getTotalPages())
+            throw new TransactionError("The page you request not found, try page 1 or go to previous page");
+
+        //Create URLs
+        StringBuilder url = new StringBuilder(
+                "http://localhost:8080/transactions/list?page=");
+
+        pagination.setNextPage(totalPages == page ? null : url + String.valueOf(page + 1));
+        pagination.setPreviousPage(page == 1 ? null : url + String.valueOf(page - 1));
+        pagination.setTransactionDtoList(transactionMapper.listModelToResponseTransactionDto(transactionList));
+
+        return pagination;
     }
 
     @Override

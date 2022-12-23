@@ -67,6 +67,19 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.findAllTransactionsByUserId(jwtUtils.getJwt(req.getHeader("Authorization"))));
     }
 
+    @Operation(method = "GET", summary = "pages", description = "Order by page with five elements and sorted by account ascending and amount descending",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransactionPageDto.class))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
+                    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+            })
+    @GetMapping("/list")
+    //TODO only ADMIN users
+    public ResponseEntity<TransactionPageDto> getAllTransactionPages(@RequestParam(value = "page", defaultValue = "1") @PathVariable int page) throws Exception{
+        return ResponseEntity.ok(transactionService.findAllByAccount(page));
+    }
+
     @Operation(method = "GET", summary = "getTransactionByIdAndUserLogged", description = "Get transaction by id",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseTransactionDto.class))),

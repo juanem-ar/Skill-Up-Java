@@ -1,9 +1,6 @@
 package com.alkemy.wallet.service;
 
-import com.alkemy.wallet.dto.RequestTransactionDto;
-import com.alkemy.wallet.dto.ResponseSendTransactionDto;
-import com.alkemy.wallet.dto.ResponseTransactionDto;
-import com.alkemy.wallet.dto.TransactionDtoPay;
+import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.exceptions.TransactionError;
 import com.alkemy.wallet.model.ECurrency;
 import com.alkemy.wallet.model.Transaction;
@@ -14,6 +11,7 @@ public interface ITransactionService {
     ResponseTransactionDto save(RequestTransactionDto transactionDto);
     List<Transaction> findAllTransactionsWith(Long accountId);
     List<ResponseTransactionDto> findAllTransactionsByUserId(String token);
+    TransactionPageDto findAllByAccount(Integer page) throws Exception;
     ResponseTransactionDto payment(TransactionDtoPay transactionDtoPay);
     ResponseTransactionDto findResponseTransactionById(Long id, String token) throws Exception;
     Transaction findTransactionById(Long id, String token) throws Exception;

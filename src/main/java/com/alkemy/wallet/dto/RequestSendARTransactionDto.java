@@ -14,7 +14,7 @@ public class RequestSendARTransactionDto extends ResponseSendTransactionDto{
     private Double amount;
 
     @Nullable
-    @Schema(type = "string", example = "Money sent in AR.", required = true)
+    @Schema(type = "string", example = "Transaction description", required = true)
     private String description;
 
     @Schema(type = "long", example = "3", required = true)

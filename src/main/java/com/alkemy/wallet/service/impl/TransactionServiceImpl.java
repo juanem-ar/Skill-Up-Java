@@ -25,89 +25,71 @@ public class TransactionServiceImpl implements ITransactionService {
     private final ITransactionMapper transactionMapper;
     private final IJwtUtils jwtUtils;
 
-    public ResponseTransactionDto send(String token, ResponseSendTransactionDto responseSendTransactionDto, ECurrency currency) throws Exception {
+    public ResponseTransactionDto send(String token, ResponseSendTransactionDto dto, ECurrency currency) throws Exception {
         Long senderId = jwtUtils.extractUserId(token);
+
         Account senderAccount = accountRepository.getReferenceByUserIdAndCurrency(senderId, currency);
-        Account receiverAccount = accountRepository.getReferenceById(responseSendTransactionDto.getReceiverAccountId());
-        String description = "Money transfer in " + currency;
+
+        Account receiverAccount = accountRepository.getReferenceByIdAndCurrency(dto.getReceiverAccountId(), currency);
+        if (receiverAccount == null || senderAccount.getId() == receiverAccount.getId())
+            throw new TransactionError("The selected account does not exist or belongs to you or has another currency");
 
         TransactionDtoPay sendTransaction = new TransactionDtoPay();
-        sendTransaction.setAmount(responseSendTransactionDto.getAmount());
+        sendTransaction.setAmount(dto.getAmount());
         sendTransaction.setType(EType.PAYMENT);
-        sendTransaction.setDescription(description);
+        sendTransaction.setDescription(dto.getDescription() + ". Money send in " + currency);
         sendTransaction.setAccountId(senderAccount.getId());
 
         TransactionDtoPay receiveTransaction = new TransactionDtoPay();
-        receiveTransaction.setAmount(responseSendTransactionDto.getAmount());
+        receiveTransaction.setAmount(dto.getAmount());
         receiveTransaction.setType(EType.INCOME);
-        receiveTransaction.setDescription(description);
-        receiveTransaction.setAccountId(responseSendTransactionDto.getReceiverAccountId());
+        receiveTransaction.setDescription(dto.getDescription() + ". Money send in " + currency);
+        receiveTransaction.setAccountId(dto.getReceiverAccountId());
 
-        ResponseTransactionDto transaction = new ResponseTransactionDto();
+        if (sendTransaction.getAmount() > senderAccount.getTransactionLimit())
+            throw new TransactionError("Amount trying to send is above the transaction limit");
 
-        if(receiverAccount != null) {
-            if (senderId != receiverAccount.getUser().getId()) {
-                if (senderAccount.getId() != receiverAccount.getId()) {
-                    if (receiverAccount.getCurrency().equals(currency)) {
-                        if (sendTransaction.getAmount() <= senderAccount.getBalance()) {
-                            if (sendTransaction.getAmount() <= senderAccount.getTransactionLimit()) {
-
-                                transaction = payment(sendTransaction, token);
-                                payment(receiveTransaction, token);
-
-                            } else {
-                                throw new TransactionError("Amount trying to send is above the transaction limit");
-                            }
-                        } else {
-                            throw new TransactionError("Insufficient balance");
-                        }
-                    } else {
-                        throw new TransactionError("Trying to send money to an account that holds another currency");
-                    }
-                } else {
-                    throw new TransactionError("Account trying to receive the money is the same as the one who's sending it");
-                }
-            } else {
-                throw new TransactionError("User trying to receive the money is the same as the one who's sending it");
-            }
-        } else {
-            throw new TransactionError("Receiver account doesn't exist");
-        }
+        ResponseTransactionDto transaction = payment(sendTransaction);
+        payment(receiveTransaction);
 
         return transaction;
     }
 
     @Override
-    public ResponseTransactionDto payment(TransactionDtoPay transactionDtoPay, String token) throws Exception {
-
-        Long userId = jwtUtils.extractUserId(token);
+    public ResponseTransactionDto payment(TransactionDtoPay transactionDtoPay) throws Exception {
 
         Account account = accountRepository.getReferenceById(transactionDtoPay.getAccountId());
 
-        if (account.getUser().getId() != userId)
-            throw new TransactionError("The selected account does not belong to you");
-
         Transaction entity = transactionMapper.transactionDtoToTransaction(transactionDtoPay);
+
         entity.setAccount(account);
+
         Double currentBalance = account.getBalance();
-        if(account.getBalance() < transactionDtoPay.getAmount())
-            throw new TransactionError("insufficient balance");
+        if (transactionDtoPay.getAmount() <= 0)
+            throw new TransactionError(ErrorEnum.DEPOSITNOTVALID.getMessage());
+
         if(entity.getType().equals(EType.PAYMENT)) {
+            if(currentBalance < transactionDtoPay.getAmount())
+                throw new TransactionError("insufficient balance");
             account.setBalance(currentBalance - entity.getAmount());
-        }
-        else if(entity.getType().equals(EType.INCOME)) {
+        } else if(entity.getType().equals(EType.INCOME)) {
             account.setBalance(currentBalance + entity.getAmount());
         }
-        transactionRepository.save(entity);
-        accountRepository.save(account);
+        Transaction entitySaved = transactionRepository.save(entity);
+        Account accountSaved = accountRepository.save(account);
+
         return transactionMapper.modelToResponseTransactionDto(entity);
     }
 
-    public ResponseTransactionDto save(RequestTransactionDto transactionDto){
+    public ResponseTransactionDto save(RequestTransactionDto transactionDto, String token){
+        Long userId = jwtUtils.extractUserId(token);
         if (transactionDto.getAmount() <= 0) {
             throw new TransactionError(ErrorEnum.DEPOSITNOTVALID.getMessage());
         }
-        Account account = accountRepository.getReferenceById(transactionDto.getAccountId());
+        Account account = accountRepository.findByIdAndUserId(transactionDto.getAccountId(), userId);
+        if (account == null){
+            throw new TransactionError("Insert your account id");
+        }
         transactionDto.setType(EType.DEPOSIT);
         account.setBalance(account.getBalance() + transactionDto.getAmount());
         Transaction entity = transactionMapper.requestTransactionDtoToModel(transactionDto);

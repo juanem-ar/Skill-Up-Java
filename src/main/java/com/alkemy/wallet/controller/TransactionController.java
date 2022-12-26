@@ -31,6 +31,7 @@ public class TransactionController {
     private final ITransactionService transactionService;
     private final IJwtUtils jwtUtils;
 
+    /*
     @Operation(method = "POST", summary = "transactionPayment", description = "Registrar un pago.",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Ok",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseTransactionDto.class))),
@@ -42,6 +43,7 @@ public class TransactionController {
     public ResponseEntity<ResponseTransactionDto> transactionPayment(HttpServletRequest req, @RequestBody @Valid TransactionDtoPay transactionDtoPay) throws Exception {
         return new ResponseEntity<>(transactionService.payment(transactionDtoPay, jwtUtils.getJwt(req.getHeader("Authorization"))), HttpStatus.CREATED);
     }
+    */
 
     @Operation(method = "POST", summary = "saveDeposit", description = "Registrar un depósito.",
             responses = {
@@ -52,8 +54,9 @@ public class TransactionController {
             })
     @PostMapping("/deposit")
     public ResponseEntity<ResponseTransactionDto> saveDeposit(
+            HttpServletRequest req,
             @RequestBody RequestTransactionDto deposit){
-        ResponseTransactionDto depositCreated = transactionService.save(deposit);
+        ResponseTransactionDto depositCreated = transactionService.save(deposit, jwtUtils.getJwt(req.getHeader("Authorization")));
         return ResponseEntity.status(HttpStatus.CREATED).body(depositCreated);
     }
 

@@ -1,6 +1,5 @@
 package com.alkemy.wallet.dto;
 
-import com.alkemy.wallet.model.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,6 +35,6 @@ public class RequestUserDto {
     @Schema(required = true, example = "12345678", description = "Password", minLength = 8, maxLength = 25)
     private String password;
 
-    @Schema(required = true)
-    private Role role;
+    @Schema(required = true, example = "USER")
+    private String role;
 }

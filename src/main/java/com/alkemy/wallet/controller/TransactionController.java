@@ -69,7 +69,7 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.findAllTransactionsByUserId(jwtUtils.getJwt(req.getHeader("Authorization"))));
     }
 
-    @Operation(method = "GET", summary = "pages", description = "Order by page with five elements and sorted by account ascending and amount descending",
+    @Operation(method = "GET", summary = "transactions pagination by admin", description = "Order by page with five elements and sorted by account ascending and amount descending",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransactionPageDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),

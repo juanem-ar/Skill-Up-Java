@@ -58,13 +58,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/swagger-ui.html",
                         "/v3/api-docs/**",
                         "/api/**"
-                        /*  ,
-                            "/api/v1/transactions/**",
-                            "/api/v1/users/**",
-                            "/api/v1/accounts/**"
-                        */
                 )
                 .permitAll()
+                .antMatchers("/transactions/list**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and().exceptionHandling()
                 .and()
@@ -79,7 +75,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                                     ex.getMessage()
                             );
                         }
-                );
+                ).and();
 
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }

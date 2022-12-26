@@ -1,5 +1,6 @@
 package com.alkemy.wallet.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +33,10 @@ import org.springframework.security.core.userdetails.UserDetails;
       type = "boolean"))
 @Filter(name = "deletedUserFilter", condition = "deleted= :isDeleted")
 @EntityListeners(AuditingEntityListener.class)
-public class User implements UserDetails {
+public class User implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -65,47 +69,13 @@ public class User implements UserDetails {
 	private Timestamp updateDate;
 
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinColumn(name = "ROLE_ID")
+	@JoinColumn(name = "ROLE")
 	private Role role;
 	
 	@OneToMany(mappedBy = "user")
 	private List<Account> accounts = new ArrayList<>();
 
 	private Boolean deleted = Boolean.FALSE;
-
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
-	}
-	@Override
-	public String getPassword() {
-		return password;
-	}
-
-	@Override
-	public String getUsername() {
-		return email;
-	}
-
-	@Override
-	public boolean isAccountNonExpired() {
-		return false;
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		return false;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return false;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return false;
-	}
 	
 	public void addAccount(Account account) {
 	  accounts.add(account);

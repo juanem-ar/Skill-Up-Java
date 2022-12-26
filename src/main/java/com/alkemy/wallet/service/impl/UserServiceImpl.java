@@ -9,10 +9,12 @@ import com.alkemy.wallet.mapper.IuserMapper;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.security.service.JwtUtils;
+import com.alkemy.wallet.security.service.UserDetailsImpl;
 import com.alkemy.wallet.service.IUserService;
 import lombok.AllArgsConstructor;
 import org.hibernate.Filter;
 import org.hibernate.Session;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -143,7 +145,11 @@ public class UserServiceImpl implements IUserService {
 	}
 
     @Override
-    public User loadUserByUsername(String email) throws UsernameNotFoundException {
-        return iUserRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		User userEntity = iUserRepository.findByEmail(email);
+		if (userEntity == null) {
+			throw new UsernameNotFoundException("username or password not found");
+		}
+        return UserDetailsImpl.build(userEntity);
     }
 }

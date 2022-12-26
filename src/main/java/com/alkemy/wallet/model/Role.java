@@ -2,7 +2,6 @@ package com.alkemy.wallet.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,7 +17,10 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Entity
 @Table(name = "ROLES")
-public class Role {
+public class Role implements Serializable{
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @SequenceGenerator(name = "roleSequence",sequenceName = "roleSequence", allocationSize = 1)

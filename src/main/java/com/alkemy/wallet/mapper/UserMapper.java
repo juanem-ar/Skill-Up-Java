@@ -3,6 +3,7 @@ package com.alkemy.wallet.mapper;
 import com.alkemy.wallet.dto.RequestUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.model.ERoles;
+import com.alkemy.wallet.model.Role;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.repository.IRoleRepository;
@@ -24,7 +25,7 @@ public class UserMapper {
         userEntity.setEmail(dto.getEmail());
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         userEntity.setPassword(passwordEncoder.encode(dto.getPassword()));
-        userEntity.setRole(iRoleRepository.findByName(ERoles.ROLE_ADMIN));
+        userEntity.setRole(this.convertRole(dto.getRole()));
         return userEntity;
     }
     public ResponseUserDto toDto(User entity) {
@@ -42,4 +43,8 @@ public class UserMapper {
         return dto;
     }
 
+    public Role convertRole (String name){
+        return name.equalsIgnoreCase("ADMIN") ?
+                iRoleRepository.findByName(ERoles.ROLE_ADMIN) : iRoleRepository.findByName(ERoles.ROLE_USER);
+    }
 }

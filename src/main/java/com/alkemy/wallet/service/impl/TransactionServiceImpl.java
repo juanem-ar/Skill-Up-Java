@@ -25,7 +25,8 @@ public class TransactionServiceImpl implements ITransactionService {
     private final ITransactionMapper transactionMapper;
     private final IJwtUtils jwtUtils;
 
-    public ResponseTransactionDto send(Long senderId, ResponseSendTransactionDto responseSendTransactionDto, ECurrency currency) throws TransactionError {
+    public ResponseTransactionDto send(String token, ResponseSendTransactionDto responseSendTransactionDto, ECurrency currency) throws Exception {
+        Long senderId = jwtUtils.extractUserId(token);
         Account senderAccount = accountRepository.getReferenceByUserIdAndCurrency(senderId, currency);
         Account receiverAccount = accountRepository.getReferenceById(responseSendTransactionDto.getReceiverAccountId());
         String description = "Money transfer in " + currency;
@@ -51,8 +52,8 @@ public class TransactionServiceImpl implements ITransactionService {
                         if (sendTransaction.getAmount() <= senderAccount.getBalance()) {
                             if (sendTransaction.getAmount() <= senderAccount.getTransactionLimit()) {
 
-                                transaction = payment(sendTransaction);
-                                payment(receiveTransaction);
+                                transaction = payment(sendTransaction, token);
+                                payment(receiveTransaction, token);
 
                             } else {
                                 throw new TransactionError("Amount trying to send is above the transaction limit");
@@ -77,11 +78,20 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
     @Override
-    public ResponseTransactionDto payment(TransactionDtoPay transactionDtoPay) {
+    public ResponseTransactionDto payment(TransactionDtoPay transactionDtoPay, String token) throws Exception {
+
+        Long userId = jwtUtils.extractUserId(token);
+
         Account account = accountRepository.getReferenceById(transactionDtoPay.getAccountId());
+
+        if (account.getUser().getId() != userId)
+            throw new TransactionError("The selected account does not belong to you");
+
         Transaction entity = transactionMapper.transactionDtoToTransaction(transactionDtoPay);
         entity.setAccount(account);
         Double currentBalance = account.getBalance();
+        if(account.getBalance() < transactionDtoPay.getAmount())
+            throw new TransactionError("insufficient balance");
         if(entity.getType().equals(EType.PAYMENT)) {
             account.setBalance(currentBalance - entity.getAmount());
         }
@@ -90,8 +100,7 @@ public class TransactionServiceImpl implements ITransactionService {
         }
         transactionRepository.save(entity);
         accountRepository.save(account);
-        ResponseTransactionDto response = transactionMapper.modelToResponseTransactionDto(entity);
-        return response;
+        return transactionMapper.modelToResponseTransactionDto(entity);
     }
 
     public ResponseTransactionDto save(RequestTransactionDto transactionDto){
@@ -125,7 +134,7 @@ public class TransactionServiceImpl implements ITransactionService {
     @Override
     public TransactionPageDto findAllByAccount(Integer page) throws Exception {
         if (page <= 0)
-            throw new TransactionError("The page you request not found, try page 1");
+            throw new TransactionError("You request page not found, try page 1");
 
         Pageable pageWithTenElementsAndSortedByAccountAsc = PageRequest.of(page-1,2,
                 Sort.by("account.id")
@@ -143,7 +152,6 @@ public class TransactionServiceImpl implements ITransactionService {
         if (page > transactionPage.getTotalPages())
             throw new TransactionError("The page you request not found, try page 1 or go to previous page");
 
-        //Create URLs
         StringBuilder url = new StringBuilder(
                 "http://localhost:8080/transactions/list?page=");
 

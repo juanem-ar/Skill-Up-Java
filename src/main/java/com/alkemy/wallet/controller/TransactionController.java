@@ -39,8 +39,8 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("payment")
-    public ResponseEntity<ResponseTransactionDto> transactionPayment(@RequestBody @Valid TransactionDtoPay transactionDtoPay){
-        return new ResponseEntity<>(transactionService.payment(transactionDtoPay), HttpStatus.CREATED);
+    public ResponseEntity<ResponseTransactionDto> transactionPayment(HttpServletRequest req, @RequestBody @Valid TransactionDtoPay transactionDtoPay) throws Exception {
+        return new ResponseEntity<>(transactionService.payment(transactionDtoPay, jwtUtils.getJwt(req.getHeader("Authorization"))), HttpStatus.CREATED);
     }
 
     @Operation(method = "POST", summary = "saveDeposit", description = "Registrar un depósito.",
@@ -113,10 +113,9 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/sendArs")
-    public ResponseEntity<ResponseTransactionDto> sendArs(HttpServletRequest req, @RequestBody RequestSendARTransactionDto requestTransactionDto) {
-        String token = req.getHeader("Authorization");
-        Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
-        return ResponseEntity.ok().body(transactionService.send(senderId, requestTransactionDto, ECurrency.ARS));
+    public ResponseEntity<ResponseTransactionDto> sendArs(HttpServletRequest req, @RequestBody RequestSendARTransactionDto requestTransactionDto) throws Exception{
+
+        return ResponseEntity.ok().body(transactionService.send(jwtUtils.getJwt(req.getHeader("Authorization")), requestTransactionDto, ECurrency.ARS));
     }
 
     @Operation(method = "POST", summary = "send money to user", description = "Send Pesos (USD).",
@@ -127,9 +126,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/sendUsd")
-    public ResponseEntity<ResponseTransactionDto> sendUsd(HttpServletRequest req, @RequestBody RequestSendUSDTransactionDto requestTransactionDto) {
-        String token = req.getHeader("Authorization");
-        Long senderId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
-        return ResponseEntity.ok().body(transactionService.send(senderId, requestTransactionDto, ECurrency.USD));
+    public ResponseEntity<ResponseTransactionDto> sendUsd(HttpServletRequest req, @RequestBody RequestSendUSDTransactionDto requestTransactionDto) throws Exception{
+        return ResponseEntity.ok().body(transactionService.send(jwtUtils.getJwt(req.getHeader("Authorization")), requestTransactionDto, ECurrency.USD));
     }
 }

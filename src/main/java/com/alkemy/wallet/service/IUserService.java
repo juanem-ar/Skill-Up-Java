@@ -2,6 +2,8 @@ package com.alkemy.wallet.service;
 
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.dto.ResponseDetailsUserDto;
@@ -16,7 +18,7 @@ public interface IUserService extends UserDetailsService {
     	HttpServletRequest httpServletRequest);
     Optional<User> findById(Long id);
 	public User getUserById(Long userId);
-    User loadUserByUsername(String email);
+    UserDetails loadUserByUsername(String email);
     ResponseDetailsUserDto getUserDetails(Long id, String token);
     ResponseDetailsUserDto updateUserDetails(
 		Long id,

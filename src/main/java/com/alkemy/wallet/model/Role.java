@@ -12,17 +12,13 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-@ToString
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "ROLES")
-public class Role implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class Role {
 
     @Id
     @SequenceGenerator(name = "roleSequence",sequenceName = "roleSequence", allocationSize = 1)
@@ -33,7 +29,7 @@ public class Role implements Serializable {
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "NAME")
-    @Schema(required = true, example = "USER", description = "User role")
+    @Schema(required = true, example = "ROLE_USER", description = "User role")
     private ERoles name;
 
     @Column(name = "DESCRIPTION")

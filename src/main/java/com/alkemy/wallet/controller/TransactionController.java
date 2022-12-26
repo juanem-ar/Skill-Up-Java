@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,7 +77,6 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @GetMapping("/list")
-    //TODO only ADMIN users
     public ResponseEntity<TransactionPageDto> getAllTransactionPages(@RequestParam(value = "page", defaultValue = "1") @PathVariable int page) throws Exception{
         return ResponseEntity.ok(transactionService.findAllByAccount(page));
     }

@@ -101,7 +101,7 @@ public class AccountController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping
-    public ResponseEntity<String> createAccount(HttpServletRequest req, @Valid @RequestParam(name = "Currency") String currency) throws Exception {
+    public ResponseEntity<String> createAccount(HttpServletRequest req, @Valid @RequestParam(name = "currency") String currency) throws Exception {
         String userEmail = jwtUtils.extractUsername(jwtUtils.getJwt(req.getHeader("Authorization")));
         return ResponseEntity.status(HttpStatus.OK).body(iAccountService.addAccount(userEmail, currency));
     }

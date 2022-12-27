@@ -95,7 +95,11 @@ public class AccountServiceImpl implements IAccountService {
     @Override
     public String addAccount(String email, String currencyParam) throws Exception {
         CurrencyDto currency = new CurrencyDto();
-        currency.setCurrency(ECurrency.valueOf(currencyParam));
+        try{
+            currency.setCurrency(ECurrency.valueOf(currencyParam));
+        }catch (Exception ex){
+            throw new BadRequestException("Insert ARS or USD");
+        }
         int countByUserId = iAccountRepository.countByUserId(userRepository.findByEmail(email).getId()).intValue();
         if (countByUserId < 0 || countByUserId >1)
             throw new ResourceNotFoundException("You have 2 associated accounts");

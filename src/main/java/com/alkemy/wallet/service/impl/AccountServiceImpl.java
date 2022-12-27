@@ -93,23 +93,23 @@ public class AccountServiceImpl implements IAccountService {
 
 
     @Override
-    public String addAccount(String email, CurrencyDto currency) throws Exception {
+    public String addAccount(String email, String currencyParam) throws Exception {
+        CurrencyDto currency = new CurrencyDto();
+        currency.setCurrency(ECurrency.valueOf(currencyParam));
         int countByUserId = iAccountRepository.countByUserId(userRepository.findByEmail(email).getId()).intValue();
-        if (countByUserId < 0 || countByUserId >1){
+        if (countByUserId < 0 || countByUserId >1)
             throw new ResourceNotFoundException("You have 2 associated accounts");
-        }else{
-            if (iAccountRepository.getReferenceByUserId(userRepository.findByEmail(email).getId()) != null) {
-                Account accRegistered = iAccountRepository.getReferenceByUserId(userRepository.findByEmail(email).getId());
-                if (accRegistered.getCurrency() == currency.getCurrency()) {
-                    throw new ResourceNotFoundException("You already have an " + currency.getCurrency() + " associated account.");
-                }
+        if (iAccountRepository.getReferenceByUserId(userRepository.findByEmail(email).getId()) != null) {
+            Account accRegistered = iAccountRepository.getReferenceByUserId(userRepository.findByEmail(email).getId());
+            if (accRegistered.getCurrency() == currency.getCurrency()) {
+                throw new ResourceNotFoundException("You already have an " + currency.getCurrency() + " associated account.");
             }
-            Account account = createAccount(currency);
-            User userLogged = userRepository.findByEmail(email);
-            account.setUser(userLogged);
-            iAccountRepository.save(account);
-            return HttpStatus.CREATED.getReasonPhrase();
         }
+        Account account = createAccount(currency);
+        User userLogged = userRepository.findByEmail(email);
+        account.setUser(userLogged);
+        iAccountRepository.save(account);
+        return HttpStatus.CREATED.getReasonPhrase();
     }
 
     @Override

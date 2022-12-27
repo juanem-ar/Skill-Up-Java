@@ -3,19 +3,14 @@ package com.alkemy.wallet.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
 import com.alkemy.wallet.dto.*;
-import io.swagger.v3.oas.annotations.Hidden;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -58,7 +53,6 @@ public class AccountController {
         return new ResponseEntity<>(iAccountService.findAllByUser(id), HttpStatus.OK);
     }
 
-
     @Operation(method = "GET", summary = "findAllAccounts", description = "Traer todas las cuentas.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
@@ -69,11 +63,8 @@ public class AccountController {
     //@Secured(value = { "ROLE_ADMIN" })
     @GetMapping
     public ResponseEntity<ResponseAccountsDto> findAllAccounts(
-            @RequestParam(required = false, name = "page") Integer page,
-            HttpServletRequest httpServletRequest){
-        return ResponseEntity.ok(iAccountService.findAll(
-                page,
-                httpServletRequest));
+            @RequestParam(required = false, name = "page") Integer page, HttpServletRequest httpServletRequest){
+        return ResponseEntity.ok(iAccountService.findAll(page, httpServletRequest));
     }
 
     @Operation(method = "PATCH", summary = "updateAccount", description = "Actualizar una cuenta.",
@@ -99,22 +90,19 @@ public class AccountController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @GetMapping("/balance")
-	public ResponseEntity<
-		ResponseUserBalanceDto> getAccountsBalance(
-			@RequestHeader(name = "Authorization") String token) {
+	public ResponseEntity<ResponseUserBalanceDto> getAccountsBalance(@RequestHeader(name = "Authorization") String token) {
 		return ResponseEntity.ok(iAccountService.getBalance(token));
 	}
 
-    @Operation(method = "POST", summary = "createAccount", description = "Crear una cuenta.",
+    @Operation(method = "POST", summary = "createAccount", description = "Create an account by a specific currency.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
+                    @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "string", schema = @Schema(example = "Created"))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping
-    public ResponseEntity<String> createAccount(HttpServletRequest req, @Valid @RequestBody CurrencyDto currency) throws Exception {
-        String token = req.getHeader("Authorization");
-        String userEmail = jwtUtils.extractUsername(jwtUtils.getJwt(token));
+    public ResponseEntity<String> createAccount(HttpServletRequest req, @Valid @RequestParam(name = "Currency") String currency) throws Exception {
+        String userEmail = jwtUtils.extractUsername(jwtUtils.getJwt(req.getHeader("Authorization")));
         return ResponseEntity.status(HttpStatus.OK).body(iAccountService.addAccount(userEmail, currency));
     }
 }

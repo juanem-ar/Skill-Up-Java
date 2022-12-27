@@ -42,8 +42,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             User entity = userMapper.toEntity(dto);
             User entitySaved = iUserRepository.save(entity);
 
-            iAccountService.addAccount(entitySaved.getEmail(), new CurrencyDto(ECurrency.ARS));
-            iAccountService.addAccount(entitySaved.getEmail(), new CurrencyDto(ECurrency.USD));
+            iAccountService.addAccount(entitySaved.getEmail(), "ARS");
+            iAccountService.addAccount(entitySaved.getEmail(), "USD");
 
             ResponseUserDto responseDto = userMapper.toDto(entitySaved);
 

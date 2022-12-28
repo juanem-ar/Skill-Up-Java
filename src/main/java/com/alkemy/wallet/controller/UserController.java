@@ -60,7 +60,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<ResponseUsersDto> findAllUsers (
     	@RequestParam(required = false, name = "page") Integer page,
-    	HttpServletRequest httpServletRequest) {
+    	HttpServletRequest httpServletRequest) throws Exception {
     	return ResponseEntity.ok(userService.findAllUsers(
     		page, 
     		httpServletRequest));
@@ -71,7 +71,7 @@ public class UserController {
     public ResponseEntity<ResponseDetailsUserDto> getUserDetails(
         @Parameter(description = "id of User to be searched")
     	@RequestHeader(name = "Authorization") String token,
-    	@PathVariable Long id) {
+    	@PathVariable Long id) throws Exception {
 		return ResponseEntity.ok(userService.getUserDetails(id, token));
     }
     
@@ -79,7 +79,7 @@ public class UserController {
     public ResponseEntity<ResponseDetailsUserDto> updateUserDetails(
     	@PathVariable Long id,
     	@RequestBody PatchRequestUserDto dto,
-    	@RequestHeader(name = "Authorization") String token){
+    	@RequestHeader(name = "Authorization") String token) throws Exception {
 		return ResponseEntity.ok(
 			userService.updateUserDetails(id, dto, token));
     }

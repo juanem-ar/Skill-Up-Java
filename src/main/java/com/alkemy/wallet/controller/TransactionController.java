@@ -39,7 +39,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/deposit")
-    public ResponseEntity<ResponseTransactionDto> saveDeposit(HttpServletRequest req, @RequestBody RequestTransactionDto deposit){
+    public ResponseEntity<ResponseTransactionDto> saveDeposit(HttpServletRequest req, @RequestBody RequestTransactionDto deposit) throws Exception {
         ResponseTransactionDto depositCreated = transactionService.save(deposit, jwtUtils.getJwt(req.getHeader("Authorization")));
         return ResponseEntity.status(HttpStatus.CREATED).body(depositCreated);
     }
@@ -64,8 +64,8 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @GetMapping("/list")
-    public ResponseEntity<TransactionPageDto> getAllTransactionPages(@RequestParam(value = "page", defaultValue = "1") @PathVariable int page) throws Exception{
-        return ResponseEntity.ok(transactionService.findAllByAccount(page));
+    public ResponseEntity<TransactionPageDto> getAllTransactionPages(@RequestParam(value = "page", defaultValue = "1") @PathVariable int page, HttpServletRequest httpServletRequest) throws Exception{
+        return ResponseEntity.ok(transactionService.findAllByAccount(page, httpServletRequest));
     }
 
     @Operation(method = "GET", summary = "getTransactionByIdAndUserLogged", description = "Get transaction by id",
@@ -85,7 +85,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "200", description = "Ok"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+                    @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseTransactionDto> editTransactionByAuthUser(HttpServletRequest req, @RequestBody PatchTransactionDescriptionDto description, @PathVariable Long id) throws Exception {

@@ -2,6 +2,8 @@ package com.alkemy.wallet.repository;
 
 import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.ECurrency;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -15,4 +17,5 @@ public interface IAccountRepository extends JpaRepository<Account, Long>{
     Account getReferenceByUserIdAndCurrency(Long userId,ECurrency currency);
     Account getReferenceById(Long id);
     Account getReferenceByIdAndCurrency(Long id,ECurrency currency);
+    Page<Account> findAll(Pageable page);
 }

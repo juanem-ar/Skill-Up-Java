@@ -6,8 +6,8 @@ public enum ErrorEnum {
 
     public String getMessage() {
         if (ErrorEnum.this == DEPOSITNOTVALID){
-            return ("El deposito debe ser mayor a 0");
+            return ("Deposit value must be greater than 0");
         }
-        return ("Error indefinido");
+        return ("Error undefined");
     }
 }

@@ -39,7 +39,7 @@ class AccountControllerTest {
 
 	private String uri = "/accounts";
 
-
+/*
 	@Test
 	void getAccountsBalance_GetRequestWithSpecificName_ResponseUserBalanceDto()
 		throws Exception {
@@ -54,5 +54,5 @@ class AccountControllerTest {
 					.header("authorization", "Bearer " + token))
 			.andExpect(status().isOk());
 	}
-
+*/
 }

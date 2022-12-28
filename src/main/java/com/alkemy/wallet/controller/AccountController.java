@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
     private final IAccountService iAccountService;
 
-    @Operation(method = "GET", summary = "listAccountsByUser", description = "Get all accounts from user",
+    @Operation(method = "GET", summary = "listAccountsByUser", description = "Get all accounts from user. Only use by admin.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Ok",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseAccountDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
@@ -44,7 +44,7 @@ public class AccountController {
         return new ResponseEntity<>(iAccountService.findAllByUser(id), HttpStatus.OK);
     }
 
-    @Operation(method = "GET", summary = "findAllAccounts", description = "Traer todas las cuentas.",
+    @Operation(method = "GET", summary = "findAllAccounts", description = "Get all system accounts. Only use by admin.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Ok",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseAccountsListDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),

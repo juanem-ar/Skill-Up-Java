@@ -9,9 +9,9 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseAccountsDto {
-    List<ResponseAccountDto> accountsDto;
+public class ResponseAccountsListDto {
+    int totalPages;
     String previousPage;
-    String nextpage;
-
+    String nextPage;
+    List<ResponseAccountDto> accountsDto;
 }

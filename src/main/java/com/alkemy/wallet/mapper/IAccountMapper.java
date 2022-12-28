@@ -13,6 +13,7 @@ public interface IAccountMapper {
     List<ResponseAccountDto> accountsToAccountsDto(List<Account> account);
 
     AccountBalanceDto accountToBalanceDto(Account account);
+    List<AccountBalanceDto> accountListToBalanceDtoList(List<Account> account);
 
     ResponseAccountDto accountToAccountDto(Account account);
 

@@ -15,6 +15,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.exceptions.ErrorEnum;
 import com.alkemy.wallet.exceptions.TransactionError;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Service
@@ -24,6 +26,8 @@ public class TransactionServiceImpl implements ITransactionService {
     private final IAccountRepository accountRepository;
     private final ITransactionMapper transactionMapper;
     private final IJwtUtils jwtUtils;
+
+    private static final Integer TRANSACTIONS_FOR_PAGE = 10;
 
     public ResponseTransactionDto send(String token, ResponseSendTransactionDto dto, ECurrency currency) throws Exception {
         Long senderId = jwtUtils.extractUserId(token);
@@ -114,33 +118,32 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
     @Override
-    public TransactionPageDto findAllByAccount(Integer page) throws Exception {
+    public TransactionPageDto findAllByAccount(Integer page, HttpServletRequest httpServletRequest) throws Exception {
         if (page <= 0)
             throw new TransactionError("You request page not found, try page 1");
 
-        Pageable pageWithTenElementsAndSortedByAccountAsc = PageRequest.of(page-1,2,
+        Pageable pageWithTenElementsAndSortedByAccountAscAndAmountDesc = PageRequest.of(page-1,TRANSACTIONS_FOR_PAGE,
                 Sort.by("account.id")
                         .ascending()
                         .and(Sort.by("amount")
                                 .descending()));
-        Page<Transaction> transactionPage = transactionRepository.findAll(pageWithTenElementsAndSortedByAccountAsc);
-        List<Transaction> transactionList = transactionPage.getContent();
+        Page<Transaction> transactionPage = transactionRepository.findAll(pageWithTenElementsAndSortedByAccountAscAndAmountDesc);
 
         //Pagination DTO
         TransactionPageDto pagination = new TransactionPageDto();
         int totalPages = transactionPage.getTotalPages();
         pagination.setTotalPages(totalPages);
 
-        if (page > transactionPage.getTotalPages())
+        if (page > totalPages)
             throw new TransactionError("The page you request not found, try page 1 or go to previous page");
 
-        StringBuilder url = new StringBuilder(
-                "http://localhost:8080/transactions/list?page=");
+        // url
+        String url = httpServletRequest
+                .getRequestURL().toString() + "?" + "page=";
 
         pagination.setNextPage(totalPages == page ? null : url + String.valueOf(page + 1));
         pagination.setPreviousPage(page == 1 ? null : url + String.valueOf(page - 1));
-        pagination.setTransactionDtoList(transactionMapper.listModelToResponseTransactionDto(transactionList));
-
+        pagination.setTransactionDtoList(transactionMapper.listModelToResponseTransactionDto(transactionPage.getContent()));
         return pagination;
     }
 

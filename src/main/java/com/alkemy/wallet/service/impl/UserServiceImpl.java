@@ -46,7 +46,7 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public ResponseUsersDto findAllUsers(
 		Integer page, 
-		HttpServletRequest httpServletRequest) {
+		HttpServletRequest httpServletRequest) throws Exception {
 		ResponseUsersDto dto = new ResponseUsersDto();
 		// activate hibernate filter
 		Session session = entityManager.unwrap(Session.class);
@@ -113,7 +113,7 @@ public class UserServiceImpl implements IUserService {
     }
 
 	@Override
-	public ResponseDetailsUserDto getUserDetails(Long id, String token) {
+	public ResponseDetailsUserDto getUserDetails(Long id, String token) throws Exception {
 		Long tokenUserId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
 		
 		sameIdOrThrowException(id, tokenUserId);
@@ -125,7 +125,7 @@ public class UserServiceImpl implements IUserService {
 	public ResponseDetailsUserDto updateUserDetails(
 		Long id,
 		PatchRequestUserDto dto,
-		String token) {
+		String token) throws Exception {
 		Long tUserId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
 		
 		sameIdOrThrowException(id, tUserId);
@@ -139,7 +139,7 @@ public class UserServiceImpl implements IUserService {
 	}
 	
 	
-	private void sameIdOrThrowException(Long userId, Long tokenUserId) {
+	private void sameIdOrThrowException(Long userId, Long tokenUserId) throws Exception {
 		if(!Objects.equals(userId, tokenUserId))
 			throw new BadRequestException("not same");
 	}

@@ -24,7 +24,7 @@ class UserServiceImplIntegrationTest {
 
 	@Test
 	@Transactional
-	void findAllUsers_DataBaseWithOneUser_ReturnAListWithOneDto() {
+	void findAllUsers_DataBaseWithOneUser_ReturnAListWithOneDto() throws Exception {
 		userRepository.deleteAll();
 		
 		User user1 = new User();
@@ -47,7 +47,7 @@ class UserServiceImplIntegrationTest {
 	
 	@Test
 	@Transactional
-	void findAllUsers_DataBaseWithTwoUserButOneDeleted_ReturnAListWithOneDto() {
+	void findAllUsers_DataBaseWithTwoUserButOneDeleted_ReturnAListWithOneDto() throws Exception {
 	  userRepository.deleteAll();
 	  
 	  // create two users

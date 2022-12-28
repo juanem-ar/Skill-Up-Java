@@ -39,7 +39,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/deposit")
-    public ResponseEntity<ResponseTransactionDto> saveDeposit(HttpServletRequest req, @RequestBody RequestTransactionDto deposit){
+    public ResponseEntity<ResponseTransactionDto> saveDeposit(HttpServletRequest req, @RequestBody RequestTransactionDto deposit) throws Exception {
         ResponseTransactionDto depositCreated = transactionService.save(deposit, jwtUtils.getJwt(req.getHeader("Authorization")));
         return ResponseEntity.status(HttpStatus.CREATED).body(depositCreated);
     }

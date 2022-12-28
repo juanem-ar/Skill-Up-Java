@@ -81,7 +81,7 @@ public class TransactionServiceImpl implements ITransactionService {
         return transactionMapper.modelToResponseTransactionDto(entity);
     }
 
-    public ResponseTransactionDto save(RequestTransactionDto transactionDto, String token){
+    public ResponseTransactionDto save(RequestTransactionDto transactionDto, String token) throws Exception {
         Long userId = jwtUtils.extractUserId(token);
         if (transactionDto.getAmount() <= 0) {
             throw new TransactionError(ErrorEnum.DEPOSITNOTVALID.getMessage());
@@ -104,7 +104,7 @@ public class TransactionServiceImpl implements ITransactionService {
 	}
 
     @Override
-    public List<ResponseTransactionDto> findAllTransactionsByUserId(String token) {
+    public List<ResponseTransactionDto> findAllTransactionsByUserId(String token) throws Exception {
         Long userId = jwtUtils.extractUserId(token);
         List<Account> accountList = accountRepository.findAllByUserId(userId);
         List<Transaction> transactionsList = transactionRepository.findAllByAccountIn(accountList);

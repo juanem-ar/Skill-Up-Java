@@ -3,6 +3,7 @@ package com.alkemy.wallet.service.impl;
 import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.exceptions.ResourceNotFoundException;
+import com.alkemy.wallet.exceptions.TransactionError;
 import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.mapper.IAccountMapper;
 import com.alkemy.wallet.mapper.IFixedTermDepositMapper;
@@ -19,6 +20,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.model.FixedTermDeposit;
@@ -53,13 +55,13 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
-    public Optional<Account> findById(Long id) {
-        return iAccountRepository.findById(id);
-    }
-
-    @Override
-    public ResponseAccountDto updateAccount(Account account, UpdateAccountDto requestAccount, Authentication authentication){
-        account.setTransactionLimit(requestAccount.getTransactionLimit());
+    public ResponseAccountDto updateAccount(Long id, Double limit, Authentication authentication) throws Exception {
+        Account account = iAccountRepository.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
+        if (!account.getUser().getEmail().equals(authentication.getName()))
+            throw new ResourceNotFoundException("You don't have permission to access this resource");
+        if (limit < 0)
+            throw new BadRequestException("The limit must be greater than or equal to 0.");
+        account.setTransactionLimit(limit);
         return accountMapper.accountToAccountDto(iAccountRepository.save(account));
     }
 
@@ -133,7 +135,7 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
-    public ResponseAccountsDto findAll(Integer page, HttpServletRequest httpServletRequest) {
+    public ResponseAccountsDto findAll(Integer page, HttpServletRequest httpServletRequest) throws Exception {
         ResponseAccountsDto dto = new ResponseAccountsDto();
         if (page == null) {
             dto.setAccountsDto(

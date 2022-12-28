@@ -60,7 +60,7 @@ public class FixedDepositServiceImpl implements IFixedDepositService {
     }
 
     @Override
-    public ResponseSimulatedFixedDepositDto simulateFixedDeposit(FixedDepositDto dto) {
+    public ResponseSimulatedFixedDepositDto simulateFixedDeposit(FixedDepositDto dto) throws Exception {
         if (dto.getAmount() <= 0)
             throw new BadRequestException("Invalid amount.");
         if (dto.getCurrency() != ARS && dto.getCurrency() != USD )

@@ -11,19 +11,28 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptions {
     @ExceptionHandler({ResourceNotFoundException.class})
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    public ResponseEntity<String> processErrorNotFound(ResourceNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<ErrorsResponseMessage> processErrorNotFound(ResourceNotFoundException ex) {
+        ErrorsResponseMessage errorsResponseMessage = new ErrorsResponseMessage();
+        errorsResponseMessage.setStatusCode(HttpStatus.NOT_FOUND);
+        errorsResponseMessage.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorsResponseMessage);
     }
 
     @ExceptionHandler({BadRequestException.class})
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> processErrorBadRequest(BadRequestException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<ErrorsResponseMessage> processErrorBadRequest(BadRequestException ex) {
+        ErrorsResponseMessage errorsResponseMessage = new ErrorsResponseMessage();
+        errorsResponseMessage.setStatusCode(HttpStatus.BAD_REQUEST);
+        errorsResponseMessage.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorsResponseMessage);
     }
     @ExceptionHandler({TransactionError.class})
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    public ResponseEntity<String> processErrorTransactionError(TransactionError ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<ErrorsResponseMessage> processErrorTransactionError(TransactionError ex) {
+        ErrorsResponseMessage errorsResponseMessage = new ErrorsResponseMessage();
+        errorsResponseMessage.setStatusCode(HttpStatus.NOT_FOUND);
+        errorsResponseMessage.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorsResponseMessage);
     }
     @ExceptionHandler({UserNotFoundUserException.class})
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)

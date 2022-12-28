@@ -63,24 +63,21 @@ public class AccountController {
     //@Secured(value = { "ROLE_ADMIN" })
     @GetMapping
     public ResponseEntity<ResponseAccountsDto> findAllAccounts(
-            @RequestParam(required = false, name = "page") Integer page, HttpServletRequest httpServletRequest){
+            @RequestParam(required = false, name = "page") Integer page, HttpServletRequest httpServletRequest) throws Exception {
         return ResponseEntity.ok(iAccountService.findAll(page, httpServletRequest));
     }
 
     @Operation(method = "PATCH", summary = "updateAccount", description = "Actualizar una cuenta.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente", content = @Content(schema = @Schema(implementation = ResponseAccountDto.class))),
+                    @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseAccountDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
             })
     @Secured(value = { "ROLE_USER" })
     @PatchMapping("{id}")
-    public ResponseEntity<Object> updateAccount(@PathVariable Long id, Authentication authentication, @RequestBody UpdateAccountDto requestAccountDto){
-        Account account = iAccountService.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
-    //    if (authentication == null || !authentication.isAuthenticated() || !account.getUser().getEmail().equals(authentication.getName()))
-    //        return new ResponseEntity<>("You don't have permission to access this resource", HttpStatus.UNAUTHORIZED);
-        return new ResponseEntity<>(iAccountService.updateAccount(account,requestAccountDto,authentication), HttpStatus.OK);
+    public ResponseEntity<Object> updateAccount(@PathVariable Long id, Authentication authentication, @Valid @RequestParam(name = "limit") Double transactionLimit) throws Exception{
+        return new ResponseEntity<>(iAccountService.updateAccount(id,transactionLimit,authentication), HttpStatus.OK);
     }
 
     @Operation(method = "GET", summary = "getAccountBalance", description = "Obtener el balance de ambas cuentas de un usuario.",

@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alkemy.wallet.dto.ResponseUsersDto;
+import com.alkemy.wallet.dto.ResponseUserListDto;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.service.IUserService;
@@ -37,7 +37,7 @@ class UserServiceImplIntegrationTest {
 		user1.setPassword("first password");
 		userRepository.save(user1);
 		
-		ResponseUsersDto result = userService.findAllUsers(null, null);
+		ResponseUserListDto result = userService.findAllUsers(null, null);
 		
 		assertEquals(1, result.getUserDtos().size());
 		assertEquals(
@@ -68,7 +68,7 @@ class UserServiceImplIntegrationTest {
 	  // delete one user
       userRepository.delete(user1);
 	  
-	  ResponseUsersDto result = userService.findAllUsers(null, null);
+	  ResponseUserListDto result = userService.findAllUsers(null, null);
 	  
 	  assertEquals(1, result.getUserDtos().size());
 	}

@@ -1,6 +1,7 @@
 package com.alkemy.wallet.controller;
 
 import com.alkemy.wallet.dto.PatchRequestUserDto;
+import com.alkemy.wallet.dto.ResponseUserListDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,6 +15,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import com.alkemy.wallet.dto.ResponseDetailsUserDto;
+import javax.servlet.http.HttpServletRequest;
 
 @RequestMapping("/users")
 @RestController
@@ -34,24 +36,21 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable Long id, Authentication authentication) throws Exception{
         return new ResponseEntity<>(userService.deleteUser(id,authentication), HttpStatus.OK);
     }
-    /*
-    @Operation(method = "GET", summary = "findAllUsers", description = "Traer todos los usuarios.",
+
+    @Operation(method = "GET", summary = "findAllUsers", description = "Get all system users. Only use by admin.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
+                    @ApiResponse(responseCode = "200", description = "Ok"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(hidden = true))),
-                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+                    @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @Secured(value = { "ROLE_ADMIN" })
-    @GetMapping
-    public ResponseEntity<ResponseUsersDto> findAllUsers (
-    	@RequestParam(required = false, name = "page") Integer page,
-    	HttpServletRequest httpServletRequest) throws Exception {
-    	return ResponseEntity.ok(userService.findAllUsers(
-    		page, 
-    		httpServletRequest));
+    @GetMapping("/all")
+    public ResponseEntity<ResponseUserListDto> findAllUsers (
+    	@RequestParam(name = "page") Integer page, HttpServletRequest httpServletRequest) throws Exception {
+    	return ResponseEntity.ok(userService.findAllUsers(page, httpServletRequest));
     }
-    */
+
 
     @Operation(method = "GET", summary = "getUserDetails", description = "Get user detail. Authentication needed.",
             responses = {

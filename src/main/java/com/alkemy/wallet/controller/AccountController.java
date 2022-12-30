@@ -51,8 +51,7 @@ public class AccountController {
             })
     @Secured(value = { "ROLE_ADMIN" })
     @GetMapping
-    public ResponseEntity<ResponseAccountsListDto> findAllAccounts(
-            @RequestParam(name = "page") Integer page, HttpServletRequest httpServletRequest) throws Exception {
+    public ResponseEntity<ResponseAccountsListDto> findAllAccounts(@RequestParam(name = "page") Integer page, HttpServletRequest httpServletRequest) throws Exception {
         return ResponseEntity.ok(iAccountService.findAll(page, httpServletRequest));
     }
 

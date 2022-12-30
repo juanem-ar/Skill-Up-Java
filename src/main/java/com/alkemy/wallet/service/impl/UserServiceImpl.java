@@ -1,5 +1,6 @@
 package com.alkemy.wallet.service.impl;
 
+import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.exceptions.ResourceNotFoundException;
 import com.alkemy.wallet.exceptions.UserNotFoundException;
 import com.alkemy.wallet.dto.ResponseDetailsUserDto;
@@ -48,9 +49,7 @@ public class UserServiceImpl implements IUserService {
     }
 
 	@Override
-	public ResponseUsersDto findAllUsers(
-		Integer page, 
-		HttpServletRequest httpServletRequest) throws Exception {
+	public ResponseUsersDto findAllUsers(Integer page, HttpServletRequest httpServletRequest) throws Exception {
 		ResponseUsersDto dto = new ResponseUsersDto();
 		// activate hibernate filter
 		Session session = entityManager.unwrap(Session.class);
@@ -98,7 +97,6 @@ public class UserServiceImpl implements IUserService {
         return iUserRepository.findById(id);
     }
 
-
 	@Override
 	public User getUserById(Long userId) {
 		Optional<User> userOptional = iUserRepository.findById(userId);
@@ -110,10 +108,7 @@ public class UserServiceImpl implements IUserService {
 	}
 	@Override
     public Boolean existsByEmail(@PathVariable String email){
-        if(iUserRepository.existsByEmail(email)) {
-            return true;
-        }
-        return false;
+        return iUserRepository.existsByEmail(email);
     }
 
 	@Override
@@ -124,29 +119,24 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public ResponseDetailsUserDto getUserDetailById(Long id) throws Exception {
-		User entity = iUserRepository.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
+		User entity = iUserRepository.findById(id).orElseThrow(()->
+				new UserNotFoundUserException("Not found Account with number id: "+ id));
 		return iUserMapper.toResponseDetailsUserDto(entity);
 	}
 
-	/*
-        @Override
-        public ResponseDetailsUserDto updateUserDetails(Long id, PatchRequestUserDto dto, String token){return null;}
+	@Override
+	public ResponseDetailsUserDto updateUserDetails(Long id, PatchRequestUserDto dto, Authentication authentication) throws Exception {
+		User entity = iUserRepository.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
+		if (!entity.getEmail().equals(authentication.getName()))
+			throw new ResourceNotFoundException("You don't have permission to edit this user");
+		try{
+		iUserRepository.save(iUserMapper.updateUser(dto, entity));
+		}catch (Exception ex){
+			throw new BadRequestException(ex.getMessage() + ". Please check the data inserted");
+		}
+		return iUserMapper.toResponseDetailsUserDto(entity);
+	}
 
-            Long id,
-            PatchRequestUserDto dto,
-            String token) throws Exception {
-            Long tUserId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
-
-            sameIdOrThrowException(id, tUserId);
-
-            User user = getUserById(tUserId);
-
-            user = iUserRepository.save(
-                iUserMapper.updateUser(dto, user));
-
-            return iUserMapper.toResponseDetailsUserDto(user);
-        }
-        */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		User userEntity = iUserRepository.findByEmail(email);

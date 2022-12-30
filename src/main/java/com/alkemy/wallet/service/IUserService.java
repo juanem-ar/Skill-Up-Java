@@ -2,6 +2,7 @@ package com.alkemy.wallet.service;
 
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
+import com.alkemy.wallet.dto.PatchRequestUserDto;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,5 +19,5 @@ public interface IUserService extends UserDetailsService {
     UserDetails loadUserByUsername(String email);
     ResponseDetailsUserDto getUserDetail(Authentication authentication) throws Exception;
     ResponseDetailsUserDto getUserDetailById(Long id) throws Exception;
-    //ResponseDetailsUserDto updateUserDetails(Long id, PatchRequestUserDto dto, String token) throws Exception;
+    ResponseDetailsUserDto updateUserDetails(Long id, PatchRequestUserDto dto, Authentication authentication) throws Exception;
 }

@@ -1,11 +1,9 @@
 package com.alkemy.wallet.service.impl;
 
-import com.alkemy.wallet.dto.CurrencyDto;
 import com.alkemy.wallet.dto.RequestUserDto;
 import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.mapper.UserMapper;
-import com.alkemy.wallet.model.ECurrency;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IRoleRepository;
 import com.alkemy.wallet.repository.IUserRepository;

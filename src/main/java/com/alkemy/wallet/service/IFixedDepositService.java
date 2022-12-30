@@ -3,7 +3,6 @@ package com.alkemy.wallet.service;
 import java.util.List;
 import com.alkemy.wallet.dto.FixedDepositDto;
 import com.alkemy.wallet.dto.ResponseSimulatedFixedDepositDto;
-import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.FixedTermDeposit;
 

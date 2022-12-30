@@ -7,19 +7,12 @@ import com.alkemy.wallet.model.Transaction;
 import com.alkemy.wallet.dto.ResponseTransactionDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.data.domain.Page;
-
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = AccountBalanceDto.class)
 public interface ITransactionMapper   {
-    /*
-    @Mapping(target = "idAccount", source = "account.id")
-    TransactionDtoPay  transactionToTransactionDto (Transaction transaction);
-    */
     @Mapping( target = "account.id",source = "accountId")
     Transaction transactionDtoToTransaction  (TransactionDtoPay transactionDtoPay);
-
     @Mapping(target = "account", source = "account")
     ResponseTransactionDto modelToResponseTransactionDto(Transaction transaction);
     @Mapping(target = "account", source = "account")

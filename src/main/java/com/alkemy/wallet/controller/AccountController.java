@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.IAccountService;
-import com.alkemy.wallet.service.IUserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
     private final IAccountService iAccountService;
 
-    @Operation(method = "GET", summary = "listAccountsByUser", description = "Get all accounts from user",
+    @Operation(method = "GET", summary = "listAccountsByUser", description = "Get all accounts from user. Only use by admin.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Ok",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseAccountDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
@@ -44,7 +42,7 @@ public class AccountController {
         return new ResponseEntity<>(iAccountService.findAllByUser(id), HttpStatus.OK);
     }
 
-    @Operation(method = "GET", summary = "findAllAccounts", description = "Traer todas las cuentas.",
+    @Operation(method = "GET", summary = "findAllAccounts", description = "Get all system accounts. Only use by admin.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Ok",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseAccountsListDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
@@ -53,8 +51,7 @@ public class AccountController {
             })
     @Secured(value = { "ROLE_ADMIN" })
     @GetMapping
-    public ResponseEntity<ResponseAccountsListDto> findAllAccounts(
-            @RequestParam(name = "page") Integer page, HttpServletRequest httpServletRequest) throws Exception {
+    public ResponseEntity<ResponseAccountsListDto> findAllAccounts(@RequestParam(name = "page") Integer page, HttpServletRequest httpServletRequest) throws Exception {
         return ResponseEntity.ok(iAccountService.findAll(page, httpServletRequest));
     }
 

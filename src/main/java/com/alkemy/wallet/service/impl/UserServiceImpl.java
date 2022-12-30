@@ -1,91 +1,73 @@
 package com.alkemy.wallet.service.impl;
 
-import com.alkemy.wallet.exceptions.UserNotFoundException;
 import com.alkemy.wallet.dto.PatchRequestUserDto;
+import com.alkemy.wallet.exceptions.*;
 import com.alkemy.wallet.dto.ResponseDetailsUserDto;
-import com.alkemy.wallet.exceptions.BadRequestException;
-import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.mapper.IuserMapper;
+import com.alkemy.wallet.model.ERoles;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IUserRepository;
-import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.security.service.UserDetailsImpl;
 import com.alkemy.wallet.service.IUserService;
 import lombok.AllArgsConstructor;
-import org.hibernate.Filter;
-import org.hibernate.Session;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import com.alkemy.wallet.dto.ResponseUsersDto;
+import com.alkemy.wallet.dto.ResponseUserListDto;
 import org.springframework.web.bind.annotation.PathVariable;
-import java.util.Objects;
 import java.util.Optional;
-import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements IUserService {
     private IUserRepository  iUserRepository;
-    private JwtUtils jwtUtils;
     private IuserMapper iUserMapper;
-    private EntityManager entityManager;
     private static final Integer USERS_FOR_PAGE = 10;
 
     @Override
-    public String deleteUser(Long id) {
+    public String deleteUser(Long id, Authentication authentication) throws Exception{
        User userSelected = iUserRepository.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found User with number id: "+ id));
-       userSelected.setDeleted(true);
+	   User userAuth = iUserRepository.findByEmail(authentication.getName());
+	   if (!userSelected.getEmail().equals(userAuth.getEmail()) && userAuth.getRole().getName().equals(ERoles.ROLE_USER))
+			throw new ResourceNotFoundException("You don't have permission to delete this user");
+	   userSelected.setDeleted(true);
        iUserRepository.save(userSelected);
-       return "delete user with number" + id ;
+       return "User id: " + id +", deleted.";
     }
 
 	@Override
-	public ResponseUsersDto findAllUsers(
-		Integer page, 
-		HttpServletRequest httpServletRequest) throws Exception {
-		ResponseUsersDto dto = new ResponseUsersDto();
-		// activate hibernate filter
-		Session session = entityManager.unwrap(Session.class);
-		Filter filter = session.enableFilter("deletedUserFilter");
-		filter.setParameter("isDeleted", false);
-		
-		// without request parameter
-		if(page == null) {
-			dto.setUserDtos(
-				iUserMapper.toResponseDetailsUserDtos(
-					iUserRepository.findAll()));
-			return dto;
-		}
-		
-		// with request parameter
-		Page<User> users = iUserRepository.findAll(
-			PageRequest.of(page, USERS_FOR_PAGE));
-		
-		if(users.isEmpty())
-			throw new BadRequestException("Insert an user");
-		
-		dto.setUserDtos(
-			iUserMapper.toResponseDetailsUserDtos(
-				users.toList()));
-		
+	public ResponseUserListDto findAllUsers(Integer page, HttpServletRequest httpServletRequest) throws Exception {
+		if (page <= 0)
+			throw new TransactionError("You request page not found, try page 1");
+
+		Pageable pageWithTenElementsAndSortedByIdAscAndRoleDesc = PageRequest.of(page-1,USERS_FOR_PAGE,
+				Sort.by("id")
+						.ascending()
+						.and(Sort.by("role")
+								.descending()));
+		Page<User> userList = iUserRepository.findAll(pageWithTenElementsAndSortedByIdAscAndRoleDesc);
+
+		//Pagination DTO
+		ResponseUserListDto dto = new ResponseUserListDto();
+		int totalPages = userList.getTotalPages();
+		dto.setTotalPages(totalPages);
+
+		if (page > totalPages )
+			throw new TransactionError("The page you request not found, try page 1 or go to previous page");
+
 		// url
 		String url = httpServletRequest
-			.getRequestURL().toString() + "?" + "page=";
-		
-		if(users.hasPrevious()) {
-			int previousPage = users.getNumber() - 1;
-			dto.setPreviousPage(url + previousPage);
-		}
-		
-		if (users.hasNext()) {
-			int nextPage = users.getNumber() + 1;
-			dto.setPreviousPage(url + nextPage);
-		}
-		
+				.getRequestURL().toString() + "?" + "page=";
+
+		dto.setNextPage(totalPages == page ? null : url + String.valueOf(page + 1));
+		dto.setPreviousPage(page == 1 ? null : url + String.valueOf(page - 1));
+		dto.setUsersDto(iUserMapper.toResponseDetailsUserDtos(userList.getContent()));
 		return dto;
 	}
 
@@ -93,7 +75,6 @@ public class UserServiceImpl implements IUserService {
     public Optional<User> findById(Long id) {
         return iUserRepository.findById(id);
     }
-
 
 	@Override
 	public User getUserById(Long userId) {
@@ -106,42 +87,29 @@ public class UserServiceImpl implements IUserService {
 	}
 	@Override
     public Boolean existsByEmail(@PathVariable String email){
-        if(iUserRepository.existsByEmail(email)) {
-            return true;
-        }
-        return false;
+        return iUserRepository.existsByEmail(email);
     }
 
 	@Override
-	public ResponseDetailsUserDto getUserDetails(Long id, String token) throws Exception {
-		Long tokenUserId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
-		
-		sameIdOrThrowException(id, tokenUserId);
-		
-		return iUserMapper.toResponseDetailsUserDto(getUserById(tokenUserId));
+	public ResponseDetailsUserDto getUserDetail(Authentication authentication) throws Exception {
+		User entity = iUserRepository.findByEmail(authentication.getName());
+		return iUserMapper.toResponseDetailsUserDto(entity);
 	}
 
 	@Override
-	public ResponseDetailsUserDto updateUserDetails(
-		Long id,
-		PatchRequestUserDto dto,
-		String token) throws Exception {
-		Long tUserId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
-		
-		sameIdOrThrowException(id, tUserId);
-		
-		User user = getUserById(tUserId);
-		
-		user = iUserRepository.save(
-			iUserMapper.updateUser(dto, user));
-		
-		return iUserMapper.toResponseDetailsUserDto(user);
+	public ResponseDetailsUserDto getUserDetailById(Long id) throws Exception {
+		User entity = iUserRepository.findById(id).orElseThrow(()->
+				new UserNotFoundUserException("Not found Account with number id: "+ id));
+		return iUserMapper.toResponseDetailsUserDto(entity);
 	}
-	
-	
-	private void sameIdOrThrowException(Long userId, Long tokenUserId) throws Exception {
-		if(!Objects.equals(userId, tokenUserId))
-			throw new BadRequestException("not same");
+
+	@Override
+	public ResponseDetailsUserDto updateUserDetails(Long id, PatchRequestUserDto dto, Authentication authentication) throws Exception {
+		User entity = iUserRepository.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
+		if (!entity.getEmail().equals(authentication.getName()))
+			throw new ResourceNotFoundException("You don't have permission to edit this user");
+		iUserRepository.save(iUserMapper.updateUser(dto, entity));
+		return iUserMapper.toResponseDetailsUserDto(entity);
 	}
 
     @Override

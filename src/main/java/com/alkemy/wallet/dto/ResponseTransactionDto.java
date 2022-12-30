@@ -1,6 +1,5 @@
 package com.alkemy.wallet.dto;
 
-import com.alkemy.wallet.model.Account;
 import com.alkemy.wallet.model.EType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
@@ -9,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.lang.Nullable;
-
 import java.sql.Timestamp;
 
 @Getter

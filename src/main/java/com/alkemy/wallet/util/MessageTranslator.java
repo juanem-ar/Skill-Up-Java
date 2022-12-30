@@ -19,5 +19,4 @@ public class MessageTranslator {
     return messageSource.getMessage(code, null,
         LocaleContextHolder.getLocale());
   }
-
 }

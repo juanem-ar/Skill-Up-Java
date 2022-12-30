@@ -8,7 +8,6 @@ import lombok.Data;
 public class ResponseUserBalanceDto {
 
 	private List<AccountBalanceDto> accountBalance = new ArrayList<>();
-	
 	private List<ResponseFixedDepositDto> arsFixedDeposits = new ArrayList<>();
 	private List<ResponseFixedDepositDto> usdFixedDeposits = new ArrayList<>();
 

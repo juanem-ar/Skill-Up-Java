@@ -1,12 +1,14 @@
 package com.alkemy.wallet.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import com.alkemy.wallet.model.User;
 
 @Repository
 public interface IUserRepository extends JpaRepository<User, Long> {
     User findByEmail(String email);
     Boolean existsByEmail(String username);
+    Page<User> findAll(Pageable page);
 }

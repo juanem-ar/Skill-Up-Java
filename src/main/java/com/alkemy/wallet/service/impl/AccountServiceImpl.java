@@ -24,10 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.model.FixedTermDeposit;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-
 import static com.alkemy.wallet.model.ECurrency.ARS;
 import static com.alkemy.wallet.model.ECurrency.USD;
 

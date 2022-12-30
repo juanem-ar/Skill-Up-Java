@@ -12,7 +12,6 @@ import java.util.Map;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
-
 @Service
 public class JwtUtils implements IJwtUtils {
     private String SECRET_KEY = "secret";

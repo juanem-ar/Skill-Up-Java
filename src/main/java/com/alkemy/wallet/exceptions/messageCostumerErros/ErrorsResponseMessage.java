@@ -1,6 +1,5 @@
 package com.alkemy.wallet.exceptions.messageCostumerErros;
 
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

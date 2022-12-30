@@ -25,13 +25,14 @@ import com.alkemy.wallet.dto.ResponseDetailsUserDto;
 public class UserController {
     private final IUserService userService;
 
-    @Operation(method = "DELETE", summary = "deleteUser", description = "Delete user by id",
+    @Operation(method = "DELETE", summary = "deleteUser", description = "Delete user using id, by authenticated user or admin user.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "User deleted"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
+    @Secured(value = { "ROLE_USER","ROLE_ADMIN" })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id, Authentication authentication) throws Exception{
         return new ResponseEntity<>(userService.deleteUser(id,authentication), HttpStatus.OK);

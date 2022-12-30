@@ -6,6 +6,7 @@ import com.alkemy.wallet.dto.ResponseDetailsUserDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.exceptions.UserNotFoundUserException;
 import com.alkemy.wallet.mapper.IuserMapper;
+import com.alkemy.wallet.model.ERoles;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.security.service.JwtUtils;
@@ -38,7 +39,8 @@ public class UserServiceImpl implements IUserService {
     @Override
     public String deleteUser(Long id, Authentication authentication) throws Exception{
        User userSelected = iUserRepository.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found User with number id: "+ id));
-		if (!userSelected.getEmail().equals(authentication.getName()))
+	   User userAuth = iUserRepository.findByEmail(authentication.getName());
+	   if (!userSelected.getEmail().equals(userAuth.getEmail()) && userAuth.getRole().getName().equals(ERoles.ROLE_USER))
 			throw new ResourceNotFoundException("You don't have permission to delete this user");
 	   userSelected.setDeleted(true);
        iUserRepository.save(userSelected);

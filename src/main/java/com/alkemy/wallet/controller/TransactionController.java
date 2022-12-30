@@ -2,7 +2,6 @@ package com.alkemy.wallet.controller;
 
 import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.model.ECurrency;
-import com.alkemy.wallet.security.service.IJwtUtils;
 import com.alkemy.wallet.service.ITransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,9 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +27,6 @@ import java.util.List;
 @SecurityRequirement(name = "Bearer Authentication")
 public class TransactionController {
     private final ITransactionService transactionService;
-    private final IJwtUtils jwtUtils;
 
     @Operation(method = "POST", summary = "saveDeposit", description = "Register deposit.",
             responses = {
@@ -39,9 +36,12 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/deposit")
-    public ResponseEntity<ResponseTransactionDto> saveDeposit(HttpServletRequest req, @RequestBody RequestTransactionDto deposit) throws Exception {
-        ResponseTransactionDto depositCreated = transactionService.save(deposit, jwtUtils.getJwt(req.getHeader("Authorization")));
-        return ResponseEntity.status(HttpStatus.CREATED).body(depositCreated);
+    public ResponseEntity<ResponseTransactionDto> saveDeposit(@Valid Authentication authentication,
+                                                              @RequestParam(name = "amount") Double amount,
+                                                              @RequestParam(name = "description") String description,
+                                                              @RequestParam(name = "account id") Long accountId)
+            throws Exception {
+        return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.save(amount, description, accountId, authentication));
     }
 
     @Operation(method = "GET", summary = "getListTransactionByUserLogged", description = "Get all transactions from user logged.",
@@ -52,8 +52,8 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @GetMapping
-    public ResponseEntity<List<ResponseTransactionDto>> getListTransactionByUserLogged(HttpServletRequest req) throws Exception{
-        return ResponseEntity.ok(transactionService.findAllTransactionsByUserId(jwtUtils.getJwt(req.getHeader("Authorization"))));
+    public ResponseEntity<List<ResponseTransactionDto>> getListTransactionByUserLogged(Authentication authentication) throws Exception{
+        return ResponseEntity.ok(transactionService.findAllTransactionsByUserId(authentication));
     }
 
     @Operation(method = "GET", summary = "transactions pagination by admin", description = "Order by page with five elements and sorted by account ascending and amount descending",
@@ -63,6 +63,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
+    @Secured(value = { "ROLE_ADMIN" })
     @GetMapping("/list")
     public ResponseEntity<TransactionPageDto> getAllTransactionPages(@RequestParam(value = "page", defaultValue = "1") @PathVariable int page, HttpServletRequest httpServletRequest) throws Exception{
         return ResponseEntity.ok(transactionService.findAllByAccount(page, httpServletRequest));
@@ -76,8 +77,8 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @GetMapping("/{transactionId}")
-    public ResponseEntity<ResponseTransactionDto> getTransactionByIdAndUserLogged(HttpServletRequest req, @PathVariable Long transactionId) throws Exception{
-        return ResponseEntity.ok(transactionService.findResponseTransactionById(transactionId, jwtUtils.getJwt(req.getHeader("Authorization"))));
+    public ResponseEntity<ResponseTransactionDto> getTransactionByIdAndUserLogged(Authentication authentication, @PathVariable Long transactionId) throws Exception{
+        return ResponseEntity.ok(transactionService.findResponseTransactionById(transactionId, authentication));
     }
 
     @Operation(method = "PATCH", summary = "editTransactionByAuthUser", description = "Update transaction descriptions.",
@@ -88,8 +89,8 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @PatchMapping("/{id}")
-    public ResponseEntity<ResponseTransactionDto> editTransactionByAuthUser(HttpServletRequest req, @RequestBody PatchTransactionDescriptionDto description, @PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(transactionService.updateDescriptionFromTransaction(id, jwtUtils.getJwt(req.getHeader("Authorization")), description.getDescription()));
+    public ResponseEntity<ResponseTransactionDto> editTransactionByAuthUser(Authentication authentication, @RequestParam(name = "description") String description, @PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(transactionService.updateDescriptionFromTransaction(id, authentication, description));
     }
 
     @Operation(method = "POST", summary = "send money to user", description = "Send Pesos (AR).",
@@ -100,9 +101,8 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/sendArs")
-    public ResponseEntity<ResponseTransactionDto> sendArs(HttpServletRequest req, @RequestBody RequestSendARTransactionDto requestTransactionDto) throws Exception{
-
-        return ResponseEntity.ok().body(transactionService.send(jwtUtils.getJwt(req.getHeader("Authorization")), requestTransactionDto, ECurrency.ARS));
+    public ResponseEntity<ResponseTransactionDto> sendArs(Authentication authentication, @RequestParam(name = "amount") Double amount, @RequestParam(name = "description") String description, @RequestParam(name = "receiver account id") Long accountId) throws Exception {
+        return ResponseEntity.ok().body(transactionService.send(authentication, amount, description, accountId, ECurrency.ARS));
     }
 
     @Operation(method = "POST", summary = "send money to user", description = "Send Pesos (USD).",
@@ -113,7 +113,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/sendUsd")
-    public ResponseEntity<ResponseTransactionDto> sendUsd(HttpServletRequest req, @RequestBody RequestSendUSDTransactionDto requestTransactionDto) throws Exception{
-        return ResponseEntity.ok().body(transactionService.send(jwtUtils.getJwt(req.getHeader("Authorization")), requestTransactionDto, ECurrency.USD));
+    public ResponseEntity<ResponseTransactionDto> sendUsd(Authentication authentication, @RequestParam(name = "amount") Double amount, @RequestParam(name = "description") String description, @RequestParam(name = "receiver account id") Long accountId) throws Exception {
+        return ResponseEntity.ok().body(transactionService.send(authentication, amount, description, accountId, ECurrency.USD));
     }
 }

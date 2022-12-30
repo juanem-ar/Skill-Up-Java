@@ -108,11 +108,7 @@ public class UserServiceImpl implements IUserService {
 		User entity = iUserRepository.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
 		if (!entity.getEmail().equals(authentication.getName()))
 			throw new ResourceNotFoundException("You don't have permission to edit this user");
-		try{
 		iUserRepository.save(iUserMapper.updateUser(dto, entity));
-		}catch (Exception ex){
-			throw new BadRequestException(ex.getMessage() + ". Please check the data inserted");
-		}
 		return iUserMapper.toResponseDetailsUserDto(entity);
 	}
 

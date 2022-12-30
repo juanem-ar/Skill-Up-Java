@@ -1,6 +1,5 @@
 package com.alkemy.wallet.security.filter;
 
-import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;

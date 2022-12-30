@@ -5,17 +5,17 @@ import com.alkemy.wallet.mapper.ITransactionMapper;
 import com.alkemy.wallet.model.*;
 import com.alkemy.wallet.repository.ITransactionRepository;
 import com.alkemy.wallet.repository.IAccountRepository;
-import com.alkemy.wallet.security.service.IJwtUtils;
+import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.service.ITransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import com.alkemy.wallet.exceptions.ErrorEnum;
 import com.alkemy.wallet.exceptions.TransactionError;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -24,31 +24,31 @@ import java.util.List;
 public class TransactionServiceImpl implements ITransactionService {
     private final ITransactionRepository transactionRepository;
     private final IAccountRepository accountRepository;
+    private final IUserRepository iUserRepository;
     private final ITransactionMapper transactionMapper;
-    private final IJwtUtils jwtUtils;
-
     private static final Integer TRANSACTIONS_FOR_PAGE = 10;
 
-    public ResponseTransactionDto send(String token, ResponseSendTransactionDto dto, ECurrency currency) throws Exception {
-        Long senderId = jwtUtils.extractUserId(token);
+    public ResponseTransactionDto send(Authentication authentication, Double amount, String description, Long accountId,ECurrency currency) throws Exception {
+
+        Long senderId = iUserRepository.findByEmail(authentication.getName()).getId();
 
         Account senderAccount = accountRepository.getReferenceByUserIdAndCurrency(senderId, currency);
 
-        Account receiverAccount = accountRepository.getReferenceByIdAndCurrency(dto.getReceiverAccountId(), currency);
+        Account receiverAccount = accountRepository.getReferenceByIdAndCurrency(accountId, currency);
         if (receiverAccount == null || senderAccount.getId() == receiverAccount.getId())
             throw new TransactionError("The selected account does not exist or belongs to you or has another currency");
 
         TransactionDtoPay sendTransaction = new TransactionDtoPay();
-        sendTransaction.setAmount(dto.getAmount());
+        sendTransaction.setAmount(amount);
         sendTransaction.setType(EType.PAYMENT);
-        sendTransaction.setDescription(dto.getDescription() + ". Money send in " + currency);
+        sendTransaction.setDescription(description + ". Money send in " + currency);
         sendTransaction.setAccountId(senderAccount.getId());
 
         TransactionDtoPay receiveTransaction = new TransactionDtoPay();
-        receiveTransaction.setAmount(dto.getAmount());
+        receiveTransaction.setAmount(amount);
         receiveTransaction.setType(EType.INCOME);
-        receiveTransaction.setDescription(dto.getDescription() + ". Money send in " + currency);
-        receiveTransaction.setAccountId(dto.getReceiverAccountId());
+        receiveTransaction.setDescription(description + ". Money send in " + currency);
+        receiveTransaction.setAccountId(accountId);
 
         if (sendTransaction.getAmount() > senderAccount.getTransactionLimit())
             throw new TransactionError("Amount trying to send is above the transaction limit");
@@ -70,7 +70,7 @@ public class TransactionServiceImpl implements ITransactionService {
 
         Double currentBalance = account.getBalance();
         if (transactionDtoPay.getAmount() <= 0)
-            throw new TransactionError(ErrorEnum.DEPOSITNOTVALID.getMessage());
+            throw new TransactionError(ErrorEnum.DEPOSIT_NOT_VALID.getMessage());
 
         if(entity.getType().equals(EType.PAYMENT)) {
             if(currentBalance < transactionDtoPay.getAmount())
@@ -85,11 +85,18 @@ public class TransactionServiceImpl implements ITransactionService {
         return transactionMapper.modelToResponseTransactionDto(entity);
     }
 
-    public ResponseTransactionDto save(RequestTransactionDto transactionDto, String token) throws Exception {
-        Long userId = jwtUtils.extractUserId(token);
+    public ResponseTransactionDto save(Double amount, String description, Long accountId, Authentication authentication) throws Exception {
+        RequestTransactionDto transactionDto = new RequestTransactionDto();
+        transactionDto.setAmount(amount);
+        transactionDto.setDescription(description);
+        transactionDto.setAccountId(accountId);
+
+        Long userId = iUserRepository.findByEmail(authentication.getName()).getId();
+
         if (transactionDto.getAmount() <= 0) {
-            throw new TransactionError(ErrorEnum.DEPOSITNOTVALID.getMessage());
+            throw new TransactionError(ErrorEnum.DEPOSIT_NOT_VALID.getMessage());
         }
+
         Account account = accountRepository.findByIdAndUserId(transactionDto.getAccountId(), userId);
         if (account == null){
             throw new TransactionError("Insert your account id");
@@ -108,8 +115,8 @@ public class TransactionServiceImpl implements ITransactionService {
 	}
 
     @Override
-    public List<ResponseTransactionDto> findAllTransactionsByUserId(String token) throws Exception {
-        Long userId = jwtUtils.extractUserId(token);
+    public List<ResponseTransactionDto> findAllTransactionsByUserId(Authentication authentication) throws Exception {
+        Long userId = iUserRepository.findByEmail(authentication.getName()).getId();
         List<Account> accountList = accountRepository.findAllByUserId(userId);
         List<Transaction> transactionsList = transactionRepository.findAllByAccountIn(accountList);
         if (transactionsList.size()==0)
@@ -148,23 +155,23 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
     @Override
-    public ResponseTransactionDto findResponseTransactionById(Long id, String token) throws Exception {
-        return transactionMapper.modelToResponseTransactionDto(findTransactionById(id, token));
+    public ResponseTransactionDto findResponseTransactionById(Long id, Authentication authentication) throws Exception {
+        return transactionMapper.modelToResponseTransactionDto(findTransactionById(id, authentication));
     }
 
     @Override
-    public Transaction findTransactionById(Long id, String token) throws Exception {
+    public Transaction findTransactionById(Long id, Authentication authentication) throws Exception {
         if (!transactionRepository.existsById(id))
             throw new TransactionError("This transaction does not exist.");
         Transaction entity = transactionRepository.getReferenceById(id);
-        if (entity.getAccount().getUser().getId() != jwtUtils.extractUserId(token))
+        if (!entity.getAccount().getUser().getEmail().equals(authentication.getName()))
             throw new TransactionError("This transaction does not belong you");
         return entity;
     }
 
     @Override
-    public ResponseTransactionDto updateDescriptionFromTransaction(Long id, String token, String description) throws Exception {
-        Transaction entity = findTransactionById(id,token);
+    public ResponseTransactionDto updateDescriptionFromTransaction(Long id, Authentication authentication, String description) throws Exception {
+        Transaction entity = findTransactionById(id,authentication);
         entity.setDescription(description);
         Transaction entitySaved = transactionRepository.save(entity);
         return transactionMapper.modelToResponseTransactionDto(entitySaved);

@@ -1,10 +1,8 @@
 package com.alkemy.wallet.security.service;
 
 import java.util.Date;
-
 import org.springframework.cglib.core.internal.Function;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import io.jsonwebtoken.Claims;
 
 public interface IJwtUtils {

@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import com.alkemy.wallet.dto.ResponseDetailsUserDto;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RequestMapping("/users")
 @RestController
@@ -85,7 +86,7 @@ public class UserController {
                     @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @PatchMapping("/{id}")
-    public ResponseEntity<ResponseDetailsUserDto> updateUserDetails(@PathVariable Long id, @RequestBody PatchRequestUserDto dto,
+    public ResponseEntity<ResponseDetailsUserDto> updateUserDetails(@PathVariable Long id, @Valid @RequestBody PatchRequestUserDto dto,
                                                                     Authentication authentication) throws Exception {
 		return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserDetails(id, dto, authentication));
     }

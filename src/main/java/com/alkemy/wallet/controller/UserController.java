@@ -25,17 +25,18 @@ import com.alkemy.wallet.dto.ResponseDetailsUserDto;
 public class UserController {
     private final IUserService userService;
 
-    @Operation(method = "DELETE", summary = "deleteUsers", description = "Eliminar usuario.",
+    @Operation(method = "DELETE", summary = "deleteUser", description = "Delete user by id",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok. Se eliminó correctamente el usuario"),
+                    @ApiResponse(responseCode = "200", description = "User deleted"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
-                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+                    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
-    @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteUsers(@PathVariable Long id){
-        return new ResponseEntity<>(userService.deleteUser(id), HttpStatus.OK);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id, Authentication authentication) throws Exception{
+        return new ResponseEntity<>(userService.deleteUser(id,authentication), HttpStatus.OK);
     }
-/*
+    /*
     @Operation(method = "GET", summary = "findAllUsers", description = "Traer todos los usuarios.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Ok. El recurso se obtiene correctamente"),
@@ -53,6 +54,7 @@ public class UserController {
     		httpServletRequest));
     }
     */
+
     @Operation(method = "GET", summary = "getUserDetails", description = "Get user detail. Authentication needed.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Ok",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDetailsUserDto.class))),
@@ -77,6 +79,7 @@ public class UserController {
     public ResponseEntity<ResponseDetailsUserDto> getUserDetailsById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(userService.getUserDetailById(id));
     }
+
     /*
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseDetailsUserDto> updateUserDetails(

@@ -11,7 +11,7 @@ import com.alkemy.wallet.model.User;
 
 public interface IUserService extends UserDetailsService {
     Boolean existsByEmail(String email);
-    String deleteUser(Long id);
+    String deleteUser(Long id, Authentication authentication) throws Exception;
     ResponseUsersDto findAllUsers(Integer page, HttpServletRequest httpServletRequest) throws Exception;
     Optional<User> findById(Long id);
 	User getUserById(Long userId);

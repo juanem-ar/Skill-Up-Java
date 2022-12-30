@@ -36,6 +36,7 @@ import com.alkemy.wallet.service.IAccountService;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
+  /*
   @Mock
   private IUserRepository userRepository;
 
@@ -252,5 +253,5 @@ class UserServiceImplTest {
 
     assertNotNull(result);
   }
-
+*/
 }

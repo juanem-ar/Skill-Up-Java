@@ -1,7 +1,6 @@
 package com.alkemy.wallet.service.impl;
 
 import com.alkemy.wallet.exceptions.UserNotFoundException;
-import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.dto.ResponseDetailsUserDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.exceptions.UserNotFoundUserException;
@@ -14,6 +13,7 @@ import com.alkemy.wallet.service.IUserService;
 import lombok.AllArgsConstructor;
 import org.hibernate.Filter;
 import org.hibernate.Session;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import com.alkemy.wallet.dto.ResponseUsersDto;
 import org.springframework.web.bind.annotation.PathVariable;
-import java.util.Objects;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
@@ -113,37 +112,36 @@ public class UserServiceImpl implements IUserService {
     }
 
 	@Override
-	public ResponseDetailsUserDto getUserDetails(Long id, String token) throws Exception {
-		Long tokenUserId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
-		
-		sameIdOrThrowException(id, tokenUserId);
-		
-		return iUserMapper.toResponseDetailsUserDto(getUserById(tokenUserId));
+	public ResponseDetailsUserDto getUserDetail(Authentication authentication) throws Exception {
+		User entity = iUserRepository.findByEmail(authentication.getName());
+		return iUserMapper.toResponseDetailsUserDto(entity);
 	}
 
 	@Override
-	public ResponseDetailsUserDto updateUserDetails(
-		Long id,
-		PatchRequestUserDto dto,
-		String token) throws Exception {
-		Long tUserId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
-		
-		sameIdOrThrowException(id, tUserId);
-		
-		User user = getUserById(tUserId);
-		
-		user = iUserRepository.save(
-			iUserMapper.updateUser(dto, user));
-		
-		return iUserMapper.toResponseDetailsUserDto(user);
-	}
-	
-	
-	private void sameIdOrThrowException(Long userId, Long tokenUserId) throws Exception {
-		if(!Objects.equals(userId, tokenUserId))
-			throw new BadRequestException("not same");
+	public ResponseDetailsUserDto getUserDetailById(Long id) throws Exception {
+		User entity = iUserRepository.findById(id).orElseThrow(()-> new UserNotFoundUserException("Not found Account with number id: "+ id));
+		return iUserMapper.toResponseDetailsUserDto(entity);
 	}
 
+	/*
+        @Override
+        public ResponseDetailsUserDto updateUserDetails(Long id, PatchRequestUserDto dto, String token){return null;}
+
+            Long id,
+            PatchRequestUserDto dto,
+            String token) throws Exception {
+            Long tUserId = jwtUtils.extractUserId(jwtUtils.getJwt(token));
+
+            sameIdOrThrowException(id, tUserId);
+
+            User user = getUserById(tUserId);
+
+            user = iUserRepository.save(
+                iUserMapper.updateUser(dto, user));
+
+            return iUserMapper.toResponseDetailsUserDto(user);
+        }
+        */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		User userEntity = iUserRepository.findByEmail(email);

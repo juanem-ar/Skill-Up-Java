@@ -4,7 +4,6 @@ import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.model.Account;
 import org.springframework.security.core.Authentication;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 

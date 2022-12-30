@@ -2,10 +2,7 @@ package com.alkemy.wallet.mapper;
 
 import java.util.List;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.dto.ResponseDetailsUserDto;
@@ -22,10 +19,7 @@ public interface IuserMapper {
 
 	ResponseUserDto toResponseUserDto(User user);
 
-	User updateUser(
-		PatchRequestUserDto dto,
-		@MappingTarget User target);
-
+	User updateUser(PatchRequestUserDto dto, @MappingTarget User target);
 	ResponseDetailsUserDto toResponseDetailsUserDto(User user);
 	List<ResponseDetailsUserDto> toResponseDetailsUserDtos(List<User> users);
 }

@@ -31,12 +31,12 @@ public class TransactionController {
     private final ITransactionService transactionService;
     private final IJwtUtils jwtUtils;
 
-    @Operation(method = "POST", summary = "saveDeposit", description = "Registrar un depósito.",
+    @Operation(method = "POST", summary = "saveDeposit", description = "Register deposit.",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Ok",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseTransactionDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+                    @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/deposit")
     public ResponseEntity<ResponseTransactionDto> saveDeposit(HttpServletRequest req, @RequestBody RequestTransactionDto deposit) throws Exception {
@@ -49,7 +49,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseTransactionDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+                    @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @GetMapping
     public ResponseEntity<List<ResponseTransactionDto>> getListTransactionByUserLogged(HttpServletRequest req) throws Exception{
@@ -61,7 +61,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransactionPageDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+                    @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @GetMapping("/list")
     public ResponseEntity<TransactionPageDto> getAllTransactionPages(@RequestParam(value = "page", defaultValue = "1") @PathVariable int page, HttpServletRequest httpServletRequest) throws Exception{
@@ -73,7 +73,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseTransactionDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+                    @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @GetMapping("/{transactionId}")
     public ResponseEntity<ResponseTransactionDto> getTransactionByIdAndUserLogged(HttpServletRequest req, @PathVariable Long transactionId) throws Exception{
@@ -97,7 +97,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseTransactionDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+                    @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/sendArs")
     public ResponseEntity<ResponseTransactionDto> sendArs(HttpServletRequest req, @RequestBody RequestSendARTransactionDto requestTransactionDto) throws Exception{
@@ -110,7 +110,7 @@ public class TransactionController {
                     @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseTransactionDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-                    @ApiResponse(responseCode = "500", description = "Error inesperado del sistema", content = @Content(schema = @Schema(hidden = true)))
+                    @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
             })
     @PostMapping("/sendUsd")
     public ResponseEntity<ResponseTransactionDto> sendUsd(HttpServletRequest req, @RequestBody RequestSendUSDTransactionDto requestTransactionDto) throws Exception{

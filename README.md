@@ -1,9 +1,24 @@
 # ALKEMY JAVA TECHNICAL CHALLENGE - WALLET
 
+Project created in collaboration with alkemy and my dev team.
+
+<a href="https://ibb.co/xzPkb7Z"><img src="https://i.ibb.co/qmXS8r6/alkemy.png" alt="alkemy" border="0"></a>
+
 ### PROJECT SETUP & TOOLS
 1. JDK 17
-2. [MySQL](https://dev.mysql.com/doc/refman/8.0/en/installing.html).
-3. [Postman](https://www.postman.com/downloads/) for testing endpoints.
+2. MySQL
+3. Maven
+4. Spring Boot
+5. Spring Data (Jpa e Hibernate)
+6. Spring Security
+7. JWT Token
+8. Spring Web
+9. H2
+10. Lombok
+11. MapStruct
+12. Mockito
+13. Postman
+14. [Swagger Documentation (spring-boot run)](http://localhost:8080/api/swagger-ui/index.html)
 
 ### CODE STANDARDS
 - Keep in mind rules from [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).
@@ -21,7 +36,6 @@
 - Exceptions should be handled by an implementation of ControllerAdvice. 
 - Messages to user can't be hardcoded them should be handled. Some refs [here](https://looksok.wordpress.com/2014/07/05/string-externalization-in-spring-3-1-with-messagesource-no-web-xml/) and [here](https://zetcode.com/spring/messagesource/). 
 - If you add a new endpoint, make sure to set the role access for it in the SecurityConfig class.
-
 
 You will find an example of how to work with the project architecture in `architecture-example` branch.
 
@@ -51,124 +65,4 @@ For understanding more about git and how to work with different branches, I reco
 On the root folder run:
 ```
 mvn spring-boot:run
-```
-
-### POSTMAN REQUESTS
-
-#### CREATE USER - USER OR ADMIN
-- proceed to login and return JWT Access token -
-
-POST  /auth/register
-
-```
-{
-      "firstName":"Juan",
-      "lastName":"Perez",
-      "email":"juanPerez@hotmail.com", // email format valid 
-      "password":"12345678", // min = 8
-      "role":{
-            "name":"USER", // or "ADMIN"
-            "description":"description user"
-      }
-}
-```
-
-#### LOGIN
-
-POST  /auth/login
-
-```
-{
-      "email":"juanPerez@hotmail.com", // email exists validation
-      "password":"12345678" // min = 8 and verify password to database (encoded)
-}
-```
-
-#### CREATE OR SILMULATE FIXED DEPOSIT
-
-POST  /fixedDeposit
-POST  /fixedDeposit/simulate
-
-```
-{
-      "amount" : 5040, // blance account > 0
-      "currency":"ARS", // or "USD"
-      "period" :60 // min = 30
-}
-```
-
-#### CREATE A DEPOSIT
-
-POST  /transactions/deposit
-
-```
-{
-    "amount": "100.00",
-    "description": "Deposito" ,
-    "accountId" : 1
-}
-```
-
-#### GET ACCOUNTS BY ADMIN USER
-
-GET  /accounts
-
-GET /accounts?page=1
-
-```
-{
-    "accountsDto": [
-        {
-            "id": 11,
-            "balance": 12.0,
-            "currency": "ARS",
-            "creationDate": "2022-11-13T12:14:08.91228",
-            "updateDate": "2022-11-13T12:14:08.91228",
-            "transactionLimit": 300000.0
-        },
-        {...},
-        {
-            "id": 20,
-            "balance": 74.0,
-            "currency": "ARS",
-            "creationDate": "2022-11-13T12:14:08.91228",
-            "updateDate": "2022-11-13T12:14:08.91228",
-            "transactionLimit": 300000.0
-        }
-    ],
-    "previousPage": "http://localhost:8080/accounts?page=0",
-    "nextpage": "http://localhost:8080/accounts?page=2"
-}
-```
-
-#### SEND ARS
-
-POST  /transactions/sendArs
-
-```
-{
-    "amount": 350.0,
-    "receiverAccountId": 3
-}
-```
-
-#### SEND USD
-
-POST  /transactions/sendUsd
-
-```
-{
-    "amount": 350.0,
-    "receiverAccountId": 4
-}
-```
-
-#### EDIT TRANSACTION
-
-POST  /transactions/transaction/{transactionId}
-
-```
-{
-    "description": "example description",
-}
 ```

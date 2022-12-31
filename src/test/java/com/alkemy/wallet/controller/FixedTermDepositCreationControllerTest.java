@@ -56,7 +56,7 @@ class FixedTermDepositCreationControllerTest {
     private User admin = new User();
     private FixedDepositDto dto = new FixedDepositDto();
     private ResponseFixedDepositDto responseDto = new ResponseFixedDepositDto();
-
+/*
     @BeforeEach
     void setUp() throws Exception {
         Role userRole = new Role(1L, ROLE_USER, "A user", new Timestamp(new Date().getTime()), new Timestamp(new Date().getTime()));
@@ -93,7 +93,7 @@ class FixedTermDepositCreationControllerTest {
         responseDto.setClosingDate(dto.getClosingDate());
 
         when(iFdService.addFixedDeposit(user.getEmail(), dto)).thenReturn(String.valueOf(responseDto));
-    }
+    }*/
 
     @Test
     public void createFixedDeposit_RightUserToken_ResponseOk() throws Exception{

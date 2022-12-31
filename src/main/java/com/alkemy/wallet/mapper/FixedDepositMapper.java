@@ -17,7 +17,7 @@ public class FixedDepositMapper {
         entity.setAmount(dto.getAmount());
         entity.setInterest(interest);
         entity.setCreationDate(new Timestamp(System.currentTimeMillis()));
-        entity.setClosingDate(Timestamp.from(new Timestamp(System.currentTimeMillis()).toInstant().plus(dto.getPeriod(), ChronoUnit.DAYS)));
+        entity.setClosingDate(Timestamp.from(entity.getCreationDate().toInstant().plus(dto.getPeriod(), ChronoUnit.DAYS)));
         return entity;
     }
     public ResponseSimulatedFixedDepositDto toSimulateFixedDeposit(FixedDepositDto dto){

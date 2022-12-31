@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alkemy.wallet.dto.ResponseUsersDto;
+import com.alkemy.wallet.dto.ResponseUserListDto;
 import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.service.IUserService;
@@ -24,7 +24,7 @@ class UserServiceImplIntegrationTest {
 
 	@Test
 	@Transactional
-	void findAllUsers_DataBaseWithOneUser_ReturnAListWithOneDto() {
+	void findAllUsers_DataBaseWithOneUser_ReturnAListWithOneDto() throws Exception {
 		userRepository.deleteAll();
 		
 		User user1 = new User();
@@ -37,7 +37,7 @@ class UserServiceImplIntegrationTest {
 		user1.setPassword("first password");
 		userRepository.save(user1);
 		
-		ResponseUsersDto result = userService.findAllUsers(null, null);
+		ResponseUserListDto result = userService.findAllUsers(null, null);
 		
 		assertEquals(1, result.getUserDtos().size());
 		assertEquals(
@@ -47,7 +47,7 @@ class UserServiceImplIntegrationTest {
 	
 	@Test
 	@Transactional
-	void findAllUsers_DataBaseWithTwoUserButOneDeleted_ReturnAListWithOneDto() {
+	void findAllUsers_DataBaseWithTwoUserButOneDeleted_ReturnAListWithOneDto() throws Exception {
 	  userRepository.deleteAll();
 	  
 	  // create two users
@@ -68,7 +68,7 @@ class UserServiceImplIntegrationTest {
 	  // delete one user
       userRepository.delete(user1);
 	  
-	  ResponseUsersDto result = userService.findAllUsers(null, null);
+	  ResponseUserListDto result = userService.findAllUsers(null, null);
 	  
 	  assertEquals(1, result.getUserDtos().size());
 	}

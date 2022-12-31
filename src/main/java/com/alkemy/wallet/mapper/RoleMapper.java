@@ -6,12 +6,10 @@ import com.alkemy.wallet.repository.IRoleRepository;
 import org.mapstruct.BeforeMapping;
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.Optional;
 
 @Mapper(componentModel = "spring")
 public abstract class RoleMapper implements IValidador<Role> {
-
     @Autowired
     IRoleRepository roleRepository;
 
@@ -23,15 +21,4 @@ public abstract class RoleMapper implements IValidador<Role> {
         }
         return movie.get();
     }
-
-    //public Role toEntity(RoleDto roleDto);
-    //public RoleDto toDto(Rol rol);
-
-    //public RoleUser toRolUser(Role role, User user){
-    //    return RolUser.builder()
-    //            .rolName(role.getName())
-    //            .userName(user.getName())
-    //            .build();
-    //}
-
 }

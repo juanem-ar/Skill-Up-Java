@@ -1,11 +1,11 @@
 package com.alkemy.wallet.security.filter;
 
-import com.alkemy.wallet.model.User;
 import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -35,7 +35,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             username = jwtUtil.extractUsername(jwt);
         }
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user  = this.userService.loadUserByUsername(username);
+            UserDetails user  = this.userService.loadUserByUsername(username);
+
 
             if(jwtUtil.validateToken(jwt, user)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken  = new UsernamePasswordAuthenticationToken(user,

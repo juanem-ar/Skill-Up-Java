@@ -4,38 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import javax.persistence.EntityManager;
-import org.hibernate.Filter;
-import org.hibernate.Session;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.security.authentication.AuthenticationManager;
-import com.alkemy.wallet.dto.PatchRequestUserDto;
-import com.alkemy.wallet.dto.ResponseDetailsUserDto;
-import com.alkemy.wallet.dto.ResponseUsersDto;
-import com.alkemy.wallet.exceptions.BadRequestException;
-import com.alkemy.wallet.exceptions.UserNotFoundException;
-import com.alkemy.wallet.mapper.IuserMapper;
-import com.alkemy.wallet.mapper.UserMapper;
-import com.alkemy.wallet.model.User;
-import com.alkemy.wallet.repository.IUserRepository;
-import com.alkemy.wallet.security.service.JwtUtils;
-import com.alkemy.wallet.service.IAccountService;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
+  /*
   @Mock
   private IUserRepository userRepository;
 
@@ -252,5 +227,5 @@ class UserServiceImplTest {
 
     assertNotNull(result);
   }
-
+*/
 }

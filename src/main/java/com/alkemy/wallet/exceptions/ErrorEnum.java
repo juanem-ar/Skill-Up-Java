@@ -1,13 +1,12 @@
 package com.alkemy.wallet.exceptions;
 
 public enum ErrorEnum {
-    DEPOSITNOTVALID;
-
+    DEPOSIT_NOT_VALID;
 
     public String getMessage() {
-        if (ErrorEnum.this == DEPOSITNOTVALID){
-            return ("El deposito debe ser mayor a 0");
+        if (ErrorEnum.this == DEPOSIT_NOT_VALID){
+            return ("Deposit value must be greater than 0");
         }
-        return ("Error indefinido");
+        return ("Error undefined");
     }
 }

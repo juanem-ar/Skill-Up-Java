@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IFixedTermDepositRepository extends JpaRepository<FixedTermDeposit, Long> {
-
   List<FixedTermDeposit> findByAccount(Account account);
+  List<FixedTermDeposit> findAllByAccountId(Long id);
 }

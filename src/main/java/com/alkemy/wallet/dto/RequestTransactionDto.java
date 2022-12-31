@@ -12,11 +12,7 @@ import java.sql.Timestamp;
 
 @Getter
 @Setter
-public class ResponseTransactionDto {
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Long id;
-
+public class RequestTransactionDto {
     @NotNull
     @Schema(type = "double", example = "5500.50", required = true)
     private Double amount;
@@ -33,12 +29,11 @@ public class ResponseTransactionDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Boolean softDelete = Boolean.FALSE;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private AccountBalanceDto account;
+    @Schema(type = "long", example = "1", required = true)
+    private Long accountId;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @CreationTimestamp
     private Timestamp transactionDate;
-
 
 }

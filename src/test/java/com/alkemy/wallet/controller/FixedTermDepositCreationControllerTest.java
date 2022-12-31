@@ -23,8 +23,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.alkemy.wallet.model.ERoles.ADMIN;
-import static com.alkemy.wallet.model.ERoles.USER;
+import static com.alkemy.wallet.model.ERoles.ROLE_ADMIN;
+import static com.alkemy.wallet.model.ERoles.ROLE_USER;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -56,11 +56,11 @@ class FixedTermDepositCreationControllerTest {
     private User admin = new User();
     private FixedDepositDto dto = new FixedDepositDto();
     private ResponseFixedDepositDto responseDto = new ResponseFixedDepositDto();
-
+/*
     @BeforeEach
     void setUp() throws Exception {
-        Role userRole = new Role(1L, USER, "A user", new Timestamp(new Date().getTime()), new Timestamp(new Date().getTime()));
-        Role adminRole = new Role(2L, ADMIN, "A role", new Timestamp(new Date().getTime()), new Timestamp(new Date().getTime()));
+        Role userRole = new Role(1L, ROLE_USER, "A user", new Timestamp(new Date().getTime()), new Timestamp(new Date().getTime()));
+        Role adminRole = new Role(2L, ROLE_ADMIN, "A role", new Timestamp(new Date().getTime()), new Timestamp(new Date().getTime()));
 
         user.setFirstName("user");
         user.setLastName("cito");
@@ -93,7 +93,7 @@ class FixedTermDepositCreationControllerTest {
         responseDto.setClosingDate(dto.getClosingDate());
 
         when(iFdService.addFixedDeposit(user.getEmail(), dto)).thenReturn(String.valueOf(responseDto));
-    }
+    }*/
 
     @Test
     public void createFixedDeposit_RightUserToken_ResponseOk() throws Exception{

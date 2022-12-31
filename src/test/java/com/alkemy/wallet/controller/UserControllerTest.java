@@ -17,7 +17,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import com.alkemy.wallet.dto.PatchRequestUserDto;
 import com.alkemy.wallet.dto.ResponseDetailsUserDto;
-import com.alkemy.wallet.dto.ResponseUsersDto;
+import com.alkemy.wallet.dto.ResponseUserListDto;
 import com.alkemy.wallet.service.impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,7 +40,7 @@ class UserControllerTest {
 	@WithMockUser(roles = {"ADMIN"})
 	void findAllUsers_GetRequestWithoutRequestParameter_ResponseOk() throws Exception {
 		when(userService.findAllUsers(any(), any()))
-			.thenReturn(new ResponseUsersDto());
+			.thenReturn(new ResponseUserListDto());
 		
 		mockMvc
 			.perform(get(uri))
@@ -50,7 +50,7 @@ class UserControllerTest {
 	@Test
 	void findAllUsers_GetRequestWithoutRequestParameter_ResponseUnauthorized() throws Exception {
 	  when(userService.findAllUsers(any(), any()))
-	    .thenReturn(new ResponseUsersDto());
+	    .thenReturn(new ResponseUserListDto());
 	  
 	  mockMvc.perform(get(uri)).andExpect(status().isUnauthorized());
 	  }
@@ -60,7 +60,7 @@ class UserControllerTest {
 	@WithMockUser(roles = {"ADMIN"})
 	void findAllUsers_GetRequestWithRequestParameter_ResponseOk() throws Exception {
 		when(userService.findAllUsers(any(), any()))
-			.thenReturn(new ResponseUsersDto());
+			.thenReturn(new ResponseUserListDto());
 		
 		Integer pageNumber = 1;
 		

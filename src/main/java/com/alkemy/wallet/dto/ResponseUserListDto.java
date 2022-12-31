@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseUsersDto {
-	List<ResponseDetailsUserDto> userDtos;
+public class ResponseUserListDto {
+	int totalPages;
 	String previousPage;
 	String nextPage;
+	List<ResponseDetailsUserDto> usersDto;
 }

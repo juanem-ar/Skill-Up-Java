@@ -5,6 +5,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import com.alkemy.wallet.dto.ResponseFixedDepositDto;
 import com.alkemy.wallet.model.FixedTermDeposit;
+import java.util.List;
 
 @Mapper(
     componentModel = "spring",
@@ -12,4 +13,5 @@ import com.alkemy.wallet.model.FixedTermDeposit;
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface IFixedTermDepositMapper {
   ResponseFixedDepositDto toResponseFixedDepositDto(FixedTermDeposit deposit);
+  List<ResponseFixedDepositDto> fixedDepositListToResponseList(List<FixedTermDeposit> list);
 }

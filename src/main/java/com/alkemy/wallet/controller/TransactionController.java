@@ -4,6 +4,7 @@ import com.alkemy.wallet.dto.*;
 import com.alkemy.wallet.model.ECurrency;
 import com.alkemy.wallet.service.ITransactionService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -46,7 +47,7 @@ public class TransactionController {
 
     @Operation(method = "GET", summary = "getListTransactionByUserLogged", description = "Get all transactions from user logged.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseTransactionDto.class))),
+                    @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", array = @ArraySchema( schema = @Schema(implementation = ResponseTransactionDto.class)))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))
@@ -56,7 +57,7 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.findAllTransactionsByUserId(authentication));
     }
 
-    @Operation(method = "GET", summary = "transactions pagination by admin", description = "Order by page with five elements and sorted by account ascending and amount descending",
+    @Operation(method = "GET", summary = "getAllTransactionPages", description = "Order by page with five elements and sorted by account ascending and amount descending",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransactionPageDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),

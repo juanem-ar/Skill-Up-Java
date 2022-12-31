@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import com.alkemy.wallet.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,7 +32,7 @@ public class AccountController {
 
     @Operation(method = "GET", summary = "listAccountsByUser", description = "Get all accounts from user. Only use by admin.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseAccountDto.class))),
+                    @ApiResponse(responseCode = "200", description = "Ok",content = @Content(mediaType = "application/json", array = @ArraySchema( schema = @Schema(implementation = ResponseAccountDto.class)))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Error", content = @Content(schema = @Schema(hidden = true)))

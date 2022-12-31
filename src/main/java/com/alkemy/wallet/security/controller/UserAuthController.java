@@ -6,7 +6,6 @@ import com.alkemy.wallet.security.dto.AuthenticationRequestDto;
 import com.alkemy.wallet.security.dto.AuthenticationResponseDto;
 import com.alkemy.wallet.service.IAuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,7 +30,7 @@ public class UserAuthController {
                     @ApiResponse(responseCode = "201", description = "Account registered and logged!", content = {
                             @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = RequestUserDto.class)))
+                                    schema = @Schema(implementation = ResponseUserDto.class))
                     }),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
@@ -47,7 +46,7 @@ public class UserAuthController {
                     @ApiResponse(responseCode = "200", description = "Account logged!", content = {
                             @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = AuthenticationResponseDto.class)))
+                                    schema = @Schema(implementation = AuthenticationResponseDto.class))
                     }),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(hidden = true))),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(hidden = true))),

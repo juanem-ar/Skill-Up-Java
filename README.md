@@ -23,10 +23,10 @@ Project created in collaboration with alkemy and my dev team.
 ### SEED DATA USER
 
 
-## USERS:
+#### USERS:
 - email: user1@hotmail.com pw: password123
 - email: user2@hotmail.com pw: password123
-## ADMINS:
+#### ADMINS:
 - email: admin1@hotmail.com pw: password123
 - email: admin2@hotmail.com pw: password123
 

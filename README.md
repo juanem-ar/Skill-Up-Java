@@ -18,7 +18,7 @@ Project created in collaboration with alkemy and my dev team.
 11. MapStruct
 12. Mockito
 13. Postman
-14. [Swagger Documentation (spring-boot run)](http://localhost:8080/api/swagger-ui/index.html)
+14. [Swagger Documentation (spring-boot run)](http://localhost:8080/api/docs-ui)
 
 ### CODE STANDARDS
 - Keep in mind rules from [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).

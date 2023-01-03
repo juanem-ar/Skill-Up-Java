@@ -48,7 +48,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
+                httpSecurity
                 .csrf()
                 .disable()
                 .authorizeRequests()
@@ -57,6 +57,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/v3/api-docs/**",
+                        "/h2-console/**",
                         "/api/**"
                 )
                 .permitAll()
@@ -76,6 +77,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                             );
                         }
                 ).and();
+        //h2 config
+        httpSecurity.headers().frameOptions().sameOrigin();
 
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }

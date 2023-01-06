@@ -5,7 +5,6 @@ import com.alkemy.wallet.dto.ResponseUserDto;
 import com.alkemy.wallet.exceptions.BadRequestException;
 import com.alkemy.wallet.mapper.UserMapper;
 import com.alkemy.wallet.model.User;
-import com.alkemy.wallet.repository.IRoleRepository;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.security.config.PasswordEncoder;
 import com.alkemy.wallet.security.dto.AuthenticationRequestDto;
@@ -14,22 +13,22 @@ import com.alkemy.wallet.security.service.JwtUtils;
 import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IAuthenticationService;
 import com.alkemy.wallet.service.IUserService;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuthenticationServiceImpl implements IAuthenticationService {
 
-    private final IUserRepository iUserRepository;
-    private final IRoleRepository iRoleRepository;
-    private final IAccountService iAccountService;
-    private final IUserService iUserService;
-    private final UserMapper userMapper;
-    private final JwtUtils jwtUtils;
-    private final PasswordEncoder passwordEncoder;
-
+    private IUserRepository iUserRepository;
+    private IAccountService iAccountService;
+    private IUserService iUserService;
+    private UserMapper userMapper;
+    private JwtUtils jwtUtils;
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public ResponseUserDto saveUser(RequestUserDto dto) throws Exception {

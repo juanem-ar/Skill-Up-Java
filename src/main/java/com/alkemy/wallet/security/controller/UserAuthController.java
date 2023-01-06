@@ -23,7 +23,7 @@ import javax.validation.*;
 @Tag(name = "Authentication", description = "Register and Login to use the app")
 public class UserAuthController {
     @Autowired
-    public IAuthenticationService  authenticationServiceService;
+    public IAuthenticationService iAuthenticationService;
 
     @Operation(method = "POST", summary = "signUp and signIn", description = "Register and Login to app",
             responses = {
@@ -38,7 +38,7 @@ public class UserAuthController {
             })
     @PostMapping("/register")
     public ResponseEntity<ResponseUserDto> signUp(@Valid @RequestBody RequestUserDto user) throws Exception {
-        return ResponseEntity.status(HttpStatus.CREATED).body(authenticationServiceService.saveUser(user));
+        return ResponseEntity.status(HttpStatus.CREATED).body(iAuthenticationService.saveUser(user));
     }
 
     @Operation(method = "POST", summary = "signIn", description = "Login to the app",
@@ -54,7 +54,7 @@ public class UserAuthController {
             })
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponseDto> signIn(@Valid @RequestBody AuthenticationRequestDto authRequest) throws Exception {
-        return ResponseEntity.status(HttpStatus.OK).body(authenticationServiceService.login(authRequest));
+        return ResponseEntity.status(HttpStatus.OK).body(iAuthenticationService.login(authRequest));
     }
 
 }

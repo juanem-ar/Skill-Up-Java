@@ -20,6 +20,16 @@ Project created in collaboration with alkemy and my dev team.
 13. Postman
 14. [Swagger Documentation (spring-boot run)](http://localhost:8080/api/docs-ui)
 
+### SEED DATA USER
+
+
+#### USERS:
+- email: user1@hotmail.com pw: password123
+- email: user2@hotmail.com pw: password123
+#### ADMINS:
+- email: admin1@hotmail.com pw: password123
+- email: admin2@hotmail.com pw: password123
+
 ### CODE STANDARDS
 - Keep in mind rules from [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).
 - Code must be in English.

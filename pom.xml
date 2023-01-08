@@ -48,7 +48,6 @@
 	      <artifactId>h2</artifactId>
 	      <scope>runtime</scope>
 	    </dependency>
-	    <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
 		<dependency>
 		    <groupId>com.mysql</groupId>
 		    <artifactId>mysql-connector-j</artifactId>
@@ -70,29 +69,22 @@
 	      <artifactId>spring-security-test</artifactId>
 	      <scope>test</scope>
 	    </dependency>
-
 		<!-- jwt -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
 			<version>0.9.1</version>
 		</dependency>
-
-		<!-- mapstruct -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
 			<version>1.4.2.Final</version>
 		</dependency>
-
-		<!-- mapstruct -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct-processor</artifactId>
 			<version>1.4.2.Final</version>
 		</dependency>
-
-		<!-- swagger -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>

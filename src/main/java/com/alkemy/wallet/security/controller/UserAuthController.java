@@ -23,7 +23,7 @@ import javax.validation.*;
 @Tag(name = "Authentication", description = "Register and Login to use the app")
 public class UserAuthController {
     @Autowired
-    public IAuthenticationService iAuthenticationService;
+    private IAuthenticationService iAuthenticationService;
 
     @Operation(method = "POST", summary = "signUp and signIn", description = "Register and Login to app",
             responses = {

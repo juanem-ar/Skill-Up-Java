@@ -2,8 +2,7 @@ package com.alkemy.wallet.security.dto;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

@@ -2,18 +2,15 @@ package com.alkemy.wallet.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.*;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+
 @Entity
 @Data
-@Getter
-@Setter
 @Table(name= "accounts")
 @SQLDelete(sql = "UPDATE accounts SET deleted = true WHERE id = ?")
 @Where(clause = "deleted = false")

@@ -11,7 +11,7 @@ import com.alkemy.wallet.repository.IAccountRepository;
 import com.alkemy.wallet.repository.IFixedTermDepositRepository;
 import com.alkemy.wallet.repository.IUserRepository;
 import com.alkemy.wallet.service.IFixedDepositService;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -20,9 +20,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class FixedDepositServiceImpl implements IFixedDepositService {
-    private static final int MIN_DAYS = 30;
+    public static final int MIN_DAYS = 30;
     private final IAccountRepository iAccountRepository;
     private final IUserRepository userRepository;
     private final IFixedTermDepositRepository iFixedTermDepositRepository;

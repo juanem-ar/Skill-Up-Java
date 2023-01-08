@@ -1,9 +1,8 @@
 package com.alkemy.wallet.model;
 
 import com.sun.istack.NotNull;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -13,8 +12,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "transactions")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE transactions SET soft_delete=true WHERE id = ?")
 @Where(clause = "soft_delete = false")
@@ -24,7 +22,7 @@ public class Transaction {
     private Long id;
     @NotNull
     private Double amount;
-   // @NotNull
+
     private EType type;
     @Nullable
     private String description;

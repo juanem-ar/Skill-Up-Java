@@ -1,8 +1,6 @@
 package com.alkemy.wallet.model;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import javax.persistence.*;
@@ -11,8 +9,6 @@ import java.sql.Timestamp;
 
 @Entity
 @Data
-@Getter
-@Setter
 @Table(name = "fixed_term_deposits")
 @SQLDelete(sql = "UPDATE fixed_term_deposits SET deleted = true WHERE id=?")
 @Where(clause = "deleted=false")

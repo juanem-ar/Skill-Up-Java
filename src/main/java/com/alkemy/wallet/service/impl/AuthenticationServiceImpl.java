@@ -14,21 +14,18 @@ import com.alkemy.wallet.service.IAccountService;
 import com.alkemy.wallet.service.IAuthenticationService;
 import com.alkemy.wallet.service.IUserService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-@NoArgsConstructor
 public class AuthenticationServiceImpl implements IAuthenticationService {
-
-    private IUserRepository iUserRepository;
-    private IAccountService iAccountService;
-    private IUserService iUserService;
-    private UserMapper userMapper;
-    private JwtUtils jwtUtils;
-    private PasswordEncoder passwordEncoder;
+    private final IUserRepository iUserRepository;
+    private final IAccountService iAccountService;
+    private final IUserService iUserService;
+    private final UserMapper userMapper;
+    private final JwtUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public ResponseUserDto saveUser(RequestUserDto dto) throws Exception {

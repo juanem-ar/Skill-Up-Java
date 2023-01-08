@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/accounts")
 @RestController
-@RequiredArgsConstructor
+@AllArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
 public class AccountController {
     private final IAccountService iAccountService;

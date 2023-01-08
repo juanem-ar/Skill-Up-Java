@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import com.alkemy.wallet.service.IUserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -20,7 +20,7 @@ import javax.validation.Valid;
 
 @RequestMapping("/users")
 @RestController
-@RequiredArgsConstructor
+@AllArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
 public class UserController {
     private final IUserService userService;

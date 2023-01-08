@@ -1,13 +1,11 @@
 package com.alkemy.wallet.dto;
 
 import com.alkemy.wallet.model.ECurrency;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@Getter
-@Setter
+@Data
 public class ResponseSimulatedFixedDepositDto {
 
     @NotNull(message = "Invalid amount.")

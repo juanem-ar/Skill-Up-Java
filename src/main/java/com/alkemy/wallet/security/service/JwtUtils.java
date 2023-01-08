@@ -2,7 +2,7 @@ package com.alkemy.wallet.security.service;
 
 import com.alkemy.wallet.repository.IUserRepository;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.core.internal.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -13,10 +13,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
 @Service
+@RequiredArgsConstructor
 public class JwtUtils implements IJwtUtils {
     private String SECRET_KEY = "secret";
-    @Autowired
-    private IUserRepository userRepository;
+    private final IUserRepository userRepository;
 
     @Override
 	public String extractUsername (String token){ return extractClaim(token, Claims::getSubject);}

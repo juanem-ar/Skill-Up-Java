@@ -4,14 +4,12 @@ import com.alkemy.wallet.model.EType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.lang.Nullable;
 import java.sql.Timestamp;
 
-@Getter
-@Setter
+@Data
 public class RequestTransactionDto {
     @NotNull
     @Schema(type = "double", example = "5500.50", required = true)

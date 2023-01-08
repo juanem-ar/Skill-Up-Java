@@ -26,7 +26,7 @@ public class TransactionServiceImpl implements ITransactionService {
     private final IAccountRepository accountRepository;
     private final IUserRepository iUserRepository;
     private final ITransactionMapper transactionMapper;
-    private static final Integer TRANSACTIONS_FOR_PAGE = 10;
+    public static final Integer TRANSACTIONS_FOR_PAGE = 10;
 
     public ResponseTransactionDto send(Authentication authentication, Double amount, String description, Long accountId,ECurrency currency) throws Exception {
 

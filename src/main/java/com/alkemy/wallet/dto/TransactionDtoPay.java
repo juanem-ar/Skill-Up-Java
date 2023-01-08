@@ -2,13 +2,11 @@ package com.alkemy.wallet.dto;
 
 import com.alkemy.wallet.model.EType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 
-@Setter
-@Getter
+@Data
 public class TransactionDtoPay {
 
     @NotNull

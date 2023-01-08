@@ -1,7 +1,6 @@
 package com.alkemy.wallet.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.*;
 import org.hibernate.validator.constraints.Length;
@@ -21,8 +20,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "users")
 @SQLDelete(sql = "UPDATE users SET deleted = true WHERE id=?")
 @FilterDef(name = "deletedUserFilter",

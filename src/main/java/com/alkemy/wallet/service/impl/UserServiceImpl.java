@@ -26,9 +26,9 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements IUserService {
-    private IUserRepository  iUserRepository;
-    private IuserMapper iUserMapper;
-    private static final Integer USERS_FOR_PAGE = 10;
+    private final IUserRepository  iUserRepository;
+    private final IuserMapper iUserMapper;
+    public static final Integer USERS_FOR_PAGE = 10;
 
     @Override
     public String deleteUser(Long id, Authentication authentication) throws Exception{

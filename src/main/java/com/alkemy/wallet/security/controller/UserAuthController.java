@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,10 +20,10 @@ import javax.validation.*;
 @Validated
 @RequestMapping("/auth")
 @RestController
+@AllArgsConstructor
 @Tag(name = "Authentication", description = "Register and Login to use the app")
 public class UserAuthController {
-    @Autowired
-    private IAuthenticationService iAuthenticationService;
+    private final IAuthenticationService iAuthenticationService;
 
     @Operation(method = "POST", summary = "signUp and signIn", description = "Register and Login to app",
             responses = {

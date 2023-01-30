@@ -11,15 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.ContextConfiguration;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -38,9 +33,8 @@ class UserAuthControllerTest {
     }
 
     @Test
-    void signUp() throws Exception {
-
-        ResponseUserDto responseUserDto = ResponseUserDto.builder()
+    void insertAnyCorrectRequestShouldReturnCorrectResponse() throws Exception {
+        var responseUserDto = ResponseUserDto.builder()
                 .id(1L)
                 .firstName("test")
                 .lastName("LastTest")
@@ -60,8 +54,8 @@ class UserAuthControllerTest {
     }
 
     @Test
-    void signIn() throws Exception {
-        AuthenticationResponseDto res = AuthenticationResponseDto.builder()
+    void correctRequestShouldReturnCorrectResponse() throws Exception {
+        var res = AuthenticationResponseDto.builder()
                 .user("test@test.com")
                 .jwt("token")
                 .build();

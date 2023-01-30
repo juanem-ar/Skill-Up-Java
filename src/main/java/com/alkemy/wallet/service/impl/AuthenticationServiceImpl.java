@@ -26,28 +26,25 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final UserMapper userMapper;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
-
     @Override
     public ResponseUserDto saveUser(RequestUserDto dto) throws Exception {
-        if (!iUserService.existsByEmail(dto.getEmail())) {
-            if(dto.getPassword().isEmpty())
-                throw new BadRequestException("The Password is empty!");
+        if (iUserRepository.existsByEmail(dto.getEmail()))
+            throw new BadRequestException("There is an account with that email address.");
+        if(dto.getPassword().isEmpty())
+            throw new BadRequestException("The Password is empty!");
 
-            User entity = userMapper.toEntity(dto);
-            User entitySaved = iUserRepository.save(entity);
+        User entity = userMapper.toEntity(dto);
+        User entitySaved = iUserRepository.save(entity);
 
-            iAccountService.addAccount(entitySaved.getEmail(), "ARS");
-            iAccountService.addAccount(entitySaved.getEmail(), "USD");
+        iAccountService.addAccount(entitySaved.getEmail(), "ARS");
+        iAccountService.addAccount(entitySaved.getEmail(), "USD");
 
-            ResponseUserDto responseDto = userMapper.toDto(entitySaved);
+        ResponseUserDto responseDto = userMapper.toDto(entitySaved);
 
-            AuthenticationRequestDto authenticationRequestDto = new AuthenticationRequestDto(dto.getEmail(), dto.getPassword());
-            AuthenticationResponseDto login = login(authenticationRequestDto);
-            responseDto.setJwt(login.getJwt());
-            return responseDto;
-        }else {
-            throw new BadRequestException("There is an account with that email adress: " + dto.getEmail());
-        }
+        AuthenticationRequestDto authenticationRequestDto = new AuthenticationRequestDto(dto.getEmail(), dto.getPassword());
+        AuthenticationResponseDto login = login(authenticationRequestDto);
+        responseDto.setJwt(login.getJwt());
+        return responseDto;
     }
 
     @Override
@@ -56,7 +53,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         final String password = authRequest.getPassword();
         if (username.isEmpty() && password.isEmpty())
             throw new BadRequestException("Insert email and password");
-        if (!iUserService.existsByEmail(username))
+        if (!iUserRepository.existsByEmail(username))
             throw new BadRequestException("There isn't an account with that email " + authRequest.getEmail());
         if(passwordEncoder.bCryptPasswordEncoder().matches(password, iUserRepository.findByEmail(username).getPassword())){
             final UserDetails userDetails = iUserService.loadUserByUsername(username);

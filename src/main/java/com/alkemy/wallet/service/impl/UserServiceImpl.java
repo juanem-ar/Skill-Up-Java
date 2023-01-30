@@ -85,10 +85,6 @@ public class UserServiceImpl implements IUserService {
 		
 		return userOptional.get();
 	}
-	@Override
-    public Boolean existsByEmail(@PathVariable String email){
-        return iUserRepository.existsByEmail(email);
-    }
 
 	@Override
 	public ResponseDetailsUserDto getUserDetail(Authentication authentication) throws Exception {
